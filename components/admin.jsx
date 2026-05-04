@@ -184,6 +184,7 @@ const TabEvenement = ({ d, set }) => (
       React.createElement(Field, { label: "Pigeon · email", value: d.contactEmail, onChange: v => set("contactEmail", v) }),
       React.createElement(Field, { label: "Cor de chasse · tel", value: d.contactTel, onChange: v => set("contactTel", v) }),
       React.createElement(Field, { label: "Compte à rebours (ISO)", value: d.countdownISO, onChange: v => set("countdownISO", v), span: 2, placeholder: "2026-06-12T16:00:00" }),
+      React.createElement(Field, { label: "Mot de passe du site (accès global)", value: d.sitePassword, onChange: v => set("sitePassword", v), span: 2, placeholder: "mousquet" }),
     ),
 
     React.createElement("div", {

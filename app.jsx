@@ -2,6 +2,17 @@
 
 const ADMIN_PWD = "aramis";
 
+const getSitePassword = () => {
+  try {
+    const raw = localStorage.getItem("lbn4e-data");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed.sitePassword) return parsed.sitePassword;
+    }
+  } catch(e) {}
+  return window.DEFAULT_DATA.sitePassword || "";
+};
+
 const useRoute = () => {
   const [route, setRoute] = React.useState(window.location.hash || "#/");
   React.useEffect(() => {
@@ -28,6 +39,10 @@ const useStoredData = () => {
 };
 
 const App = () => {
+  const [siteAuthed, setSiteAuthed] = React.useState(() => {
+    try { return sessionStorage.getItem("lbn4e-site") === "1"; } catch(e) { return false; }
+  });
+
   const route = useRoute();
   const [data, setData] = useStoredData();
   const [adminOpen, setAdminOpen] = React.useState(false);
@@ -63,6 +78,13 @@ const App = () => {
   }, [route]);
 
   const page = route.startsWith("#/gazette") ? "gazette" : "maison";
+
+  if (!siteAuthed) {
+    return React.createElement(SiteLogin, {
+      sitePassword: data.sitePassword,
+      onSuccess: () => setSiteAuthed(true),
+    });
+  }
 
   return (
     React.createElement(React.Fragment, null,

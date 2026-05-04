@@ -17,7 +17,7 @@ Site statique pour le Weekend LBN4E. Style cyber-baroque : Mousquetaires × Cybe
 aramis
 ```
 
-Pour le changer : modifier la constante `ADMIN_PWD` dans [`app.jsx`](app.jsx).
+Pour le changer : modifier la constante `ADMIN_PWD` dans `[app.jsx](app.jsx)`.
 
 ## Déploiement sur GitHub Pages
 
@@ -25,13 +25,13 @@ Pour le changer : modifier la constante `ADMIN_PWD` dans [`app.jsx`](app.jsx).
 
 1. Créer un dépôt GitHub (ex. `lbn4e`)
 2. Pousser tous les fichiers :
-   ```bash
+  ```bash
    git init
    git add .
    git commit -m "init site LBN4E"
    git remote add origin https://github.com/VOTRE-USER/lbn4e.git
    git push -u origin main
-   ```
+  ```
 3. Dans **Settings → Pages**, choisir `main` / `/ (root)` comme source
 4. Le site sera disponible à `https://VOTRE-USER.github.io/lbn4e/`
 
@@ -72,11 +72,11 @@ Puis ouvrir `http://localhost:8080`.
 
 ## Personnalisation
 
-- **Données initiales** (lieu, dates, articles) → [`data.js`](data.js)
-- **Mot de passe** → constante `ADMIN_PWD` dans [`app.jsx`](app.jsx)
-- **Couleurs et polices** → variables CSS dans [`styles.css`](styles.css)
+- **Données initiales** (lieu, dates, articles) → `[data.js](data.js)`
+- **Mot de passe** → constante `ADMIN_PWD` dans `[app.jsx](app.jsx)`
+- **Couleurs et polices** → variables CSS dans `[styles.css](styles.css)`
 - **Cible du compte à rebours** → champ `countdownISO` dans `data.js` ou via l'admin
 
 ## Note sur les données
 
-Les modifications faites via le panneau admin sont sauvegardées dans `localStorage` du navigateur — elles persistent entre les rechargements mais sont propres à chaque navigateur/appareil. Pour propager les changements à tous les visiteurs, modifier directement [`data.js`](data.js) et re-déployer.
+Les modifications faites via le panneau admin sont sauvegardées dans `localStorage` du navigateur — elles persistent entre les rechargements mais sont propres à chaque navigateur/appareil. Pour propager les changements à tous les visiteurs, modifier directement `[data.js](data.js)` et re-déployer.
