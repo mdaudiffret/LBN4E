@@ -89,7 +89,7 @@ const Post = ({ post }) => {
         }
       }, post.titre.split(" · ")[0]),
 
-      React.createElement(PostImage, { seed: post.id, kind: post.imageKind }),
+      React.createElement(PostImage, { seed: post.id, kind: post.imageKind, imageUrl: post.imageUrl }),
 
       React.createElement("p", {
         style: {
@@ -117,7 +117,26 @@ const Post = ({ post }) => {
   );
 };
 
-const PostImage = ({ seed, kind }) => {
+const PostImage = ({ seed, kind, imageUrl }) => {
+  if (imageUrl) {
+    return (
+      React.createElement("div", {
+        style: {
+          border: "1px solid var(--line)",
+          aspectRatio: "16 / 9",
+          overflow: "hidden",
+          background: "var(--char)",
+        }
+      },
+        React.createElement("img", {
+          src: imageUrl,
+          alt: "",
+          style: { width: "100%", height: "100%", objectFit: "cover", display: "block" },
+          onError: (e) => { e.target.style.display = "none"; },
+        })
+      )
+    );
+  }
   const h = seed.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
   const common = { display: "block", width: "100%", height: "100%" };
 

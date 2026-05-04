@@ -270,12 +270,13 @@ const TabGazette = ({ d, setD }) => {
 /* ---------- POST FORM ---------- */
 const PostForm = ({ post, onSave, onCancel }) => {
   const today = new Date().toISOString().slice(0, 10);
-  const [iso, setIso]       = React.useState(post ? post.iso : today);
-  const [titre, setTitre]   = React.useState(post ? post.titre : "");
-  const [author, setAuthor] = React.useState(post ? post.author : "Intendance · LBN4E");
-  const [kind, setKind]     = React.useState(post ? post.imageKind : "manuscrit");
-  const [text1, setText1]   = React.useState(post ? post.paragraphes[0] : "");
-  const [text2, setText2]   = React.useState(post ? (post.paragraphes[1] || "") : "");
+  const [iso, setIso]         = React.useState(post ? post.iso : today);
+  const [titre, setTitre]     = React.useState(post ? post.titre : "");
+  const [author, setAuthor]   = React.useState(post ? post.author : "Intendance · LBN4E");
+  const [kind, setKind]       = React.useState(post ? post.imageKind : "manuscrit");
+  const [imageUrl, setImageUrl] = React.useState(post ? (post.imageUrl || "") : "");
+  const [text1, setText1]     = React.useState(post ? post.paragraphes[0] : "");
+  const [text2, setText2]     = React.useState(post ? (post.paragraphes[1] || "") : "");
 
   const submit = (e) => {
     e.preventDefault();
@@ -307,6 +308,7 @@ const PostForm = ({ post, onSave, onCancel }) => {
       titre: titre.trim(),
       author: author.trim(),
       imageKind: kind,
+      imageUrl: imageUrl.trim() || null,
       tags: [],
       paragraphes: [text1.trim(), ...(text2.trim() ? [text2.trim()] : [])],
     };
@@ -339,12 +341,20 @@ const PostForm = ({ post, onSave, onCancel }) => {
           value: kind,
           onChange: e => setKind(e.target.value),
           style: { cursor: "pointer" },
+          disabled: !!imageUrl.trim(),
         },
           React.createElement("option", { value: "manuscrit" }, "Manuscrit"),
           React.createElement("option", { value: "chateau" }, "Château"),
           React.createElement("option", { value: "duel" }, "Duel")
         )
       ),
+      React.createElement(Field, {
+        label: "URL d'illustration (remplace l'illustration par défaut)",
+        value: imageUrl,
+        onChange: setImageUrl,
+        placeholder: "https://…",
+        span: 2,
+      }),
 
       React.createElement("div", { className: "field" },
         React.createElement("label", { className: "field-label" }, "Premier paragraphe"),
