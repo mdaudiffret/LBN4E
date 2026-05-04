@@ -90,6 +90,7 @@ const Post = ({ post }) => {
       }, post.titre.split(" · ")[0]),
 
       React.createElement(PostImage, { seed: post.id, kind: post.imageKind, imageUrl: post.imageUrl }),
+      post.youtubeUrl && React.createElement(YoutubeEmbed, { url: post.youtubeUrl }),
 
       React.createElement("p", {
         style: {
@@ -222,6 +223,42 @@ const PostImage = ({ seed, kind, imageUrl }) => {
           )
         )
       )
+    )
+  );
+};
+
+const YoutubeEmbed = ({ url }) => {
+  const getVideoId = (u) => {
+    try {
+      const parsed = new URL(u);
+      if (parsed.hostname === "youtu.be") return parsed.pathname.slice(1);
+      if (parsed.searchParams.get("v")) return parsed.searchParams.get("v");
+      if (parsed.pathname.startsWith("/embed/")) return parsed.pathname.split("/embed/")[1];
+    } catch(e) {}
+    return null;
+  };
+  const id = getVideoId(url);
+  if (!id) return null;
+  return (
+    React.createElement("div", {
+      style: {
+        border: "1px solid var(--line)",
+        aspectRatio: "16 / 9",
+        overflow: "hidden",
+        background: "var(--void)",
+        marginTop: 12,
+      }
+    },
+      React.createElement("iframe", {
+        width: "100%",
+        height: "100%",
+        src: `https://www.youtube-nocookie.com/embed/${id}`,
+        title: "Vidéo",
+        frameBorder: "0",
+        allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
+        allowFullScreen: true,
+        style: { display: "block", border: "none" },
+      })
     )
   );
 };

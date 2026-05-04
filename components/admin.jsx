@@ -274,7 +274,8 @@ const PostForm = ({ post, onSave, onCancel }) => {
   const [titre, setTitre]     = React.useState(post ? post.titre : "");
   const [author, setAuthor]   = React.useState(post ? post.author : "Intendance · LBN4E");
   const [kind, setKind]       = React.useState(post ? post.imageKind : "manuscrit");
-  const [imageUrl, setImageUrl] = React.useState(post ? (post.imageUrl || "") : "");
+  const [imageUrl, setImageUrl]     = React.useState(post ? (post.imageUrl || "") : "");
+  const [youtubeUrl, setYoutubeUrl] = React.useState(post ? (post.youtubeUrl || "") : "");
   const [text1, setText1]     = React.useState(post ? post.paragraphes[0] : "");
   const [text2, setText2]     = React.useState(post ? (post.paragraphes[1] || "") : "");
 
@@ -309,6 +310,7 @@ const PostForm = ({ post, onSave, onCancel }) => {
       author: author.trim(),
       imageKind: kind,
       imageUrl: imageUrl.trim() || null,
+      youtubeUrl: youtubeUrl.trim() || null,
       tags: [],
       paragraphes: [text1.trim(), ...(text2.trim() ? [text2.trim()] : [])],
     };
@@ -353,6 +355,13 @@ const PostForm = ({ post, onSave, onCancel }) => {
         value: imageUrl,
         onChange: setImageUrl,
         placeholder: "https://…",
+        span: 2,
+      }),
+      React.createElement(Field, {
+        label: "URL YouTube (vidéo affichée sous l'illustration)",
+        value: youtubeUrl,
+        onChange: setYoutubeUrl,
+        placeholder: "https://youtu.be/… ou https://youtube.com/watch?v=…",
         span: 2,
       }),
 
