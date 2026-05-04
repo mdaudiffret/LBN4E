@@ -1,6 +1,11 @@
 /* global React, ReactDOM */
 
-const ADMIN_PWD = "aramis";
+const ADMIN_PWD_HASH = "cadc62047f58dce349fe916385c2b3802c37490b02bc2135b298253d8f17b6f7";
+
+const hashPassword = async (pwd) => {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(pwd.toLowerCase().trim()));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+};
 
 const getSitePassword = () => {
   try {
@@ -50,8 +55,9 @@ const App = () => {
     try { return sessionStorage.getItem("lbn4e-admin") === "1"; } catch(e) { return false; }
   });
 
-  const onLogin = (pwd) => {
-    if (pwd.toLowerCase().trim() === ADMIN_PWD) {
+  const onLogin = async (pwd) => {
+    const h = await hashPassword(pwd);
+    if (h === ADMIN_PWD_HASH) {
       setIsAdmin(true);
       try { sessionStorage.setItem("lbn4e-admin", "1"); } catch(e) {}
       return true;

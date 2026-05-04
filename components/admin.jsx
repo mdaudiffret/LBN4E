@@ -24,9 +24,10 @@ const AdminPanel = ({ open, onClose, isAdmin, onLogin, onLogout, data, onUpdateD
 const AdminLogin = ({ onLogin, onClose }) => {
   const [pwd, setPwd] = React.useState("");
   const [err, setErr] = React.useState(false);
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    if (onLogin(pwd)) onClose();
+    const ok = await onLogin(pwd);
+    if (ok) onClose();
     else { setErr(true); setPwd(""); }
   };
   return (
