@@ -5,8 +5,12 @@ const DEFAULT_DATA = {
   /* Countdown target — ISO 8601, modifiable via admin */
   countdownISO: "2026-06-12T16:00:00",
 
-  /* Mot de passe de révélation des infos pratiques (accessible à tous) */
-  revealPwd: "porthos",
+  /* 9 codes de révélation — à distribuer via les posts de la Gazette */
+  revealCodes: [
+    "athos", "porthos", "aramis",
+    "dartagan", "rochefort", "buckingham",
+    "richelieu", "milady", "constance"
+  ],
 
   chateau: "Chasteau de Beaumesnil",
   dateLabel: "Été · Anno MMXXVI",

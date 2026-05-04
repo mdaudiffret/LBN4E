@@ -446,35 +446,83 @@ img { max-width: 100%; display: block; }
   padding-top: 4px;
 }
 
-/* Reveal password form */
-.reveal-form {
-  display: flex;
-  gap: 8px;
-  margin-top: 20px;
-  flex-wrap: wrap;
+/* Reveal codes grid */
+.codes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 24px;
 }
-.reveal-input {
-  flex: 1;
-  min-width: 160px;
+.code-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.code-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+.code-input {
   background: var(--char);
   border: 1px solid var(--line);
   color: var(--pearl);
-  padding: 10px 14px;
+  padding: 9px 10px;
   font-family: var(--font-mono);
-  font-size: 13px;
-  letter-spacing: 0.12em;
+  font-size: 12px;
+  letter-spacing: 0.1em;
   outline: none;
-}
-.reveal-input:focus { border-color: var(--gold); }
-.reveal-input::placeholder { color: var(--bone); opacity: 0.4; letter-spacing: 0.08em; }
-.reveal-error {
   width: 100%;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.18em;
+  text-align: center;
+  transition: border-color .15s, box-shadow .15s;
+}
+.code-input:focus { border-color: var(--gold); }
+.code-input::placeholder { color: var(--bone); opacity: 0.3; }
+.code-input.is-correct {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.25);
+  color: var(--neon-cyan);
+}
+.code-input.is-almost {
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 8px rgba(244, 200, 113, 0.2);
+  color: var(--gold-bright);
+}
+.code-input.is-wrong {
+  border-color: var(--neon-magenta);
+  box-shadow: 0 0 8px rgba(255, 27, 141, 0.15);
   color: var(--neon-magenta);
+}
+.code-status {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-align: center;
+  height: 14px;
+}
+.code-status.is-correct { color: var(--neon-cyan); }
+.code-status.is-almost  { color: var(--gold-bright); }
+.code-status.is-wrong   { color: var(--neon-magenta); }
+.codes-submit {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.codes-hint {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--bone);
+  opacity: 0.5;
   text-transform: uppercase;
-  margin-top: 6px;
+}
+@media (max-width: 480px) {
+  .codes-grid { grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .code-input { font-size: 11px; padding: 8px 6px; }
 }
 
 /* Responsive */

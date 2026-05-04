@@ -184,7 +184,43 @@ const TabEvenement = ({ d, set }) => (
       React.createElement(Field, { label: "Pigeon · email", value: d.contactEmail, onChange: v => set("contactEmail", v) }),
       React.createElement(Field, { label: "Cor de chasse · tel", value: d.contactTel, onChange: v => set("contactTel", v) }),
       React.createElement(Field, { label: "Compte à rebours (ISO)", value: d.countdownISO, onChange: v => set("countdownISO", v), span: 2, placeholder: "2026-06-12T16:00:00" }),
-      React.createElement(Field, { label: "Mot de passe de révélation", value: d.revealPwd, onChange: v => set("revealPwd", v), span: 2, placeholder: "porthos" }),
+    ),
+
+    React.createElement("div", {
+      style: {
+        marginTop: 20,
+        padding: "14px 16px",
+        border: "1px solid var(--line)",
+        background: "var(--char)",
+      }
+    },
+      React.createElement("div", {
+        style: {
+          fontFamily: "var(--font-mono)",
+          fontSize: 10,
+          letterSpacing: "0.26em",
+          color: "var(--gold)",
+          textTransform: "uppercase",
+          marginBottom: 12,
+        }
+      }, "Codes de révélation (9)"),
+      React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 } },
+        ["I","II","III","IV","V","VI","VII","VIII","IX"].map((roman, i) =>
+          React.createElement("div", { key: i, className: "field", style: { margin: 0 } },
+            React.createElement("label", { className: "field-label" }, "Code ", roman),
+            React.createElement("input", {
+              className: "field-input",
+              value: (d.revealCodes || [])[i] || "",
+              onChange: e => {
+                const next = [...(d.revealCodes || Array(9).fill(""))];
+                next[i] = e.target.value;
+                set("revealCodes", next);
+              },
+              placeholder: "···",
+            })
+          )
+        )
+      )
     )
   )
 );

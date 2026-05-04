@@ -9,7 +9,7 @@ const MaisonPage = ({ data, isAdmin, onUpdateData }) => (
         ? React.createElement(InfosRevealed, { data, isAdmin, onUpdateData })
         : React.createElement(InfosSealed, {
             isAdmin,
-            revealPwd: data.revealPwd,
+            revealCodes: data.revealCodes,
             onReveal: () => onUpdateData({ ...data, infosRevealed: true }),
           })
     )
@@ -86,11 +86,29 @@ const Countdown = ({ target, data }) => {
   );
 };
 
+/* Levenshtein distance */
+const levenshtein = (a, b) => {
+  const m = a.length, n = b.length;
+  const dp = Array.from({ length: m + 1 }, (_, i) =>
+    Array.from({ length: n + 1 }, (_, j) => i === 0 ? j : j === 0 ? i : 0)
+  );
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = a[i-1] === b[j-1]
+        ? dp[i-1][j-1]
+        : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+  return dp[m][n];
+};
+
+const romans = ["I","II","III","IV","V","VI","VII","VIII","IX"];
+
 /* ---------- SEALED ---------- */
-const InfosSealed = ({ isAdmin, onReveal, revealPwd }) => {
-  const [tick, setTick] = React.useState(0);
-  const [pwd, setPwd] = React.useState("");
-  const [err, setErr] = React.useState(false);
+const InfosSealed = ({ isAdmin, onReveal, revealCodes }) => {
+  const codes = revealCodes || Array(9).fill("");
+  const [tick, setTick]       = React.useState(0);
+  const [inputs, setInputs]   = React.useState(Array(9).fill(""));
+  const [results, setResults] = React.useState(Array(9).fill(null)); // null | 'correct' | 'almost' | 'wrong'
+  const [submitted, setSubmitted] = React.useState(false);
 
   React.useEffect(() => {
     const id = setInterval(() => setTick(t => t + 1), 120);
@@ -100,15 +118,37 @@ const InfosSealed = ({ isAdmin, onReveal, revealPwd }) => {
   const glyphs = "▓▒░█◆◇※★✦";
   const noise = (n) => Array.from({ length: n }, (_, i) => glyphs[(i * 7 + tick) % glyphs.length]).join("");
 
-  const submitReveal = (e) => {
-    e.preventDefault();
-    if (pwd.toLowerCase().trim() === (revealPwd || "").toLowerCase().trim()) {
-      onReveal();
-    } else {
-      setErr(true);
-      setPwd("");
+  const setInput = (i, v) => {
+    const next = [...inputs];
+    next[i] = v;
+    setInputs(next);
+    if (submitted) {
+      const r = [...results];
+      const target = (codes[i] || "").toLowerCase().trim();
+      const val = v.toLowerCase().trim();
+      r[i] = val === "" ? null : val === target ? "correct" : levenshtein(val, target) <= 2 ? "almost" : "wrong";
+      setResults(r);
     }
   };
+
+  const submitReveal = (e) => {
+    e.preventDefault();
+    const r = inputs.map((v, i) => {
+      const target = (codes[i] || "").toLowerCase().trim();
+      const val = v.toLowerCase().trim();
+      if (!target) return "correct"; // empty slot counts as correct
+      if (val === target) return "correct";
+      if (levenshtein(val, target) <= 2) return "almost";
+      return "wrong";
+    });
+    setResults(r);
+    setSubmitted(true);
+    if (r.every(s => s === "correct")) onReveal();
+  };
+
+  const allCorrect = submitted && results.every(s => s === "correct");
+  const countCorrect = results.filter(s => s === "correct").length;
+  const statusText = { correct: "✓", almost: "≈", wrong: "✗" };
 
   return (
     React.createElement("section", null,
@@ -196,24 +236,36 @@ const InfosSealed = ({ isAdmin, onReveal, revealPwd }) => {
           }
         }, noise(20)),
 
-        /* Reveal form — visible to all */
-        React.createElement("form", { onSubmit: submitReveal, style: { marginTop: 24 } },
-          React.createElement("div", { className: "reveal-form" },
-            React.createElement("input", {
-              type: "password",
-              className: "reveal-input",
-              value: pwd,
-              onChange: (e) => { setPwd(e.target.value); setErr(false); },
-              placeholder: "Mot de passe du sceau…",
-            }),
+        /* 9-code reveal form */
+        React.createElement("form", { onSubmit: submitReveal },
+          React.createElement("div", { className: "codes-grid" },
+            inputs.map((val, i) =>
+              React.createElement("div", { key: i, className: "code-cell" },
+                React.createElement("div", { className: "code-label" }, "Code ", romans[i]),
+                React.createElement("input", {
+                  type: "text",
+                  className: "code-input" + (results[i] ? " is-" + results[i] : ""),
+                  value: val,
+                  onChange: e => setInput(i, e.target.value),
+                  placeholder: "···",
+                  autoComplete: "off",
+                  autoCorrect: "off",
+                  spellCheck: false,
+                }),
+                React.createElement("div", {
+                  className: "code-status" + (results[i] ? " is-" + results[i] : "")
+                }, results[i] ? statusText[results[i]] : "")
+              )
+            )
+          ),
+          React.createElement("div", { className: "codes-submit" },
             React.createElement("button", {
               type: "submit",
               className: "btn btn--primary",
-              style: { whiteSpace: "nowrap" },
-            }, "⚜ Rompre")
-          ),
-          err && React.createElement("div", { className: "reveal-error" },
-            "// Mot de passe erroné · Cherchez l'indice"
+            }, "⚜ Soumettre les codes"),
+            submitted && !allCorrect && React.createElement("span", { className: "codes-hint" },
+              countCorrect, " / 9 · ", results.filter(s => s === "almost").length, " approché(s)"
+            )
           )
         ),
 
@@ -222,7 +274,7 @@ const InfosSealed = ({ isAdmin, onReveal, revealPwd }) => {
           className: "btn btn--ghost",
           style: { marginTop: 12, fontSize: 10 },
           onClick: onReveal,
-        }, "↺ Rompre sans mot de passe (admin)")
+        }, "↺ Rompre sans codes (admin)")
       )
     )
   );
