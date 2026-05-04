@@ -142,6 +142,198 @@ const AdminEditor = ({ data, onUpdateData, onClose, onLogout }) => {
   );
 };
 
+/* ---------- SECTION HEADER HELPER ---------- */
+const SectionHeader = ({ label, onAdd, addLabel }) =>
+  React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      fontFamily: "var(--font-mono)",
+      fontSize: 10,
+      letterSpacing: "0.26em",
+      color: "var(--gold)",
+      textTransform: "uppercase",
+      marginBottom: 12,
+    }
+  },
+    label,
+    onAdd && React.createElement("button", {
+      type: "button",
+      className: "btn btn--ghost",
+      style: { padding: "4px 10px", fontSize: 10 },
+      onClick: onAdd,
+    }, addLabel || "+ Ajouter")
+  );
+
+/* ---------- ÉQUIPEMENT EDITOR ---------- */
+const EquipementEditor = ({ items, onChange }) => {
+  const update = (i, key, val) => {
+    const next = items.map((it, idx) => idx === i ? { ...it, [key]: val } : it);
+    onChange(next);
+  };
+  const remove = (i) => onChange(items.filter((_, idx) => idx !== i));
+  const add = () => onChange([...items, { cat: String(items.length + 1), titre: "", desc: "" }]);
+
+  return React.createElement("div", {
+    style: { marginTop: 20, padding: "14px 16px", border: "1px solid var(--line)", background: "var(--char)" }
+  },
+    React.createElement(SectionHeader, { label: "Ce qu'il faut apporter", onAdd: add, addLabel: "+ Article" }),
+    items.map((it, i) =>
+      React.createElement("div", {
+        key: i,
+        style: { display: "grid", gridTemplateColumns: "56px 1fr auto", gap: 8, marginBottom: 8, alignItems: "start" }
+      },
+        React.createElement("input", {
+          className: "field-input",
+          value: it.cat,
+          onChange: e => update(i, "cat", e.target.value),
+          placeholder: "I",
+          style: { textAlign: "center" },
+          title: "Numéro / catégorie",
+        }),
+        React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6 } },
+          React.createElement("input", {
+            className: "field-input",
+            value: it.titre,
+            onChange: e => update(i, "titre", e.target.value),
+            placeholder: "Titre de l'article",
+          }),
+          React.createElement("textarea", {
+            className: "field-textarea",
+            value: it.desc,
+            onChange: e => update(i, "desc", e.target.value),
+            placeholder: "Description…",
+            rows: 2,
+          })
+        ),
+        React.createElement("button", {
+          type: "button",
+          className: "btn btn--danger",
+          style: { padding: "6px 8px", fontSize: 10 },
+          onClick: () => remove(i),
+        }, "✕")
+      )
+    )
+  );
+};
+
+/* ---------- AGENDA EDITOR ---------- */
+const AgendaEditor = ({ days, onChange }) => {
+  const updateDay = (i, key, val) => {
+    const next = days.map((d, idx) => idx === i ? { ...d, [key]: val } : d);
+    onChange(next);
+  };
+  const updateEvt = (di, ei, key, val) => {
+    const next = days.map((d, idx) => idx === di
+      ? { ...d, evts: d.evts.map((e, eidx) => eidx === ei ? { ...e, [key]: val } : e) }
+      : d
+    );
+    onChange(next);
+  };
+  const removeEvt = (di, ei) => {
+    const next = days.map((d, idx) => idx === di
+      ? { ...d, evts: d.evts.filter((_, eidx) => eidx !== ei) }
+      : d
+    );
+    onChange(next);
+  };
+  const addEvt = (di) => {
+    const next = days.map((d, idx) => idx === di
+      ? { ...d, evts: [...d.evts, { h: "", t: "" }] }
+      : d
+    );
+    onChange(next);
+  };
+  const removeDay = (i) => onChange(days.filter((_, idx) => idx !== i));
+  const addDay = () => onChange([...days, {
+    roman: String(days.length + 1), code: `DAY·0${days.length}`,
+    label: "Nouveau jour", titre: "", evts: []
+  }]);
+
+  return React.createElement("div", {
+    style: { marginTop: 16, padding: "14px 16px", border: "1px solid var(--line)", background: "var(--char)" }
+  },
+    React.createElement(SectionHeader, { label: "Agenda", onAdd: addDay, addLabel: "+ Jour" }),
+    days.map((day, di) =>
+      React.createElement("div", {
+        key: di,
+        style: {
+          marginBottom: 16,
+          padding: "12px",
+          border: "1px solid var(--line-dim)",
+          background: "var(--ink)",
+        }
+      },
+        /* Day header */
+        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "56px 1fr 1fr auto", gap: 8, marginBottom: 10 } },
+          React.createElement("input", {
+            className: "field-input",
+            value: day.roman,
+            onChange: e => updateDay(di, "roman", e.target.value),
+            placeholder: "I",
+            style: { textAlign: "center" },
+            title: "Numéro romain",
+          }),
+          React.createElement("input", {
+            className: "field-input",
+            value: day.label,
+            onChange: e => updateDay(di, "label", e.target.value),
+            placeholder: "Vendredi soir",
+            title: "Libellé du jour",
+          }),
+          React.createElement("input", {
+            className: "field-input",
+            value: day.titre,
+            onChange: e => updateDay(di, "titre", e.target.value),
+            placeholder: "Titre du jour",
+          }),
+          React.createElement("button", {
+            type: "button",
+            className: "btn btn--danger",
+            style: { padding: "6px 8px", fontSize: 10 },
+            onClick: () => removeDay(di),
+          }, "✕")
+        ),
+        /* Events */
+        day.evts.map((evt, ei) =>
+          React.createElement("div", {
+            key: ei,
+            style: { display: "grid", gridTemplateColumns: "80px 1fr auto", gap: 6, marginBottom: 6 }
+          },
+            React.createElement("input", {
+              className: "field-input",
+              value: evt.h,
+              onChange: e => updateEvt(di, ei, "h", e.target.value),
+              placeholder: "16h00",
+              style: { textAlign: "center", fontSize: 12 },
+            }),
+            React.createElement("input", {
+              className: "field-input",
+              value: evt.t,
+              onChange: e => updateEvt(di, ei, "t", e.target.value),
+              placeholder: "Description du créneau",
+              style: { fontSize: 12 },
+            }),
+            React.createElement("button", {
+              type: "button",
+              className: "btn btn--ghost",
+              style: { padding: "4px 8px", fontSize: 10 },
+              onClick: () => removeEvt(di, ei),
+            }, "✕")
+          )
+        ),
+        React.createElement("button", {
+          type: "button",
+          className: "btn btn--ghost",
+          style: { padding: "4px 10px", fontSize: 10, marginTop: 4 },
+          onClick: () => addEvt(di),
+        }, "+ Créneau")
+      )
+    )
+  );
+};
+
 /* ---------- TAB: ÉVÉNEMENT ---------- */
 const TabEvenement = ({ d, set }) => (
   React.createElement("div", null,
@@ -223,7 +415,17 @@ const TabEvenement = ({ d, set }) => (
           )
         )
       )
-    )
+    ),
+
+    React.createElement(EquipementEditor, {
+      items: d.equipement || [],
+      onChange: v => set("equipement", v),
+    }),
+
+    React.createElement(AgendaEditor, {
+      days: d.agenda || [],
+      onChange: v => set("agenda", v),
+    })
   )
 );
 
