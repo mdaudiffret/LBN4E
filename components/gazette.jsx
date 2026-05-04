@@ -89,7 +89,7 @@ const Post = ({ post }) => {
         }
       }, post.titre.split(" · ")[0]),
 
-      React.createElement(PostImage, { seed: post.id, kind: post.imageKind, imageUrl: post.imageUrl }),
+      !post.noImage && React.createElement(PostImage, { seed: post.id, kind: post.imageKind, imageUrl: post.imageUrl }),
       post.youtubeUrl && React.createElement(YoutubeEmbed, { url: post.youtubeUrl }),
 
       React.createElement("p", {

@@ -275,6 +275,7 @@ const PostForm = ({ post, onSave, onCancel }) => {
   const [author, setAuthor]   = React.useState(post ? post.author : "Intendance · LBN4E");
   const [kind, setKind]       = React.useState(post ? post.imageKind : "manuscrit");
   const [imageUrl, setImageUrl]     = React.useState(post ? (post.imageUrl || "") : "");
+  const [noImage, setNoImage]       = React.useState(post ? !!post.noImage : false);
   const [youtubeUrl, setYoutubeUrl] = React.useState(post ? (post.youtubeUrl || "") : "");
   const [text1, setText1]     = React.useState(post ? post.paragraphes[0] : "");
   const [text2, setText2]     = React.useState(post ? (post.paragraphes[1] || "") : "");
@@ -310,6 +311,7 @@ const PostForm = ({ post, onSave, onCancel }) => {
       author: author.trim(),
       imageKind: kind,
       imageUrl: imageUrl.trim() || null,
+      noImage: noImage,
       youtubeUrl: youtubeUrl.trim() || null,
       tags: [],
       paragraphes: [text1.trim(), ...(text2.trim() ? [text2.trim()] : [])],
@@ -336,6 +338,18 @@ const PostForm = ({ post, onSave, onCancel }) => {
       ),
       React.createElement(Field, { label: "Titre", value: titre, onChange: setTitre, placeholder: "Le titre de la dépêche" }),
 
+      React.createElement("div", { className: "field", style: { gridColumn: "1 / -1" } },
+        React.createElement("label", {
+          className: "switch" + (noImage ? " is-on" : ""),
+          onClick: () => setNoImage(v => !v),
+          style: { cursor: "pointer" },
+        },
+          React.createElement("div", { className: "switch-track" + (noImage ? " is-on" : ""), style: { position: "relative" } },
+            React.createElement("div", { className: "switch-knob" })
+          ),
+          React.createElement("span", { className: "switch-label" }, "Sans illustration")
+        )
+      ),
       React.createElement("div", { className: "field" },
         React.createElement("label", { className: "field-label" }, "Illustration"),
         React.createElement("select", {
@@ -343,7 +357,7 @@ const PostForm = ({ post, onSave, onCancel }) => {
           value: kind,
           onChange: e => setKind(e.target.value),
           style: { cursor: "pointer" },
-          disabled: !!imageUrl.trim(),
+          disabled: noImage || !!imageUrl.trim(),
         },
           React.createElement("option", { value: "manuscrit" }, "Manuscrit"),
           React.createElement("option", { value: "chateau" }, "Château"),
@@ -356,6 +370,7 @@ const PostForm = ({ post, onSave, onCancel }) => {
         onChange: setImageUrl,
         placeholder: "https://…",
         span: 2,
+        disabled: noImage,
       }),
       React.createElement(Field, {
         label: "URL YouTube (vidéo affichée sous l'illustration)",
@@ -403,10 +418,10 @@ const PostForm = ({ post, onSave, onCancel }) => {
 };
 
 /* ---------- SHARED FIELD COMPONENT ---------- */
-const Field = ({ label, value, onChange, span = 1, type = "text", placeholder = "" }) => (
+const Field = ({ label, value, onChange, span = 1, type = "text", placeholder = "", disabled = false }) => (
   React.createElement("div", {
     className: "field",
-    style: span === 2 ? { gridColumn: "1 / -1" } : undefined,
+    style: { ...(span === 2 ? { gridColumn: "1 / -1" } : {}), ...(disabled ? { opacity: 0.4, pointerEvents: "none" } : {}) },
   },
     React.createElement("label", { className: "field-label" }, label),
     React.createElement("input", {
@@ -415,6 +430,7 @@ const Field = ({ label, value, onChange, span = 1, type = "text", placeholder = 
       value: value || "",
       onChange: e => onChange(e.target.value),
       placeholder,
+      disabled,
     })
   )
 );
