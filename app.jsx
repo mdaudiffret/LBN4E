@@ -1,5 +1,8 @@
 /* global React, ReactDOM */
 
+// Disable browser scroll restoration so our anchor scroll isn't overridden
+if (history.scrollRestoration) history.scrollRestoration = "manual";
+
 const ADMIN_PWD_HASH = "cadc62047f58dce349fe916385c2b3802c37490b02bc2135b298253d8f17b6f7";
 
 const hashPassword = async (pwd) => {
@@ -109,17 +112,27 @@ const App = () => {
   };
 
   React.useEffect(() => {
+    if (!siteAuthed) return;
     const parts = route.split("#").filter(Boolean);
     if (parts.length >= 2) {
       const id = parts[parts.length - 1];
-      requestAnimationFrame(() => {
+      // Retry until the element exists and has been laid out
+      let attempts = 0;
+      const tryScroll = () => {
         const el = document.getElementById(id);
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.scrollY - 80;
+          window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+        } else if (++attempts < 12) {
+          setTimeout(tryScroll, 250);
+        }
+      };
+      // After login React needs a full render cycle before layout is stable
+      setTimeout(tryScroll, 400);
     } else {
       window.scrollTo({ top: 0 });
     }
-  }, [route]);
+  }, [route, siteAuthed]); // re-runs after login so anchor URLs work post-login
 
   const page = route.startsWith("#/gazette") ? "gazette" : "maison";
 
