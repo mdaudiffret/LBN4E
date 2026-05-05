@@ -182,7 +182,6 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes }) => {
           lineHeight: 1.45,
           color: "var(--bone)",
           margin: "0 0 32px",
-          maxWidth: "52ch",
         }
       },
         "Les détails du séjour — adresse, dates, agenda — demeurent en lieu sceuré. Patience encores quelques tours d'horloge, l'intendance ne tardera point."
@@ -195,7 +194,6 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes }) => {
           background: "var(--char)",
           padding: "20px 24px",
           marginBottom: 28,
-          maxWidth: "56ch",
         }
       },
         React.createElement("div", {

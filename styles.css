@@ -58,7 +58,7 @@ img { max-width: 100%; display: block; }
 }
 
 /* Layout */
-.shell { max-width: 980px; margin: 0 auto; padding: 0 32px; }
+.shell { max-width: 1140px; margin: 0 auto; padding: 0 32px; }
 
 /* Topbar */
 .topbar {
@@ -153,7 +153,6 @@ img { max-width: 100%; display: block; }
   font-size: 21px;
   line-height: 1.4;
   color: var(--bone);
-  max-width: 56ch;
   margin: 0;
 }
 

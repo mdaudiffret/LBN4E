@@ -156,7 +156,6 @@ const Post = ({ post }) => {
           lineHeight: 1.6,
           color: "var(--bone)",
           margin: "20px 0 0",
-          maxWidth: "60ch",
         }
       }, post.paragraphes[0]),
 
@@ -167,7 +166,6 @@ const Post = ({ post }) => {
           lineHeight: 1.6,
           color: "var(--bone)",
           margin: "12px 0 0",
-          maxWidth: "60ch",
           opacity: 0.8,
         }
       }, post.paragraphes[1])
