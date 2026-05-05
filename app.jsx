@@ -47,7 +47,7 @@ const sheetSync = (next) => {
   const url = window.DEFAULT_DATA.sheetUrl;
   const token = window.DEFAULT_DATA.sheetWriteToken;
   if (!url || !token) return;
-  const { posts, sheetUrl: _u, sheetWriteToken: _t, ...infos } = next;
+  const { posts, sheetUrl: _u, sheetWriteToken: _t, infosRevealed: _r, ...infos } = next;
   const t = encodeURIComponent(token);
   fetch(`${url}?action=write_infos&token=${t}&data=${toUrlSafeBase64(infos)}`).catch(() => {});
   fetch(`${url}?action=write_posts&token=${t}&data=${toUrlSafeBase64(posts)}`).catch(() => {});
@@ -68,7 +68,8 @@ const App = () => {
     fetch(`${url}?t=${Date.now()}`)
       .then(r => r.json())
       .then(({ infos, posts }) => {
-        const next = { ...window.DEFAULT_DATA, ...data, ...infos };
+        const { infosRevealed: _r, ...safeInfos } = infos || {};
+        const next = { ...window.DEFAULT_DATA, ...data, ...safeInfos };
         if (posts && posts.length) next.posts = posts;
         saveLocal(next);
       })
