@@ -230,8 +230,8 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes }) => {
           }
         }, "⚜ Ordonnance de l'Intendance ⚜"),
         [
-          "Neuf codes scellent ces pages. Pour chacun d'iceux, trois indices ont esté cachés en la Gazette — du plus ardu au plus clément — soit vingt & sept dépêches en tout, publiées chaque vendredi à XII heures sonnantes.",
-          "Point n'est besoin d'attendre le dernier indice : si le premier vous illumine l'esprit, saisissez le code sans délai. Les plus vifs de la compaignie n'en auront peut-estre besoin que d'un seul.",
+          "Neuf codes scellent ces pages — chacun estant un mot. Pour chacun d'iceux, trois indices ont esté cachés en la Gazette — du plus ardu au plus clément — soit vingt & sept dépêches en tout, publiées chaque vendredi à XII heures sonnantes.",
+          "Chaque indice vous révèle la position du code parmy les neuf, & quelque indice sur le mot qu'il vous faut trouver. Point n'est besoin d'attendre le dernier : si le premier vous illumine l'esprit, saisissez le mot sans délai.",
           "Soumettez vos neuf codes en mesme temps : si l'un est juste, son encadré s'allume en bleu. En orange s'il n'est qu'à deux lettres près — vous n'estes point loin. En rouge, point du tout.",
           "Encore faut-il les ranger dans le bon ordre. Le sceau ne se rompt que si les neuf sont exacts & bien ordonnez. Bonne chasse, mes très-honorez compaignons.",
         ].map((line, i) =>
