@@ -3,7 +3,7 @@ const DEFAULT_DATA = {
   infosRevealed: false,
 
   /* Google Sheets sync — remplir après déploiement du Apps Script */
-  sheetUrl: "https://script.google.com/macros/s/AKfycbw6INpdJT0paqrZzsyLjoQzl21HI27TI-pIlBB88A4BVXc5oukEgKTpeS0TMCOZzZzb/exec",
+  sheetUrl: "https://script.google.com/macros/s/AKfycbyWucphWseAqReSrOdJLkmVPsU3W6cI5xXaSQfGG4e7ajNnK7wBDRk4B0FffMADD3-e/exec",
   sheetWriteToken: "lbn4e-write-2026", // doit correspondre à WRITE_TOKEN dans sheets/Code.gs
 
   /* Mot de passe d'accès global au site */

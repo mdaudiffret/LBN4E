@@ -44,16 +44,21 @@ const useStoredData = () => {
   return [data, saveLocal];
 };
 
+const toUrlSafeBase64 = (obj) => {
+  const str = JSON.stringify(obj);
+  // encode UTF-8 → binary → base64, then make URL-safe
+  const b64 = btoa(unescape(encodeURIComponent(str)));
+  return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+};
+
 const sheetSync = (next) => {
   const url = window.DEFAULT_DATA.sheetUrl;
   const token = window.DEFAULT_DATA.sheetWriteToken;
   if (!url || !token) return;
   const { posts, sheetUrl: _u, sheetWriteToken: _t, ...infos } = next;
-  fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain" },
-    body: JSON.stringify({ token, infos, posts }),
-  }).catch(() => {});
+  const t = encodeURIComponent(token);
+  fetch(`${url}?action=write_infos&token=${t}&data=${toUrlSafeBase64(infos)}`).catch(() => {});
+  fetch(`${url}?action=write_posts&token=${t}&data=${toUrlSafeBase64(posts)}`).catch(() => {});
 };
 
 const App = () => {
@@ -72,7 +77,7 @@ const App = () => {
   React.useEffect(() => {
     const url = window.DEFAULT_DATA.sheetUrl;
     if (!siteAuthed || !url) return;
-    fetch(url)
+    fetch(`${url}?t=${Date.now()}`)
       .then(r => r.json())
       .then(({ infos, posts }) => {
         const next = { ...window.DEFAULT_DATA, ...data, ...infos };
