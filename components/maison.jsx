@@ -34,12 +34,12 @@ const Hero = ({ data }) => (
     }, "⚜"),
     React.createElement("div", { className: "eyebrow" }, "Convocation · ", data.dateLabel),
     React.createElement("h1", { className: "page-title", style: { fontSize: "clamp(48px, 7vw, 84px)" } },
-      React.createElement("span", { className: "glitch", "data-text": "Les Trois" }, "Les Trois"),
+      React.createElement("span", { className: "glitch", "data-text": "Les Mystères" }, "Les Mystères"),
       React.createElement("br"),
-      React.createElement("em", null, "mousquetaires")
+      React.createElement("em", null, "du Chasteau")
     ),
     React.createElement("p", { className: "page-subtitle", style: { marginTop: 24 } },
-      "« Oyez, mes très-honorez amis. Vos enfants & vous-mesme estes mandez en un chasteau, où l'acier croisera la fibre. »"
+      "« Oyez, mes très-honorez amis. Vos enfants & vous-mesme estes mandez en un chasteau. Point de roture ni de noblesse — que chacun s'esbaudisse deux jours durant !»"
     ),
     React.createElement(Countdown, { target: data.countdownISO, data })
   )
@@ -230,10 +230,10 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes }) => {
           }
         }, "⚜ Ordonnance de l'Intendance ⚜"),
         [
-          "Chaque semaine, des indices seront cachés dans les Gazettes publiées en ces pages. Rendez-vous tous les vendredis à XII heures sonnantes.",
-          "Chaque indice vous permettra de vous rapprocher d'un code. Vous devez avoir les neuf codes correctes en mesme temps pour rompre le sceau & accéder aux informations.",
-          "Si un code est juste, son encadré s'allumera en bleu. En orange s'il est à deux caractères près — vous n'estes point loin. En rouge s'il n'est point le bon.",
-          "Encore faut-il que vous parveniez à remettre les codes dans le bon ordre. Bonne chasse, mes très-honorez compaignons.",
+          "Neuf codes scellent ces pages. Pour chacun d'iceux, trois indices ont esté cachés en la Gazette — du plus ardu au plus clément — soit vingt & sept dépêches en tout, publiées chaque vendredi à XII heures sonnantes.",
+          "Point n'est besoin d'attendre le dernier indice : si le premier vous illumine l'esprit, saisissez le code sans délai. Les plus vifs de la compaignie n'en auront peut-estre besoin que d'un seul.",
+          "Soumettez vos neuf codes en mesme temps : si l'un est juste, son encadré s'allume en bleu. En orange s'il n'est qu'à deux lettres près — vous n'estes point loin. En rouge, point du tout.",
+          "Encore faut-il les ranger dans le bon ordre. Le sceau ne se rompt que si les neuf sont exacts & bien ordonnez. Bonne chasse, mes très-honorez compaignons.",
         ].map((line, i) =>
           React.createElement("p", {
             key: i,
