@@ -34,9 +34,12 @@ const GazettePage = ({ data }) => {
 };
 
 const Post = ({ post }) => {
+  const [copied, setCopied] = React.useState(false);
   const copyAnchor = () => {
     const url = `${window.location.origin}${window.location.pathname}#/gazette#${post.id}`;
     navigator.clipboard?.writeText(url).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
   return (
     React.createElement("article", { id: post.id, style: { scrollMarginTop: 80 } },
@@ -60,20 +63,22 @@ const Post = ({ post }) => {
         }, post.dateLong),
         React.createElement("button", {
           onClick: copyAnchor,
-          title: "Copier le lien",
+          title: "Copier le lien vers cette dépêche",
           style: {
             marginLeft: "auto",
-            background: "transparent",
-            border: "1px solid var(--line-dim)",
-            padding: "4px 8px",
+            background: copied ? "var(--neon-cyan)" : "transparent",
+            border: `1px solid ${copied ? "var(--neon-cyan)" : "var(--line-dim)"}`,
+            padding: "5px 10px",
             fontFamily: "var(--font-mono)",
             fontSize: 9,
             letterSpacing: "0.22em",
-            color: "var(--bone)",
+            color: copied ? "var(--void)" : "var(--bone)",
             textTransform: "uppercase",
             cursor: "pointer",
+            transition: "all 0.2s",
+            whiteSpace: "nowrap",
           }
-        }, "⚯ #", post.id.replace(/^post-/, ""))
+        }, copied ? "✓ Lien copié" : "⚯ Copier le lien")
       ),
 
       React.createElement("h2", {
