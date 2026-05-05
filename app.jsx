@@ -124,7 +124,7 @@ const App = () => {
       React.createElement("div", { className: "bg-stage" }),
       React.createElement(Topbar, { route, isAdmin, onAdminClick: () => setAdminOpen(true) }),
       page === "maison"  && React.createElement(MaisonPage,  { data, isAdmin, onUpdateData: setData }),
-      page === "gazette" && React.createElement(GazettePage, { data }),
+      page === "gazette" && React.createElement(GazettePage, { data, isAdmin }),
       React.createElement(Footer, null),
       React.createElement(AdminPanel, {
         open: adminOpen,

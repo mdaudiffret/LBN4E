@@ -1,9 +1,10 @@
 /* global React */
 
-const GazettePage = ({ data }) => {
+const GazettePage = ({ data, isAdmin }) => {
+  const [showAll, setShowAll] = React.useState(false);
   const now = new Date();
   const posts = [...data.posts]
-    .filter(p => new Date(p.publishAt || p.iso + "T12:00:00") <= now)
+    .filter(p => showAll || new Date(p.publishAt || p.iso + "T12:00:00") <= now)
     .sort((a, b) => b.iso.localeCompare(a.iso));
   return (
     React.createElement("div", { className: "page" },
@@ -13,8 +14,22 @@ const GazettePage = ({ data }) => {
           "Nouvelles ",
           React.createElement("em", null, "du chasteau")
         ),
-        React.createElement("p", { className: "page-subtitle", style: { marginTop: 16 } },
-          "Du plus récent au plus ancien."
+        React.createElement("div", {
+          style: { display: "flex", alignItems: "center", gap: 20, marginTop: 16, flexWrap: "wrap" }
+        },
+          React.createElement("p", { className: "page-subtitle", style: { margin: 0 } },
+            "Du plus récent au plus ancien."
+          ),
+          isAdmin && React.createElement("label", {
+            className: "switch" + (showAll ? " is-on" : ""),
+            onClick: () => setShowAll(v => !v),
+            style: { cursor: "pointer", flexShrink: 0 },
+          },
+            React.createElement("div", { className: "switch-track" + (showAll ? " is-on" : ""), style: { position: "relative" } },
+              React.createElement("div", { className: "switch-knob" })
+            ),
+            React.createElement("span", { className: "switch-label" }, showAll ? "Toutes (admin)" : "Publiées seul.")
+          )
         ),
         React.createElement(Divider, null),
         posts.length === 0
