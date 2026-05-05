@@ -1,7 +1,10 @@
 /* global React */
 
 const GazettePage = ({ data }) => {
-  const posts = [...data.posts].sort((a, b) => b.iso.localeCompare(a.iso));
+  const now = new Date();
+  const posts = [...data.posts]
+    .filter(p => new Date(p.publishAt || p.iso + "T12:00:00") <= now)
+    .sort((a, b) => b.iso.localeCompare(a.iso));
   return (
     React.createElement("div", { className: "page" },
       React.createElement("div", { className: "shell" },

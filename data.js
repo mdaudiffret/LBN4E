@@ -6,9 +6,6 @@ const DEFAULT_DATA = {
   sheetUrl: "https://script.google.com/macros/s/AKfycbyWucphWseAqReSrOdJLkmVPsU3W6cI5xXaSQfGG4e7ajNnK7wBDRk4B0FffMADD3-e/exec",
   sheetWriteToken: "lbn4e-write-2026", // doit correspondre à WRITE_TOKEN dans sheets/Code.gs
 
-  /* Mot de passe d'accès global au site */
-  sitePassword: "mousquet",
-
   /* Countdown target — ISO 8601, modifiable via admin */
   countdownISO: "2026-06-12T16:00:00",
 

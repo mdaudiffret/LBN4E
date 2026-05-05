@@ -10,17 +10,6 @@ const hashPassword = async (pwd) => {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
 };
 
-const getSitePassword = () => {
-  try {
-    const raw = localStorage.getItem("lbn4e-data");
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (parsed.sitePassword) return parsed.sitePassword;
-    }
-  } catch(e) {}
-  return window.DEFAULT_DATA.sitePassword || "";
-};
-
 const useRoute = () => {
   const [route, setRoute] = React.useState(window.location.hash || "#/");
   React.useEffect(() => {
@@ -65,10 +54,6 @@ const sheetSync = (next) => {
 };
 
 const App = () => {
-  const [siteAuthed, setSiteAuthed] = React.useState(() => {
-    try { return sessionStorage.getItem("lbn4e-site") === "1"; } catch(e) { return false; }
-  });
-
   const route = useRoute();
   const [data, saveLocal] = useStoredData();
   const [adminOpen, setAdminOpen] = React.useState(false);
@@ -76,10 +61,10 @@ const App = () => {
     try { return sessionStorage.getItem("lbn4e-admin") === "1"; } catch(e) { return false; }
   });
 
-  // On auth: fetch latest data from sheet and override local state
+  // On mount: fetch latest data from sheet
   React.useEffect(() => {
     const url = window.DEFAULT_DATA.sheetUrl;
-    if (!siteAuthed || !url) return;
+    if (!url) return;
     fetch(`${url}?t=${Date.now()}`)
       .then(r => r.json())
       .then(({ infos, posts }) => {
@@ -88,7 +73,7 @@ const App = () => {
         saveLocal(next);
       })
       .catch(() => {});
-  }, [siteAuthed]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Saves locally + syncs to sheet (used for all admin/user writes)
   const setData = (next) => {
@@ -112,11 +97,9 @@ const App = () => {
   };
 
   React.useEffect(() => {
-    if (!siteAuthed) return;
     const parts = route.split("#").filter(Boolean);
     if (parts.length >= 2) {
       const id = parts[parts.length - 1];
-      // Retry until the element exists and has been laid out
       let attempts = 0;
       const tryScroll = () => {
         const el = document.getElementById(id);
@@ -127,21 +110,13 @@ const App = () => {
           setTimeout(tryScroll, 250);
         }
       };
-      // After login React needs a full render cycle before layout is stable
       setTimeout(tryScroll, 400);
     } else {
       window.scrollTo({ top: 0 });
     }
-  }, [route, siteAuthed]); // re-runs after login so anchor URLs work post-login
+  }, [route]);
 
   const page = route.startsWith("#/gazette") ? "gazette" : "maison";
-
-  if (!siteAuthed) {
-    return React.createElement(SiteLogin, {
-      sitePassword: data.sitePassword,
-      onSuccess: () => setSiteAuthed(true),
-    });
-  }
 
   return (
     React.createElement(React.Fragment, null,

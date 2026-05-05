@@ -187,6 +187,47 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes }) => {
       },
         "Les détails du séjour — adresse, dates, agenda — demeurent en lieu sceuré. Patience encores quelques tours d'horloge, l'intendance ne tardera point."
       ),
+
+      /* Instructions for the 9-code system */
+      React.createElement("div", {
+        style: {
+          border: "1px solid var(--line-dim)",
+          background: "var(--char)",
+          padding: "20px 24px",
+          marginBottom: 28,
+          maxWidth: "56ch",
+        }
+      },
+        React.createElement("div", {
+          style: {
+            fontFamily: "var(--font-mono)",
+            fontSize: 9,
+            letterSpacing: "0.3em",
+            color: "var(--gold)",
+            textTransform: "uppercase",
+            marginBottom: 14,
+          }
+        }, "⚜ Ordonnance de l'Intendance ⚜"),
+        [
+          "Chaque semaine, des indices seront cachés dans les Gazettes publiées en ces pages. Rendez-vous tous les vendredis à XII heures sonnantes.",
+          "Chaque indice vous permettra de vous rapprocher d'un code. Vous devez avoir les neuf codes correctes en mesme temps pour rompre le sceau & accéder aux informations.",
+          "Si un code est juste, son encadré s'allumera en bleu. En orange s'il est à deux caractères près — vous n'estes point loin. En rouge s'il n'est point le bon.",
+          "Encore faut-il que vous parveniez à remettre les codes dans le bon ordre. Bonne chasse, mes très-honorez compaignons.",
+        ].map((line, i) =>
+          React.createElement("p", {
+            key: i,
+            style: {
+              fontFamily: "var(--font-serif)",
+              fontStyle: "italic",
+              fontSize: 16,
+              lineHeight: 1.55,
+              color: "var(--bone)",
+              margin: i === 0 ? "0 0 10px" : "10px 0 0",
+              opacity: 0.9,
+            }
+          }, line)
+        )
+      ),
       React.createElement("div", {
         style: {
           border: "1px solid var(--line)",

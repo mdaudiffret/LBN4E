@@ -377,7 +377,6 @@ const TabEvenement = ({ d, set }) => (
       React.createElement(Field, { label: "Pigeon · email", value: d.contactEmail, onChange: v => set("contactEmail", v) }),
       React.createElement(Field, { label: "Cor de chasse · tel", value: d.contactTel, onChange: v => set("contactTel", v) }),
       React.createElement(Field, { label: "Compte à rebours (ISO)", value: d.countdownISO, onChange: v => set("countdownISO", v), span: 2, placeholder: "2026-06-12T16:00:00" }),
-      React.createElement(Field, { label: "Mot de passe du site (accès global)", value: d.sitePassword, onChange: v => set("sitePassword", v), span: 2, placeholder: "mousquet" }),
     ),
 
     React.createElement("div", {
@@ -511,6 +510,7 @@ const TabGazette = ({ d, setD }) => {
 const PostForm = ({ post, onSave, onCancel }) => {
   const today = new Date().toISOString().slice(0, 10);
   const [iso, setIso]         = React.useState(post ? post.iso : today);
+  const [publishTime, setPublishTime] = React.useState(post ? (post.publishAt ? post.publishAt.slice(11, 16) : "12:00") : "12:00");
   const [titre, setTitre]     = React.useState(post ? post.titre : "");
   const [author, setAuthor]   = React.useState(post ? post.author : "Intendance · LBN4E");
   const [kind, setKind]       = React.useState(post ? post.imageKind : "manuscrit");
@@ -545,6 +545,7 @@ const PostForm = ({ post, onSave, onCancel }) => {
     const saved = {
       id: post ? post.id : `post-${iso}`,
       iso,
+      publishAt: `${iso}T${publishTime}`,
       dateShort: `${String(dd).padStart(2,"0")}·${romans[mm]}·${yRom}`,
       dateLong: `${["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"][d.getDay()]} ${toRoman(dd)} de ${months[mm]} · ${yRom}`,
       titre: titre.trim(),
@@ -572,8 +573,9 @@ const PostForm = ({ post, onSave, onCancel }) => {
         }
       }, post ? "Éditer la dépêche" : "Nouvelle dépêche"),
 
-      React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 } },
+      React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 } },
         React.createElement(Field, { label: "Date (AAAA-MM-JJ)", value: iso, onChange: setIso, type: "date" }),
+        React.createElement(Field, { label: "Heure de publication", value: publishTime, onChange: setPublishTime, type: "time" }),
         React.createElement(Field, { label: "Auteur", value: author, onChange: setAuthor }),
       ),
       React.createElement(Field, { label: "Titre", value: titre, onChange: setTitre, placeholder: "Le titre de la dépêche" }),
