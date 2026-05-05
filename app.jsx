@@ -29,18 +29,31 @@ const useRoute = () => {
 };
 
 const useStoredData = () => {
-  const [data, setData] = React.useState(() => {
+  const [data, _set] = React.useState(() => {
     try {
       const raw = localStorage.getItem("lbn4e-data");
       if (raw) return { ...window.DEFAULT_DATA, ...JSON.parse(raw) };
     } catch(e) {}
     return window.DEFAULT_DATA;
   });
-  const update = (next) => {
-    setData(next);
+  // Saves to React state + localStorage only (no sheet sync)
+  const saveLocal = (next) => {
+    _set(next);
     try { localStorage.setItem("lbn4e-data", JSON.stringify(next)); } catch(e) {}
   };
-  return [data, update];
+  return [data, saveLocal];
+};
+
+const sheetSync = (next) => {
+  const url = window.DEFAULT_DATA.sheetUrl;
+  const token = window.DEFAULT_DATA.sheetWriteToken;
+  if (!url || !token) return;
+  const { posts, sheetUrl: _u, sheetWriteToken: _t, ...infos } = next;
+  fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain" },
+    body: JSON.stringify({ token, infos, posts }),
+  }).catch(() => {});
 };
 
 const App = () => {
@@ -49,11 +62,31 @@ const App = () => {
   });
 
   const route = useRoute();
-  const [data, setData] = useStoredData();
+  const [data, saveLocal] = useStoredData();
   const [adminOpen, setAdminOpen] = React.useState(false);
   const [isAdmin, setIsAdmin] = React.useState(() => {
     try { return sessionStorage.getItem("lbn4e-admin") === "1"; } catch(e) { return false; }
   });
+
+  // On auth: fetch latest data from sheet and override local state
+  React.useEffect(() => {
+    const url = window.DEFAULT_DATA.sheetUrl;
+    if (!siteAuthed || !url) return;
+    fetch(url)
+      .then(r => r.json())
+      .then(({ infos, posts }) => {
+        const next = { ...window.DEFAULT_DATA, ...data, ...infos };
+        if (posts && posts.length) next.posts = posts;
+        saveLocal(next);
+      })
+      .catch(() => {});
+  }, [siteAuthed]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Saves locally + syncs to sheet (used for all admin/user writes)
+  const setData = (next) => {
+    saveLocal(next);
+    sheetSync(next);
+  };
 
   const onLogin = async (pwd) => {
     const h = await hashPassword(pwd);

@@ -2,6 +2,10 @@
 const DEFAULT_DATA = {
   infosRevealed: false,
 
+  /* Google Sheets sync — remplir après déploiement du Apps Script */
+  sheetUrl: "",           // URL de déploiement Apps Script (ex: https://script.google.com/macros/s/.../exec)
+  sheetWriteToken: "lbn4e-write-2026", // doit correspondre à WRITE_TOKEN dans sheets/Code.gs
+
   /* Mot de passe d'accès global au site */
   sitePassword: "mousquet",
 
