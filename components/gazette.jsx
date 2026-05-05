@@ -33,13 +33,40 @@ const GazettePage = ({ data }) => {
   );
 };
 
+const copyToClipboard = (text) => {
+  if (navigator.clipboard?.writeText) {
+    return navigator.clipboard.writeText(text);
+  }
+  // Fallback for non-HTTPS or older browsers
+  return new Promise((resolve, reject) => {
+    const el = document.createElement("textarea");
+    el.value = text;
+    el.style.cssText = "position:fixed;opacity:0;top:0;left:0";
+    document.body.appendChild(el);
+    el.focus();
+    el.select();
+    try {
+      document.execCommand("copy") ? resolve() : reject();
+    } catch(e) { reject(e); }
+    document.body.removeChild(el);
+  });
+};
+
 const Post = ({ post }) => {
   const [copied, setCopied] = React.useState(false);
   const copyAnchor = () => {
-    const url = `${window.location.origin}${window.location.pathname}#/gazette#${post.id}`;
-    navigator.clipboard?.writeText(url).catch(() => {});
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    // Strip any existing hash then append gazette anchor
+    const base = window.location.href.split("#")[0];
+    const url = `${base}#/gazette#${post.id}`;
+    copyToClipboard(url)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch(() => {
+        // Last resort: open prompt so user can copy manually
+        window.prompt("Copie ce lien :", url);
+      });
   };
   return (
     React.createElement("article", { id: post.id, style: { scrollMarginTop: 80 } },
