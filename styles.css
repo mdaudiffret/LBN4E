@@ -400,8 +400,56 @@ img { max-width: 100%; display: block; }
   opacity: 0.5;
 }
 
-/* Divider */
-.divider { height: 1px; background: var(--line-dim); margin: 48px 0; }
+/* Ornamental Divider */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 48px 0;
+}
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line-dim) 20%, var(--line-dim) 80%, transparent);
+}
+.divider-orn {
+  font-size: 14px;
+  letter-spacing: 0.36em;
+  color: var(--gold);
+  opacity: 0.5;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding: 0 4px;
+}
+
+/* Corner ornaments for bordered boxes */
+.corner-orn {
+  position: absolute;
+  font-family: var(--font-display);
+  font-size: 10px;
+  color: var(--gold);
+  opacity: 0.38;
+  line-height: 1;
+  pointer-events: none;
+  letter-spacing: 0;
+}
+.corner-orn-tl { top: 8px;  left:  12px; }
+.corner-orn-tr { top: 8px;  right: 12px; }
+.corner-orn-bl { bottom: 8px; left:  12px; }
+.corner-orn-br { bottom: 8px; right: 12px; }
+
+/* Footer ornament row */
+.footer-ornament {
+  width: 100%;
+  text-align: center;
+  font-size: 13px;
+  letter-spacing: 0.44em;
+  color: var(--gold);
+  opacity: 0.38;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line-dim);
+  margin-bottom: 20px;
+}
 
 /* Site login gate */
 .site-login-stage {

@@ -51,13 +51,23 @@ const Topbar = ({ route, isAdmin, onAdminClick }) => {
   );
 };
 
+const Divider = () =>
+  React.createElement("div", { className: "divider" },
+    React.createElement("div", { className: "divider-line" }),
+    React.createElement("span", { className: "divider-orn" }, "⚜  ✠  ⚔  ✠  ⚜"),
+    React.createElement("div", { className: "divider-line" }),
+  );
+
 const Footer = () => (
   React.createElement("footer", { className: "footer" },
-    React.createElement("div", { className: "shell footer-inner" },
-      React.createElement("div", { className: "footer-mark" }, "★ Weekend LBN4E ★"),
-      React.createElement("div", { className: "footer-meta" }, "Tous pour un · un pour tous.exe")
+    React.createElement("div", { className: "shell" },
+      React.createElement("div", { className: "footer-ornament" }, "⚜ · · · ✠ · · · ⚔ · · · ✠ · · · ⚜"),
+      React.createElement("div", { className: "footer-inner" },
+        React.createElement("div", { className: "footer-mark" }, "⚜ Weekend LBN4E ⚜"),
+        React.createElement("div", { className: "footer-meta" }, "Tous pour un · un pour tous.exe")
+      )
     )
   )
 );
 
-Object.assign(window, { HexMark, Brand, Topbar, Footer });
+Object.assign(window, { HexMark, Brand, Topbar, Footer, Divider });

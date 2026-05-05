@@ -16,7 +16,7 @@ const GazettePage = ({ data }) => {
         React.createElement("p", { className: "page-subtitle", style: { marginTop: 16 } },
           "Du plus récent au plus ancien."
         ),
-        React.createElement("div", { className: "divider" }),
+        React.createElement(Divider, null),
         posts.length === 0
           ? React.createElement("div", {
               style: {
@@ -28,8 +28,12 @@ const GazettePage = ({ data }) => {
                 padding: "48px 0",
               }
             }, "Nulle dépêche pour l'heure. Revenez bientôt.")
-          : React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 64 } },
-              posts.map(p => React.createElement(Post, { key: p.id, post: p }))
+          : React.createElement("div", { style: { display: "flex", flexDirection: "column" } },
+              posts.reduce((acc, p, i) => {
+                if (i > 0) acc.push(React.createElement(Divider, { key: `d-${i}` }));
+                acc.push(React.createElement(Post, { key: p.id, post: p }));
+                return acc;
+              }, [])
             )
       )
     )

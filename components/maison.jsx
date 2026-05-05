@@ -4,7 +4,7 @@ const MaisonPage = ({ data, isAdmin, onUpdateData }) => (
   React.createElement("div", { className: "page" },
     React.createElement("div", { className: "shell" },
       React.createElement(Hero, { data }),
-      React.createElement("div", { className: "divider" }),
+      React.createElement(Divider, null),
       data.infosRevealed
         ? React.createElement(InfosRevealed, { data, isAdmin, onUpdateData })
         : React.createElement(InfosSealed, {
@@ -17,7 +17,21 @@ const MaisonPage = ({ data, isAdmin, onUpdateData }) => (
 );
 
 const Hero = ({ data }) => (
-  React.createElement("section", { style: { paddingTop: 24 } },
+  React.createElement("section", { style: { paddingTop: 24, position: "relative", overflow: "hidden" } },
+    React.createElement("div", {
+      style: {
+        position: "absolute",
+        right: "-10px",
+        top: "-10px",
+        fontFamily: "var(--font-display)",
+        fontSize: 380,
+        color: "var(--gold)",
+        opacity: 0.025,
+        lineHeight: 1,
+        pointerEvents: "none",
+        userSelect: "none",
+      }
+    }, "⚜"),
     React.createElement("div", { className: "eyebrow" }, "Convocation · ", data.dateLabel),
     React.createElement("h1", { className: "page-title", style: { fontSize: "clamp(48px, 7vw, 84px)" } },
       React.createElement("span", { className: "glitch", "data-text": "Les Trois" }, "Les Trois"),
@@ -81,7 +95,16 @@ const Countdown = ({ target, data }) => {
           color: "var(--bone)",
           marginTop: 12,
         }
-      }, data.dateDebut, " · ", data.heureArrivee)
+      }, data.dateDebut, " · ", data.heureArrivee),
+    React.createElement("div", {
+      style: {
+        fontSize: 14,
+        letterSpacing: "0.5em",
+        color: "var(--gold)",
+        opacity: 0.32,
+        marginTop: 36,
+      }
+    }, "· ⚜ · ♔ · ⚔ · ♔ · ⚜ ·")
     )
   );
 };
@@ -236,6 +259,10 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes }) => {
           overflow: "hidden",
         }
       },
+        React.createElement("span", { className: "corner-orn corner-orn-tl" }, "⚜"),
+        React.createElement("span", { className: "corner-orn corner-orn-tr" }, "⚜"),
+        React.createElement("span", { className: "corner-orn corner-orn-bl" }, "⚜"),
+        React.createElement("span", { className: "corner-orn corner-orn-br" }, "⚜"),
         React.createElement("div", {
           style: {
             position: "absolute",
@@ -389,8 +416,15 @@ const InfosRevealed = ({ data, isAdmin, onUpdateData }) => {
           color: "var(--pearl)",
           textTransform: "uppercase",
           margin: "48px 0 20px",
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
         }
-      }, "Ce qu'il faut apporter"),
+      },
+        React.createElement("span", { style: { color: "var(--gold)", opacity: 0.6, fontSize: 14 } }, "⚔"),
+        "Ce qu'il faut apporter",
+        React.createElement("span", { style: { color: "var(--gold)", opacity: 0.6, fontSize: 14 } }, "⚔"),
+      ),
       data.equipement.map((item) =>
         React.createElement("div", { key: item.cat, className: "kv" },
           React.createElement("div", { className: "kv-key" }, item.cat, " · ", item.titre),
@@ -410,8 +444,15 @@ const InfosRevealed = ({ data, isAdmin, onUpdateData }) => {
           color: "var(--pearl)",
           textTransform: "uppercase",
           margin: "48px 0 20px",
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
         }
-      }, "Agenda"),
+      },
+        React.createElement("span", { style: { color: "var(--gold)", opacity: 0.6, fontSize: 14 } }, "⚜"),
+        "Agenda",
+        React.createElement("span", { style: { color: "var(--gold)", opacity: 0.6, fontSize: 14 } }, "⚜"),
+      ),
       data.agenda.map((day, i) =>
         React.createElement("div", {
           key: i,
