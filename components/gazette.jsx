@@ -53,20 +53,13 @@ const copyToClipboard = (text) => {
 };
 
 const Post = ({ post }) => {
-  const [copied, setCopied] = React.useState(false);
+  const [linkUrl, setLinkUrl] = React.useState(null); // null = hidden, string = show URL
   const copyAnchor = () => {
-    // Strip any existing hash then append gazette anchor
     const base = window.location.href.split("#")[0];
     const url = `${base}#/gazette#${post.id}`;
-    copyToClipboard(url)
-      .then(() => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      })
-      .catch(() => {
-        // Last resort: open prompt so user can copy manually
-        window.prompt("Copie ce lien :", url);
-      });
+    setLinkUrl(url);
+    copyToClipboard(url).catch(() => {});
+    setTimeout(() => setLinkUrl(null), 8000);
   };
   return (
     React.createElement("article", { id: post.id, style: { scrollMarginTop: 80 } },
@@ -93,19 +86,48 @@ const Post = ({ post }) => {
           title: "Copier le lien vers cette dépêche",
           style: {
             marginLeft: "auto",
-            background: copied ? "var(--neon-cyan)" : "transparent",
-            border: `1px solid ${copied ? "var(--neon-cyan)" : "var(--line-dim)"}`,
+            background: linkUrl ? "var(--neon-cyan)" : "transparent",
+            border: `1px solid ${linkUrl ? "var(--neon-cyan)" : "var(--line-dim)"}`,
             padding: "5px 10px",
             fontFamily: "var(--font-mono)",
             fontSize: 9,
             letterSpacing: "0.22em",
-            color: copied ? "var(--void)" : "var(--bone)",
+            color: linkUrl ? "var(--void)" : "var(--bone)",
             textTransform: "uppercase",
             cursor: "pointer",
             transition: "all 0.2s",
             whiteSpace: "nowrap",
           }
-        }, copied ? "✓ Lien copié" : "⚯ Copier le lien")
+        }, linkUrl ? "⚯ Lien prêt" : "⚯ Copier le lien")
+      ),
+
+      /* URL display — visible 8s after click, selectable for manual copy */
+      linkUrl && React.createElement("div", {
+        style: {
+          marginBottom: 14,
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+        }
+      },
+        React.createElement("input", {
+          readOnly: true,
+          value: linkUrl,
+          onFocus: e => e.target.select(),
+          onClick: e => e.target.select(),
+          style: {
+            flex: 1,
+            fontFamily: "var(--font-mono)",
+            fontSize: 10,
+            letterSpacing: "0.08em",
+            color: "var(--neon-cyan)",
+            background: "var(--char)",
+            border: "1px solid var(--neon-cyan)",
+            padding: "6px 10px",
+            outline: "none",
+            cursor: "text",
+          }
+        })
       ),
 
       React.createElement("h2", {
