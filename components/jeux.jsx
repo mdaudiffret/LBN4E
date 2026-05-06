@@ -1,7 +1,6 @@
 // components/jeux.jsx — Page des 9 mini-jeux LBN4E
 /* global React */
 
-const JEUX_STORAGE_KEY = "lbn4e:indices:v1";
 
 const GAMES_LIST = [
   { id: "memoire",    num: "01", cat: "Logique",  title: "Mémoire flash",
@@ -15,9 +14,9 @@ const GAMES_LIST = [
   { id: "suite",      num: "02", cat: "Logique",  title: "Suite logique",
     desc: "Trouve le nombre qui complète la suite.",
     levels: [
-      { lv: 1, label: "Enfant",  hint: "Suites simples (+1, +2)",     maxTime: 60,  target: 4, total: 5 },
-      { lv: 2, label: "Adulte",  hint: "Arithmétique & géométrique",  maxTime: 90,  target: 4, total: 5 },
-      { lv: 3, label: "Maître",  hint: "Fibonacci, carrés, mixtes",   maxTime: 120, target: 4, total: 5 }
+      { lv: 1, label: "Enfant",  hint: "Alternances, ×2/×3",              maxTime: 60,  target: 4, total: 5 },
+      { lv: 2, label: "Adulte",  hint: "Quadratique, géométrique, mixte", maxTime: 90,  target: 4, total: 5 },
+      { lv: 3, label: "Maître",  hint: "Fibonacci, cubes, triangulaires", maxTime: 120, target: 4, total: 5 }
     ]
   },
   { id: "anagrammes", num: "03", cat: "Logique",  title: "Anagrammes",
@@ -45,11 +44,11 @@ const GAMES_LIST = [
     ]
   },
   { id: "tempo",      num: "06", cat: "Adresse",  title: "Tap-tempo",
-    desc: "Tape en rythme régulier pendant 8 battements.",
+    desc: "Tape 10 fois en suivant le point clignotant. Le rythme est imposé.",
     levels: [
-      { lv: 1, label: "Enfant",  hint: "Tolérance ±200 ms", maxTime: 30, target: 5, total: 7 },
-      { lv: 2, label: "Adulte",  hint: "Tolérance ±100 ms", maxTime: 30, target: 5, total: 7 },
-      { lv: 3, label: "Maître",  hint: "Tolérance ±50 ms",  maxTime: 30, target: 6, total: 7 }
+      { lv: 1, label: "Enfant",  hint: "60 BPM, ±220 ms",  maxTime: 60,  target: 60, total: 100 },
+      { lv: 2, label: "Adulte",  hint: "90 BPM, ±130 ms",  maxTime: 60,  target: 70, total: 100 },
+      { lv: 3, label: "Maître",  hint: "120 BPM, ±70 ms",  maxTime: 60,  target: 80, total: 100 }
     ]
   },
   { id: "drapeaux",   num: "07", cat: "Culture",  title: "Drapeaux",
@@ -71,9 +70,9 @@ const GAMES_LIST = [
   { id: "annee",      num: "09", cat: "Culture",  title: "Devine l'année",
     desc: "Devine l'année d'un événement célèbre, à quelques années près.",
     levels: [
-      { lv: 1, label: "Enfant",  hint: "Tolérance ±10 ans", maxTime: 60,  target: 4, total: 5 },
-      { lv: 2, label: "Adulte",  hint: "Tolérance ±5 ans",  maxTime: 90,  target: 4, total: 5 },
-      { lv: 3, label: "Maître",  hint: "Tolérance ±2 ans",  maxTime: 120, target: 4, total: 5 }
+      { lv: 1, label: "Enfant",  hint: "1960–2025, ±10 ans",  maxTime: 60,  target: 4, total: 5 },
+      { lv: 2, label: "Adulte",  hint: "1880–2000, ±5 ans",   maxTime: 90,  target: 4, total: 5 },
+      { lv: 3, label: "Maître",  hint: "1300–1900, ±2 ans",   maxTime: 120, target: 4, total: 5 }
     ]
   },
 ];
@@ -87,13 +86,6 @@ const JEUX_CATS = [
 
 function indiceKey(gameId, lv) { return `${gameId}-${lv}`; }
 
-function loadJeuxIndices() {
-  try { return JSON.parse(localStorage.getItem(JEUX_STORAGE_KEY) || "{}"); }
-  catch { return {}; }
-}
-function saveJeuxIndices(o) {
-  try { localStorage.setItem(JEUX_STORAGE_KEY, JSON.stringify(o)); } catch {}
-}
 
 function formatJeuxTime(s) {
   if (s == null) return "—";
@@ -440,14 +432,10 @@ function JeuxPlayView({ game, onClose, indices, unlockIndice, jeuxIndices }) {
 function JeuxPage({ data }) {
   const [filter, setFilter] = React.useState("all");
   const [openId, setOpenId] = React.useState(null);
-  const [indices, setIndices] = React.useState(() => loadJeuxIndices());
+  const [indices, setIndices] = React.useState({});
 
   const unlockIndice = (key) => {
-    setIndices((prev) => {
-      const next = { ...prev, [key]: { at: Date.now() } };
-      saveJeuxIndices(next);
-      return next;
-    });
+    setIndices((prev) => ({ ...prev, [key]: { at: Date.now() } }));
   };
 
   const filtered = React.useMemo(
@@ -463,17 +451,6 @@ function JeuxPage({ data }) {
 
   const open = openId ? GAMES_LIST.find(g => g.id === openId) : null;
   const jeuxIndices = data.jeuxIndices || {};
-  const totalIndices = GAMES_LIST.length * 3;
-
-  const unlockedList = React.useMemo(() => {
-    const items = [];
-    for (const g of GAMES_LIST) {
-      for (const lv of g.levels) {
-        if (indices[indiceKey(g.id, lv.lv)]) items.push({ num: g.num, lv: lv.lv });
-      }
-    }
-    return items.sort((a, b) => a.num.localeCompare(b.num) || a.lv - b.lv);
-  }, [indices]);
 
   return (
     <div className="page jeux-page">
@@ -484,26 +461,15 @@ function JeuxPage({ data }) {
           <div className="eyebrow">⚜ Tournoi · 9 épreuves</div>
           <h1 className="page-title">Les Jeux du <em>Chasteau</em></h1>
           <p className="page-subtitle">
-            Remporte chaque épreuve pour débloquer les 27 indices qui dévoilent les neuf codes du puzzle final.
+            Remporte chaque épreuve pour débloquer les 27 indices qui éclairent les neuf codes du puzzle final.
             Trois niveaux par jeu — du plus clément au plus ardu.
           </p>
-        </div>
-
-        {/* Collected indices */}
-        <div className="jeux-indices-bar">
-          <div className="jeux-indices-bar__label">Indices collectés</div>
-          <div className="jeux-indices-bar__list">
-            {unlockedList.length === 0 ? (
-              <span className="muted" style={{ fontSize: 12 }}>
-                Aucun indice — joue une épreuve et atteins l'objectif !
-              </span>
-            ) : unlockedList.map((u, i) => (
-              <span key={i} className="jeux-indice-pill">
-                {u.num}<span className="lv">{u.lv}</span>
-              </span>
-            ))}
-          </div>
-          <div className="jeux-indices-bar__count">{unlockedList.length} / {totalIndices}</div>
+          <p className="page-subtitle" style={{ marginTop: 10 }}>
+            ⚠ Les indices sont des <em>aides</em> aux énigmes, pas des substituts — résoudre l'énigme reste indispensable.
+            Joue au bon moment : le jeu <strong>n°1</strong> donne des indices sur le <strong>code n°1</strong>,
+            le jeu <strong>n°2</strong> sur le <strong>code n°2</strong>, et ainsi de suite.
+            Mieux vaut jouer face à l'énigme concernée.
+          </p>
         </div>
 
         {/* Category filter */}

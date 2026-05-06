@@ -4,46 +4,97 @@ const { useState, useEffect, useRef } = React;
 
 function makeSuite(level) {
   const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+
   if (level === 1) {
-    const start = rnd(1, 10);
-    const step = rnd(1, 4);
-    const arr = Array.from({ length: 5 }, (_, i) => start + i * step);
-    return { seq: arr.slice(0, 4), answer: arr[4], hint: `+${step}` };
-  }
-  if (level === 2) {
-    if (Math.random() < 0.5) {
-      const start = rnd(2, 12);
+    const t = rnd(0, 2);
+    if (t === 0) {
+      // Alternating +a +b
+      const a = rnd(2, 7), b = rnd(3, 9);
+      const start = rnd(3, 20);
+      const arr = [start];
+      for (let i = 0; i < 5; i++) arr.push(arr[i] + (i % 2 === 0 ? a : b));
+      return { seq: arr.slice(0, 5), answer: arr[5], hint: `alterné +${a}/+${b}` };
+    }
+    if (t === 1) {
+      // ×2 or ×3
       const ratio = rnd(2, 3);
+      const start = rnd(2, 6);
+      const arr = Array.from({ length: 6 }, (_, i) => start * Math.pow(ratio, i));
+      return { seq: arr.slice(0, 5), answer: arr[5], hint: `×${ratio}` };
+    }
+    // Arithmetic, bigger step
+    const start = rnd(4, 30);
+    const step = rnd(4, 12);
+    const arr = Array.from({ length: 6 }, (_, i) => start + i * step);
+    return { seq: arr.slice(0, 5), answer: arr[5], hint: `+${step}` };
+  }
+
+  if (level === 2) {
+    const t = rnd(0, 3);
+    if (t === 0) {
+      // Geometric ×2 to ×4
+      const ratio = rnd(2, 4);
+      const start = rnd(2, 8);
       const arr = Array.from({ length: 5 }, (_, i) => start * Math.pow(ratio, i));
       return { seq: arr.slice(0, 4), answer: arr[4], hint: `×${ratio}` };
     }
-    const start = rnd(3, 25);
-    const step = rnd(2, 7);
-    const arr = Array.from({ length: 5 }, (_, i) => start + i * step);
-    return { seq: arr.slice(0, 4), answer: arr[4], hint: `+${step}` };
+    if (t === 1) {
+      // Quadratic: differences grow by +dd each step
+      const start = rnd(2, 15);
+      const d1 = rnd(2, 5), dd = rnd(1, 3);
+      const arr = [start];
+      let diff = d1;
+      for (let i = 0; i < 5; i++) { arr.push(arr[i] + diff); diff += dd; }
+      return { seq: arr.slice(0, 5), answer: arr[5], hint: `+${d1}, +${d1+dd}, +${d1+2*dd}…` };
+    }
+    if (t === 2) {
+      // Alternating ×ratio then +add
+      const start = rnd(3, 10), add = rnd(4, 12);
+      const arr = [start];
+      for (let i = 0; i < 5; i++) arr.push(i % 2 === 0 ? arr[i] * 2 : arr[i] + add);
+      return { seq: arr.slice(0, 5), answer: arr[5], hint: `alterné ×2/+${add}` };
+    }
+    // Perfect squares
+    const offset = rnd(2, 10);
+    const arr = Array.from({ length: 5 }, (_, i) => Math.pow(offset + i, 2));
+    return { seq: arr.slice(0, 4), answer: arr[4], hint: 'carrés' };
   }
-  const t = rnd(0, 3);
+
+  // Level 3
+  const t = rnd(0, 4);
   if (t === 0) {
-    const a = rnd(1, 5), b = rnd(2, 7);
+    // Fibonacci-like
+    const a = rnd(2, 7), b = rnd(5, 12);
     const arr = [a, b];
-    for (let i = 0; i < 4; i++) arr.push(arr[arr.length - 1] + arr[arr.length - 2]);
-    return { seq: arr.slice(0, 5), answer: arr[5], hint: "Fibonacci" };
+    for (let i = 0; i < 5; i++) arr.push(arr[arr.length - 1] + arr[arr.length - 2]);
+    return { seq: arr.slice(0, 5), answer: arr[5], hint: 'Fibonacci' };
   }
   if (t === 1) {
+    // Cubes
     const start = rnd(2, 5);
-    const arr = Array.from({ length: 5 }, (_, i) => Math.pow(start + i, 2));
-    return { seq: arr.slice(0, 4), answer: arr[4], hint: "carrés" };
+    const arr = Array.from({ length: 5 }, (_, i) => Math.pow(start + i, 3));
+    return { seq: arr.slice(0, 4), answer: arr[4], hint: 'cubes' };
   }
   if (t === 2) {
-    const start = rnd(1, 8);
+    // Alternating ×m then −s
+    const start = rnd(10, 24), m = rnd(2, 3), s = rnd(4, 10);
     const arr = [start];
-    for (let i = 0; i < 5; i++) arr.push(arr[i] + (i + 2));
-    return { seq: arr.slice(0, 5), answer: arr[5], hint: "+2, +3, +4..." };
+    for (let i = 0; i < 5; i++) arr.push(i % 2 === 0 ? arr[i] * m : arr[i] - s);
+    return { seq: arr.slice(0, 5), answer: arr[5], hint: `alterné ×${m}/−${s}` };
   }
-  const a = rnd(2, 6), b = rnd(3, 7);
-  const arr = [a];
-  for (let i = 0; i < 5; i++) arr.push(arr[i] + (i % 2 === 0 ? b : -1));
-  return { seq: arr.slice(0, 5), answer: arr[5], hint: "alterné" };
+  if (t === 3) {
+    // Triangular numbers: n*(n+1)/2
+    const sn = rnd(3, 8);
+    const arr = Array.from({ length: 5 }, (_, i) => {
+      const n = sn + i;
+      return (n * (n + 1)) / 2;
+    });
+    return { seq: arr.slice(0, 4), answer: arr[4], hint: 'triangulaires' };
+  }
+  // Powers of 2
+  const start = rnd(1, 4);
+  const arr = Array.from({ length: 5 }, (_, i) => Math.pow(2, start + i));
+  return { seq: arr.slice(0, 4), answer: arr[4], hint: 'puissances de 2' };
 }
 
 const SUITE_TOTAL = 5;
@@ -69,10 +120,7 @@ function SuiteGame({ level, onHud, onFinish }) {
     if (ok) setScore(newScore);
     setTimeout(() => {
       setFeedback(null);
-      if (round >= SUITE_TOTAL) {
-        onFinish(newScore);
-        return;
-      }
+      if (round >= SUITE_TOTAL) { onFinish(newScore); return; }
       setRound(r => r + 1);
       setQ(makeSuite(level));
       setVal("");
@@ -83,12 +131,12 @@ function SuiteGame({ level, onHud, onFinish }) {
     <div className="col" style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: 24 }}>
       <div className="prompt">
         <div className="prompt__instruction">Manche {round} / {SUITE_TOTAL} — Trouve le suivant</div>
-        <div className="prompt__main" style={{ fontSize: 56, display: "flex", gap: 16, justifyContent: "center", alignItems: "center" }}>
+        <div className="prompt__main" style={{ fontSize: 44, display: "flex", gap: 12, justifyContent: "center", alignItems: "center", flexWrap: "wrap" }}>
           {q.seq.map((n, i) => (<span key={i}>{n}</span>))}
           <span style={{
             display: "inline-flex", alignItems: "center", justifyContent: "center",
-            width: 80, height: 64, borderRadius: 12,
-            border: "2px dashed var(--gold)", color: "var(--gold-bright)", fontSize: 32
+            width: 72, height: 56, borderRadius: 12,
+            border: "2px dashed var(--gold)", color: "var(--gold-bright)", fontSize: 28
           }}>?</span>
         </div>
       </div>

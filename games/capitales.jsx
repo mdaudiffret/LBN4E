@@ -3,69 +3,70 @@
 const { useState, useEffect } = React;
 
 const CAPITALES = {
+  // Niveau 1 : pays connus, mais capitale ≠ plus grande ville → pièges classiques
   1: [
-    { p: "France", c: "Paris" },
-    { p: "Espagne", c: "Madrid" },
-    { p: "Italie", c: "Rome" },
-    { p: "Allemagne", c: "Berlin" },
-    { p: "Belgique", c: "Bruxelles" },
-    { p: "Royaume-Uni", c: "Londres" },
-    { p: "Portugal", c: "Lisbonne" },
-    { p: "Suisse", c: "Berne", distractors: ["Zurich", "Genève"] },
-    { p: "Pays-Bas", c: "Amsterdam" },
-    { p: "Maroc", c: "Rabat", distractors: ["Casablanca", "Marrakech"] },
+    { p: "France",       c: "Paris" },
+    { p: "Espagne",      c: "Madrid" },
+    { p: "Japon",        c: "Tokyo" },
+    { p: "Suisse",       c: "Berne",      distractors: ["Zurich", "Genève", "Lausanne"] },
+    { p: "Pays-Bas",     c: "Amsterdam",  distractors: ["La Haye", "Rotterdam", "Utrecht"] },
+    { p: "Australie",    c: "Canberra",   distractors: ["Sydney", "Melbourne", "Brisbane"] },
+    { p: "Canada",       c: "Ottawa",     distractors: ["Toronto", "Montréal", "Vancouver"] },
+    { p: "États-Unis",   c: "Washington", distractors: ["New York", "Los Angeles", "Chicago"] },
+    { p: "Brésil",       c: "Brasília",   distractors: ["Rio de Janeiro", "São Paulo", "Salvador"] },
+    { p: "Maroc",        c: "Rabat",      distractors: ["Casablanca", "Marrakech", "Fès"] },
+    { p: "Inde",         c: "New Delhi",  distractors: ["Mumbai", "Calcutta", "Bangalore"] },
+    { p: "Chine",        c: "Pékin",      distractors: ["Shanghai", "Shenzhen", "Guangzhou"] },
   ],
+  // Niveau 2 : capitales moins évidentes, distracteurs plus piégeux
   2: [
-    { p: "Suède", c: "Stockholm" },
-    { p: "Norvège", c: "Oslo" },
-    { p: "Pologne", c: "Varsovie" },
-    { p: "Grèce", c: "Athènes" },
-    { p: "Russie", c: "Moscou" },
-    { p: "Japon", c: "Tokyo" },
-    { p: "Chine", c: "Pékin" },
-    { p: "États-Unis", c: "Washington", distractors: ["New York", "Los Angeles"] },
-    { p: "Brésil", c: "Brasília", distractors: ["Rio de Janeiro", "São Paulo"] },
-    { p: "Canada", c: "Ottawa", distractors: ["Toronto", "Montréal"] },
-    { p: "Australie", c: "Canberra", distractors: ["Sydney", "Melbourne"] },
-    { p: "Égypte", c: "Le Caire" },
-    { p: "Argentine", c: "Buenos Aires" },
-    { p: "Inde", c: "New Delhi" },
-    { p: "Turquie", c: "Ankara", distractors: ["Istanbul", "Izmir"] },
+    { p: "Turquie",          c: "Ankara",        distractors: ["Istanbul", "Izmir", "Bursa"] },
+    { p: "Nouvelle-Zélande", c: "Wellington",    distractors: ["Auckland", "Christchurch", "Dunedin"] },
+    { p: "Pakistan",         c: "Islamabad",     distractors: ["Karachi", "Lahore", "Peshawar"] },
+    { p: "Afrique du Sud",   c: "Pretoria",      distractors: ["Le Cap", "Johannesburg", "Durban"] },
+    { p: "Kazakhstan",       c: "Astana",        distractors: ["Almaty", "Chimkent", "Karaganda"] },
+    { p: "Suède",            c: "Stockholm" },
+    { p: "Norvège",          c: "Oslo" },
+    { p: "Pologne",          c: "Varsovie" },
+    { p: "Grèce",            c: "Athènes" },
+    { p: "Russie",           c: "Moscou",        distractors: ["Saint-Pétersbourg", "Novossibirsk", "Ekaterinbourg"] },
+    { p: "Argentine",        c: "Buenos Aires" },
+    { p: "Égypte",           c: "Le Caire",      distractors: ["Alexandrie", "Louxor", "Assouan"] },
+    { p: "Myanmar",          c: "Naypyidaw",     distractors: ["Rangoon", "Mandalay", "Pagan"] },
+    { p: "Nigeria",          c: "Abuja",         distractors: ["Lagos", "Kano", "Ibadan"] },
   ],
+  // Niveau 3 : capitales obscures ou très contre-intuitives
   3: [
-    { p: "Kazakhstan", c: "Astana" },
-    { p: "Bhoutan", c: "Thimphou" },
-    { p: "Mongolie", c: "Oulan-Bator" },
-    { p: "Sri Lanka", c: "Colombo" },
-    { p: "Burkina Faso", c: "Ouagadougou" },
-    { p: "Madagascar", c: "Antananarivo" },
-    { p: "Géorgie", c: "Tbilissi" },
-    { p: "Slovénie", c: "Ljubljana" },
-    { p: "Croatie", c: "Zagreb" },
-    { p: "Lettonie", c: "Riga" },
-    { p: "Lituanie", c: "Vilnius" },
-    { p: "Bolivie", c: "Sucre", distractors: ["La Paz", "Santa Cruz"] },
-    { p: "Équateur", c: "Quito" },
-    { p: "Paraguay", c: "Asunción" },
-    { p: "Cambodge", c: "Phnom Penh" },
-    { p: "Népal", c: "Katmandou" },
+    { p: "Bolivie",          c: "Sucre",         distractors: ["La Paz", "Santa Cruz", "Cochabamba"] },
+    { p: "Bhoutan",          c: "Thimphou",      distractors: ["Paro", "Punakha", "Wangdue"] },
+    { p: "Mongolie",         c: "Oulan-Bator",   distractors: ["Erdenet", "Darkhan", "Choibalsan"] },
+    { p: "Burkina Faso",     c: "Ouagadougou",   distractors: ["Bobo-Dioulasso", "Koudougou", "Banfora"] },
+    { p: "Madagascar",       c: "Antananarivo",  distractors: ["Toamasina", "Mahajanga", "Fianarantsoa"] },
+    { p: "Géorgie",          c: "Tbilissi",      distractors: ["Batoumi", "Koutaïssi", "Roustavi"] },
+    { p: "Slovénie",         c: "Ljubljana",     distractors: ["Maribor", "Celje", "Kranj"] },
+    { p: "Sri Lanka",        c: "Sri Jayewardenepura Kotte", distractors: ["Colombo", "Kandy", "Galle"] },
+    { p: "Namibie",          c: "Windhoek",      distractors: ["Walvis Bay", "Swakopmund", "Lüderitz"] },
+    { p: "Cambodge",         c: "Phnom Penh",    distractors: ["Siem Reap", "Battambang", "Sihanoukville"] },
+    { p: "Népal",            c: "Katmandou",     distractors: ["Pokhara", "Bhaktapur", "Lalitpur"] },
+    { p: "Érythrée",         c: "Asmara",        distractors: ["Massawa", "Keren", "Assab"] },
+    { p: "Laos",             c: "Vientiane",     distractors: ["Luang Prabang", "Pakse", "Savannakhet"] },
+    { p: "Lettonie",         c: "Riga",          distractors: ["Daugavpils", "Liepāja", "Jūrmala"] },
   ]
 };
-
-const ALL_CAPITALES = Object.values(CAPITALES).flat();
 
 function pickCapitale(level) {
   const pool = CAPITALES[level];
   const item = pool[Math.floor(Math.random() * pool.length)];
-  // gather 3 distractors
-  const inherent = item.distractors || [];
-  const fromOthers = ALL_CAPITALES.filter(x => x.c !== item.c).sort(() => Math.random() - 0.5);
-  const distractors = [...inherent.slice(0, 2)];
-  while (distractors.length < 3) {
-    const candidate = fromOthers.shift().c;
-    if (!distractors.includes(candidate) && candidate !== item.c) distractors.push(candidate);
+  // Build distractors: explicit ones first, then fill from same-level pool
+  const distractors = [...(item.distractors || []).slice(0, 3)];
+  const samePool = pool
+    .filter(x => x.c !== item.c && !distractors.includes(x.c))
+    .sort(() => Math.random() - 0.5);
+  for (const x of samePool) {
+    if (distractors.length >= 3) break;
+    distractors.push(x.c);
   }
-  const choices = [item.c, ...distractors].sort(() => Math.random() - 0.5);
+  const choices = [item.c, ...distractors.slice(0, 3)].sort(() => Math.random() - 0.5);
   return { item, choices };
 }
 
@@ -113,7 +114,7 @@ function CapitalesGame({ level, onHud, onFinish }) {
                 borderRadius: 10,
                 background: bg, color,
                 border: `1px solid ${border}`,
-                fontFamily: "var(--font-brand)", fontWeight: 700, fontSize: 18,
+                fontFamily: "var(--font-brand)", fontWeight: 700, fontSize: 16,
                 cursor: picked ? "default" : "pointer",
                 transition: "all .15s",
                 boxShadow: "var(--shadow-xs)"
