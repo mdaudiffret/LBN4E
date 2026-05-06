@@ -85,6 +85,37 @@ const DEFAULT_DATA = {
     },
   ],
 
+  /* 27 indices des jeux — 3 par énigme — configurables via admin */
+  jeuxIndices: {
+    "memoire-1":    "",
+    "memoire-2":    "",
+    "memoire-3":    "",
+    "suite-1":      "",
+    "suite-2":      "",
+    "suite-3":      "",
+    "anagrammes-1": "",
+    "anagrammes-2": "",
+    "anagrammes-3": "",
+    "reflexes-1":   "",
+    "reflexes-2":   "",
+    "reflexes-3":   "",
+    "cible-1":      "",
+    "cible-2":      "",
+    "cible-3":      "",
+    "tempo-1":      "",
+    "tempo-2":      "",
+    "tempo-3":      "",
+    "drapeaux-1":   "",
+    "drapeaux-2":   "",
+    "drapeaux-3":   "",
+    "capitales-1":  "",
+    "capitales-2":  "",
+    "capitales-3":  "",
+    "annee-1":      "",
+    "annee-2":      "",
+    "annee-3":      "",
+  },
+
   posts: [
     {
       id: "post-2026-04-28",

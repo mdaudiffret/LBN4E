@@ -24,8 +24,11 @@ const Topbar = ({ route, isAdmin, onAdminClick }) => {
   const links = [
     { to: "#/", label: "Maison" },
     { to: "#/gazette", label: "Gazette" },
+    { to: "#/jeux", label: "Jeux" },
   ];
-  const here = route.startsWith("#/gazette") ? "#/gazette" : "#/";
+  const here = route.startsWith("#/gazette") ? "#/gazette"
+             : route.startsWith("#/jeux")    ? "#/jeux"
+             : "#/";
   return (
     React.createElement("header", { className: "topbar" },
       React.createElement("div", { className: "shell topbar-inner" },

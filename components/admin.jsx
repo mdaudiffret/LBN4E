@@ -86,6 +86,7 @@ const AdminEditor = ({ data, onUpdateData, onClose, onLogout }) => {
   const tabs = [
     { id: "evenement", label: "Événement" },
     { id: "gazette",   label: "Gazette" },
+    { id: "jeux",      label: "Jeux" },
   ];
 
   return (
@@ -114,6 +115,9 @@ const AdminEditor = ({ data, onUpdateData, onClose, onLogout }) => {
 
       /* Tab: Gazette */
       tab === "gazette" && React.createElement(TabGazette, { d, setD }),
+
+      /* Tab: Jeux */
+      tab === "jeux" && React.createElement(TabJeux, { d, set }),
 
       /* Footer buttons */
       React.createElement("div", {
@@ -676,5 +680,55 @@ const Field = ({ label, value, onChange, span = 1, type = "text", placeholder = 
     })
   )
 );
+
+/* ---------- TAB: JEUX — 27 indices configurables ---------- */
+const JEUX_ADMIN_GAMES = [
+  { id: "memoire",    num: "01", title: "Mémoire flash" },
+  { id: "suite",      num: "02", title: "Suite logique" },
+  { id: "anagrammes", num: "03", title: "Anagrammes" },
+  { id: "reflexes",   num: "04", title: "Réflexes" },
+  { id: "cible",      num: "05", title: "Cible mobile" },
+  { id: "tempo",      num: "06", title: "Tap-tempo" },
+  { id: "drapeaux",   num: "07", title: "Drapeaux" },
+  { id: "capitales",  num: "08", title: "Capitales" },
+  { id: "annee",      num: "09", title: "Devine l'année" },
+];
+
+const TabJeux = ({ d, set }) => {
+  const indices = d.jeuxIndices || {};
+  const update = (key, val) => {
+    set("jeuxIndices", { ...indices, [key]: val });
+  };
+
+  return React.createElement("div", null,
+    React.createElement("div", {
+      style: {
+        fontFamily: "var(--font-mono)", fontSize: 10,
+        letterSpacing: "0.26em", color: "var(--bone)",
+        textTransform: "uppercase", marginBottom: 12,
+        fontStyle: "italic",
+      }
+    }, "Ces textes apparaissent dans la carte d'indice une fois l'épreuve validée. Laissez vide pour masquer."),
+
+    React.createElement("div", { className: "jeux-admin-grid" },
+      JEUX_ADMIN_GAMES.map(g =>
+        React.createElement("div", { key: g.id, className: "jeux-admin-card" },
+          React.createElement("div", { className: "jeux-admin-card__title" }, `${g.num} · ${g.title}`),
+          [1, 2, 3].map(lv =>
+            React.createElement("div", { key: lv, className: "jeux-admin-field" },
+              React.createElement("label", null, `Indice ${g.num}·${lv} — Niveau ${["Enfant","Adulte","Maître"][lv-1]}`),
+              React.createElement("textarea", {
+                rows: 3,
+                value: indices[`${g.id}-${lv}`] || "",
+                onChange: e => update(`${g.id}-${lv}`, e.target.value),
+                placeholder: "Texte de l'indice (ex : « Le code est un prénom, commence par A »)",
+              })
+            )
+          )
+        )
+      )
+    )
+  );
+};
 
 window.AdminPanel = AdminPanel;

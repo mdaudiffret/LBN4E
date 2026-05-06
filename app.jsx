@@ -125,7 +125,9 @@ const App = () => {
     }
   }, [route]);
 
-  const page = route.startsWith("#/gazette") ? "gazette" : "maison";
+  const page = route.startsWith("#/gazette") ? "gazette"
+             : route.startsWith("#/jeux")   ? "jeux"
+             : "maison";
 
   return (
     React.createElement(React.Fragment, null,
@@ -133,6 +135,7 @@ const App = () => {
       React.createElement(Topbar, { route, isAdmin, onAdminClick: () => setAdminOpen(true) }),
       page === "maison"  && React.createElement(MaisonPage,  { data, isAdmin, onUpdateData: setData }),
       page === "gazette" && React.createElement(GazettePage, { data, isAdmin }),
+      page === "jeux"    && React.createElement(JeuxPage,    { data }),
       React.createElement(Footer, null),
       React.createElement(AdminPanel, {
         open: adminOpen,
