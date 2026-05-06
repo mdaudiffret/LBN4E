@@ -48,9 +48,12 @@ const sheetSync = (next) => {
   const token = window.DEFAULT_DATA.sheetWriteToken;
   if (!url || !token) return;
   const { posts, sheetUrl: _u, sheetWriteToken: _t, infosRevealed: _r, ...infos } = next;
-  const t = encodeURIComponent(token);
-  fetch(`${url}?action=write_infos&token=${t}&data=${toUrlSafeBase64(infos)}`).catch(() => {});
-  fetch(`${url}?action=write_posts&token=${t}&data=${toUrlSafeBase64(posts)}`).catch(() => {});
+  const postWrite = (action, data) => {
+    const body = new URLSearchParams({ action, token, data: JSON.stringify(data) });
+    fetch(url, { method: "POST", mode: "no-cors", body }).catch(() => {});
+  };
+  postWrite("write_infos", infos);
+  postWrite("write_posts", posts);
 };
 
 const App = () => {
@@ -67,10 +70,15 @@ const App = () => {
     if (!url) return;
     fetch(`${url}?t=${Date.now()}`)
       .then(r => r.json())
-      .then(({ infos, posts }) => {
+      .then(({ infos, posts: sheetPosts }) => {
         const { infosRevealed: _r, ...safeInfos } = infos || {};
         const next = { ...window.DEFAULT_DATA, ...data, ...safeInfos };
-        if (posts && posts.length) next.posts = posts;
+        if (sheetPosts && sheetPosts.length) {
+          // Merge : préserve les posts locaux absents du sheet (sync raté)
+          const sheetById = Object.fromEntries(sheetPosts.map(p => [p.id, p]));
+          const localOnly = (data.posts || []).filter(p => !sheetById[p.id]);
+          next.posts = [...sheetPosts, ...localOnly].sort((a, b) => b.iso.localeCompare(a.iso));
+        }
         saveLocal(next);
       })
       .catch(() => {});

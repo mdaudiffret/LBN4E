@@ -8,6 +8,23 @@
 
 const WRITE_TOKEN = "lbn4e-write-2026";
 
+// Writes via POST (body = form-encoded: action, token, data)
+function doPost(e) {
+  const action = e.parameter.action;
+  const token  = e.parameter.token;
+  if (!token || token !== WRITE_TOKEN) {
+    return jsonResponse({ error: "unauthorized" });
+  }
+  try {
+    const data = JSON.parse(e.parameter.data);
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    writeSheet(ss, action === "write_infos" ? "infos" : "posts", data);
+    return jsonResponse({ ok: true });
+  } catch (err) {
+    return jsonResponse({ error: err.toString() });
+  }
+}
+
 function doGet(e) {
   const action = (e && e.parameter && e.parameter.action) || "read";
 
