@@ -4,26 +4,26 @@ const { useState, useEffect, useRef } = React;
 
 const EVENTS = {
   1: [
-    { y: 1969, e: "Premiers pas de l'homme sur la Lune" },
-    { y: 1977, e: "Sortie du premier film Star Wars" },
-    { y: 1989, e: "Chute du mur de Berlin" },
-    { y: 1990, e: "Fin de l'apartheid : libération de Nelson Mandela" },
-    { y: 1998, e: "Zidane offre la Coupe du Monde à la France en finale contre le Brésil (à domicile)" },
-    { y: 2001, e: "Lancement de Wikipédia" },
+    { y: 2001, e: "Attentats du 11 septembre aux États-Unis" },
+    { y: 2002, e: "L'euro devient la monnaie physique officielle en Europe" },
     { y: 2004, e: "Ouverture de Facebook" },
-    { y: 2007, e: "Sortie du premier iPhone" },
+    { y: 2005, e: "Lancement de YouTube" },
+    { y: 2006, e: "Zidane donne un coup de tête en finale de la Coupe du Monde" },
+    { y: 2007, e: "Sortie du premier iPhone par Apple" },
+    { y: 2008, e: "Élection de Barack Obama, premier président noir des États-Unis" },
+    { y: 2009, e: "Mort de Michael Jackson" },
+    { y: 2010, e: "Sortie de la première tablette iPad d'Apple" },
+    { y: 2011, e: "Tsunami et catastrophe nucléaire de Fukushima au Japon" },
     { y: 2012, e: "Felix Baumgartner saute en chute libre depuis la stratosphère" },
-    { y: 2015, e: "Accord de Paris sur le climat" },
-    { y: 2016, e: "Brexit : référendum au Royaume-Uni" },
-    { y: 2019, e: "Première photo d'un trou noir" },
-    { y: 1971, e: "Création de Greenpeace" },
-    { y: 1981, e: "Sortie du premier PC IBM" },
-    { y: 1991, e: "Dissolution de l'URSS" },
-    { y: 1994, e: "Inauguration du tunnel sous la Manche" },
-    { y: 2000, e: "Explosion de la bulle internet (Dot-com crash)" },
-    { y: 2008, e: "Élection de Barack Obama à la présidence des États-Unis" },
+    { y: 2013, e: "Mariage pour tous légalisé en France" },
+    { y: 2014, e: "L'Allemagne écrase le Brésil 7-1 en demi-finale de Coupe du Monde" },
+    { y: 2015, e: "Attentats du 13 novembre à Paris" },
+    { y: 2016, e: "Sortie mondiale de Pokémon GO" },
+    { y: 2018, e: "La France remporte la Coupe du Monde en Russie" },
+    { y: 2019, e: "Incendie de Notre-Dame de Paris" },
     { y: 2020, e: "Début de la pandémie de Covid-19" },
-    { y: 1986, e: "Catastrophe nucléaire de Tchernobyl" },
+    { y: 2022, e: "Invasion de l'Ukraine par la Russie" },
+    { y: 2024, e: "Jeux Olympiques d'été à Paris" },
   ],
   2: [
     { y: 1914, e: "Début de la Première Guerre mondiale" },
@@ -72,7 +72,7 @@ const EVENTS = {
 };
 
 const SLIDER = {
-  1: { min: 1960, max: 2025, def: 1990 },
+  1: { min: 2000, max: 2025, def: 2012 },
   2: { min: 1880, max: 2000, def: 1940 },
   3: { min: 1300, max: 1900, def: 1600 },
 };

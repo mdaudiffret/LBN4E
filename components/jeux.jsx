@@ -70,7 +70,7 @@ const GAMES_LIST = [
   { id: "annee",      num: "09", cat: "Culture",  title: "Devine l'année",
     desc: "Devine l'année d'un événement célèbre à quelques années près. 5 secondes par question.",
     levels: [
-      { lv: 1, label: "Enfant",  hint: "1960–2025 · ±10 ans · 10s/q",  maxTime: 90, target: 4, total: 6 },
+      { lv: 1, label: "Enfant",  hint: "2000–2025 · ±10 ans · 10s/q",  maxTime: 90, target: 4, total: 6 },
       { lv: 2, label: "Adulte",  hint: "1880–2000 · ±5 ans · 10s/q",   maxTime: 90, target: 4, total: 6 },
       { lv: 3, label: "Maître",  hint: "1300–1900 · ±2 ans · 10s/q",   maxTime: 90, target: 4, total: 6 }
     ]
