@@ -8,7 +8,7 @@ const EVENTS = {
     { y: 1977, e: "Sortie du premier film Star Wars" },
     { y: 1989, e: "Chute du mur de Berlin" },
     { y: 1990, e: "Fin de l'apartheid : libération de Nelson Mandela" },
-    { y: 1998, e: "La France gagne la Coupe du monde de football" },
+    { y: 1998, e: "Zidane offre la Coupe du Monde à la France en finale contre le Brésil (à domicile)" },
     { y: 2001, e: "Lancement de Wikipédia" },
     { y: 2004, e: "Ouverture de Facebook" },
     { y: 2007, e: "Sortie du premier iPhone" },
@@ -38,7 +38,7 @@ const EVENTS = {
     { y: 1889, e: "Inauguration de la tour Eiffel" },
     { y: 1903, e: "Premier vol motorisé des frères Wright" },
     { y: 1912, e: "Naufrage du Titanic" },
-    { y: 1945, e: "Fin de la Seconde Guerre mondiale (capitulation du Japon)" },
+    { y: 1947, e: "Indépendance de l'Inde et du Pakistan" },
     { y: 1969, e: "Premiers pas de l'homme sur la Lune" },
     { y: 1918, e: "Armistice de la Première Guerre mondiale" },
     { y: 1944, e: "Débarquement allié en Normandie" },
@@ -62,12 +62,12 @@ const EVENTS = {
     { y: 1431, e: "Exécution de Jeanne d'Arc à Rouen" },
     { y: 1517, e: "Luther publie ses 95 thèses" },
     { y: 1712, e: "Naissance de Jean-Jacques Rousseau" },
-    { y: 1509, e: "Érasme publie l'Éloge de la folie" },
-    { y: 1687, e: "Première publication des Principia de Newton" },
+    { y: 1511, e: "Érasme publie l'Éloge de la folie" },
+    { y: 1337, e: "Début de la guerre de Cent Ans" },
     { y: 1440, e: "Gutenberg invente l'imprimerie à caractères mobiles" },
     { y: 1610, e: "Galilée observe les lunes de Jupiter avec sa lunette" },
     { y: 1756, e: "Début de la guerre de Sept Ans" },
-    { y: 1348, e: "Fondation de l'université de Prague" },
+    { y: 1572, e: "Massacre de la Saint-Barthélemy à Paris" },
   ],
 };
 
@@ -98,7 +98,7 @@ function AnneeGame({ level, onHud, onFinish }) {
   const [q, setQ] = useState(() => pickEventNoRepeat());
   const [val, setVal] = useState(slider.def);
   const [feedback, setFeedback] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(5);
+  const [timeLeft, setTimeLeft] = useState(10);
   const timerRef = useRef(null);
   const valRef = useRef(slider.def);
 
@@ -110,12 +110,12 @@ function AnneeGame({ level, onHud, onFinish }) {
     setVal(slider.def);
     valRef.current = slider.def;
     setFeedback(null);
-    setTimeLeft(5);
+    setTimeLeft(10);
   }, [round]);
 
   // Countdown timer — no early return: feedback may still hold last round's value
   useEffect(() => {
-    setTimeLeft(5);
+    setTimeLeft(10);
     timerRef.current = setInterval(() => {
       setTimeLeft(t => {
         if (t <= 1) {
@@ -153,7 +153,7 @@ function AnneeGame({ level, onHud, onFinish }) {
   };
 
   const mid = Math.round((slider.min + slider.max) / 2);
-  const timerColor = timeLeft <= 2 ? "var(--danger)" : "var(--komin-blue)";
+  const timerColor = timeLeft <= 3 ? "var(--danger)" : "var(--komin-blue)";
 
   return (
     <div className="col" style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: 28 }}>
@@ -177,7 +177,7 @@ function AnneeGame({ level, onHud, onFinish }) {
         <div style={{ width: "100%", maxWidth: 520, height: 4, background: "var(--komin-lightgray)", borderRadius: 2, overflow: "hidden" }}>
           <div style={{
             height: "100%",
-            width: `${(timeLeft / 5) * 100}%`,
+            width: `${(timeLeft / 10) * 100}%`,
             background: timerColor,
             transition: "width 1s linear, background .3s"
           }} />

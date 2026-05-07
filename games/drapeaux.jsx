@@ -212,20 +212,25 @@ const FLAGS = {
 
 function DrapeauxGame({ level, onHud, onFinish }) {
   const TOTAL = 8;
-  const numChoices = level === 1 ? 4 : 5;
+  const numChoices = level === 1 ? 4 : 6;
   const usedRef = useRef(new Set());
 
   function pickNoRepeat() {
     const pool = FLAGS[level];
+    // Correct answer: prefer flags not yet shown as correct
     const available = pool.filter(f => !usedRef.current.has(f.name));
-    const pickPool = available.length >= numChoices ? available : pool;
+    const pickPool = available.length > 0 ? available : pool;
     const correct = pickPool[Math.floor(Math.random() * pickPool.length)];
     usedRef.current.add(correct.name);
-    const others = pool
-      .filter(f => f.name !== correct.name)
-      .sort(() => Math.random() - 0.5)
-      .slice(0, numChoices - 1);
-    return { correct, choices: [correct, ...others].sort(() => Math.random() - 0.5) };
+    // Distractors: prefer flags not yet used as correct (avoids "same flag twice")
+    const freshOthers = pool
+      .filter(f => f.name !== correct.name && !usedRef.current.has(f.name))
+      .sort(() => Math.random() - 0.5);
+    const usedOthers = pool
+      .filter(f => f.name !== correct.name && usedRef.current.has(f.name))
+      .sort(() => Math.random() - 0.5);
+    const distractors = [...freshOthers, ...usedOthers].slice(0, numChoices - 1);
+    return { correct, choices: [correct, ...distractors].sort(() => Math.random() - 0.5) };
   }
 
   const [round, setRound] = useState(1);
