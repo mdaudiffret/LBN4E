@@ -101,9 +101,8 @@ function CapitalesGame({ level, onHud, onFinish }) {
     setTimeLeft(5);
   }, [round]);
 
-  // Countdown timer
+  // Countdown timer — no early return: picked may still hold last round's value
   useEffect(() => {
-    if (picked) return;
     setTimeLeft(5);
     timerRef.current = setInterval(() => {
       setTimeLeft(t => {
@@ -138,20 +137,19 @@ function CapitalesGame({ level, onHud, onFinish }) {
 
   return (
     <div className="col" style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: 24 }}>
-      <div className="prompt" style={{ position: "relative" }}>
-        <div className="prompt__instruction">Manche {round} / {TOTAL} — Capitale de</div>
-        <div className="prompt__main">{q.item.p}</div>
-        {/* Countdown */}
-        <div style={{
-          position: "absolute", top: 0, right: 0,
-          fontFamily: "var(--font-brand)", fontWeight: 800,
-          fontSize: 28, lineHeight: 1,
-          color: timerColor,
-          transition: "color .3s",
-          minWidth: 32, textAlign: "right"
-        }}>
-          {picked ? "" : timeLeft}
+      <div className="prompt">
+        <div className="prompt__instruction" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16 }}>
+          <span>Manche {round} / {TOTAL} — Capitale de</span>
+          {!picked && (
+            <span style={{
+              fontFamily: "var(--font-brand)", fontWeight: 800,
+              fontSize: 28, lineHeight: 1,
+              color: timerColor, transition: "color .3s",
+              flexShrink: 0
+            }}>{timeLeft}</span>
+          )}
         </div>
+        <div className="prompt__main">{q.item.p}</div>
       </div>
 
       {/* Timer bar */}

@@ -113,15 +113,13 @@ function AnneeGame({ level, onHud, onFinish }) {
     setTimeLeft(5);
   }, [round]);
 
-  // Countdown timer — auto-submit at 0
+  // Countdown timer — no early return: feedback may still hold last round's value
   useEffect(() => {
-    if (feedback) return;
     setTimeLeft(5);
     timerRef.current = setInterval(() => {
       setTimeLeft(t => {
         if (t <= 1) {
           clearInterval(timerRef.current);
-          // Auto-submit current slider value
           submitValue(valRef.current);
           return 0;
         }
@@ -159,22 +157,19 @@ function AnneeGame({ level, onHud, onFinish }) {
 
   return (
     <div className="col" style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: 28 }}>
-      <div className="prompt" style={{ position: "relative" }}>
-        <div className="prompt__instruction">Manche {round} / {TOTAL} — En quelle année ?</div>
+      <div className="prompt">
+        <div className="prompt__instruction" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16 }}>
+          <span>Manche {round} / {TOTAL} — En quelle année ?</span>
+          {!feedback && (
+            <span style={{
+              fontFamily: "var(--font-brand)", fontWeight: 800,
+              fontSize: 28, lineHeight: 1,
+              color: timerColor, transition: "color .3s",
+              flexShrink: 0
+            }}>{timeLeft}</span>
+          )}
+        </div>
         <div className="prompt__main" style={{ fontSize: 26, maxWidth: 640, margin: "0 auto" }}>{q.e}</div>
-        {/* Countdown */}
-        {!feedback && (
-          <div style={{
-            position: "absolute", top: 0, right: 0,
-            fontFamily: "var(--font-brand)", fontWeight: 800,
-            fontSize: 32, lineHeight: 1,
-            color: timerColor,
-            transition: "color .3s",
-            minWidth: 36, textAlign: "right"
-          }}>
-            {timeLeft}
-          </div>
-        )}
       </div>
 
       {/* Timer bar */}
