@@ -4,75 +4,75 @@
 
 const GAMES_LIST = [
   { id: "memoire",    num: "01", cat: "Logique",  title: "Mémoire flash",
-    desc: "Reproduis la séquence de couleurs dans le bon ordre.",
+    desc: "Reproduis la séquence de couleurs dans le bon ordre. 10 secondes par séquence.",
     levels: [
-      { lv: 1, label: "Enfant",  hint: "4 couleurs, lent",       maxTime: 60,  target: 4, total: 4 },
-      { lv: 2, label: "Adulte",  hint: "6 couleurs, rapide",     maxTime: 90,  target: 6, total: 6 },
-      { lv: 3, label: "Maître",  hint: "8 couleurs, éclair",     maxTime: 120, target: 8, total: 8 }
+      { lv: 1, label: "Enfant",  hint: "4 couleurs · 10s/séquence",  maxTime: 60,  target: 4, total: 4 },
+      { lv: 2, label: "Adulte",  hint: "6 couleurs · 10s/séquence",  maxTime: 90,  target: 6, total: 6 },
+      { lv: 3, label: "Maître",  hint: "8 couleurs · 10s/séquence",  maxTime: 120, target: 8, total: 8 }
     ]
   },
   { id: "suite",      num: "02", cat: "Logique",  title: "Suite logique",
-    desc: "Trouve le nombre qui complète la suite.",
+    desc: "Trouve le nombre qui complète la suite. 1 minute pour tout résoudre.",
     levels: [
-      { lv: 1, label: "Enfant",  hint: "Alternances, ×2/×3",              maxTime: 60,  target: 4, total: 5 },
-      { lv: 2, label: "Adulte",  hint: "Quadratique, géométrique, mixte", maxTime: 90,  target: 4, total: 5 },
-      { lv: 3, label: "Maître",  hint: "Fibonacci, cubes, triangulaires", maxTime: 120, target: 4, total: 5 }
+      { lv: 1, label: "Enfant",  hint: "5 suites · 1:00",  maxTime: 120, target: 3, total: 5 },
+      { lv: 2, label: "Adulte",  hint: "5 suites · 1:00",  maxTime: 120, target: 3, total: 5 },
+      { lv: 3, label: "Maître",  hint: "5 suites · 1:00",  maxTime: 120, target: 3, total: 5 }
     ]
   },
   { id: "anagrammes", num: "03", cat: "Logique",  title: "Anagrammes",
-    desc: "Remets les lettres dans l'ordre pour former un mot.",
+    desc: "Remets les lettres dans l'ordre pour former un mot. 1 minute pour tout résoudre.",
     levels: [
-      { lv: 1, label: "Enfant",  hint: "Mots de 4 lettres", maxTime: 60,  target: 4, total: 5 },
-      { lv: 2, label: "Adulte",  hint: "Mots de 6 lettres", maxTime: 90,  target: 4, total: 5 },
-      { lv: 3, label: "Maître",  hint: "Mots de 8 lettres", maxTime: 120, target: 4, total: 5 }
+      { lv: 1, label: "Enfant",  hint: "5 mots · 1:00",  maxTime: 120, target: 3, total: 5 },
+      { lv: 2, label: "Adulte",  hint: "5 mots · 1:00",  maxTime: 120, target: 3, total: 5 },
+      { lv: 3, label: "Maître",  hint: "5 mots · 1:00",  maxTime: 120, target: 3, total: 5 }
     ]
   },
   { id: "reflexes",   num: "04", cat: "Adresse",  title: "Réflexes",
-    desc: "Clique dès que la cible passe au vert. Attention aux feintes !",
+    desc: "Clique dès que la cible passe au vert. L'objectif est une moyenne de temps de réaction suffisamment basse.",
     levels: [
-      { lv: 1, label: "Enfant",  hint: "Délai prévisible", maxTime: 60, target: 5, total: 5 },
-      { lv: 2, label: "Adulte",  hint: "Aléatoire",        maxTime: 60, target: 5, total: 5 },
-      { lv: 3, label: "Maître",  hint: "Feintes rouges",   maxTime: 60, target: 5, total: 5 }
+      { lv: 1, label: "Enfant",  hint: "Moy. < 500 ms",                  maxTime: 60, target: 5, total: 5 },
+      { lv: 2, label: "Adulte",  hint: "Moy. < 400 ms · délai aléatoire", maxTime: 60, target: 5, total: 5 },
+      { lv: 3, label: "Maître",  hint: "Moy. < 300 ms · feintes rouges",  maxTime: 60, target: 5, total: 5 }
     ]
   },
   { id: "cible",      num: "05", cat: "Adresse",  title: "Cible mobile",
-    desc: "Touche un maximum de cibles avant la fin du chrono.",
+    desc: "Touche un maximum de cibles en 30s. Au niveau 3, les cibles rouges font perdre un point.",
     levels: [
-      { lv: 1, label: "Enfant",  hint: "Cibles lentes & grosses", maxTime: 30, target: 12, total: 30 },
-      { lv: 2, label: "Adulte",  hint: "Vitesse moyenne",         maxTime: 30, target: 18, total: 30 },
-      { lv: 3, label: "Maître",  hint: "Petites & rapides",       maxTime: 30, target: 24, total: 30 }
+      { lv: 1, label: "Enfant",  hint: "≥ 15 cibles · 30s",               maxTime: 35, target: 15, total: 50 },
+      { lv: 2, label: "Adulte",  hint: "≥ 30 cibles · 30s",               maxTime: 35, target: 30, total: 60 },
+      { lv: 3, label: "Maître",  hint: "≥ 45 cibles · leurres rouges −1", maxTime: 35, target: 45, total: 70 }
     ]
   },
   { id: "tempo",      num: "06", cat: "Adresse",  title: "Tap-tempo",
-    desc: "Tape 10 fois en suivant le point clignotant. Le rythme est imposé.",
+    desc: "Tape 10 fois en suivant le point clignotant au rythme imposé.",
     levels: [
-      { lv: 1, label: "Enfant",  hint: "60 BPM, ±220 ms",  maxTime: 60,  target: 60, total: 100 },
-      { lv: 2, label: "Adulte",  hint: "90 BPM, ±130 ms",  maxTime: 60,  target: 70, total: 100 },
-      { lv: 3, label: "Maître",  hint: "120 BPM, ±70 ms",  maxTime: 60,  target: 80, total: 100 }
+      { lv: 1, label: "Enfant",  hint: "60 BPM · ±220 ms",                      maxTime: 60, target: 60, total: 100 },
+      { lv: 2, label: "Adulte",  hint: "90 BPM · repère masqué après 5 taps",   maxTime: 60, target: 70, total: 100 },
+      { lv: 3, label: "Maître",  hint: "120 BPM · repère masqué après 2 taps",  maxTime: 60, target: 80, total: 100 }
     ]
   },
   { id: "drapeaux",   num: "07", cat: "Culture",  title: "Drapeaux",
-    desc: "Identifie le pays correspondant au drapeau affiché.",
+    desc: "Identifie le pays correspondant au drapeau affiché. 5 secondes par question.",
     levels: [
-      { lv: 1, label: "Enfant",  hint: "Pays connus",          maxTime: 60,  target: 5, total: 6 },
-      { lv: 2, label: "Adulte",  hint: "Europe & grands pays", maxTime: 90,  target: 5, total: 6 },
-      { lv: 3, label: "Maître",  hint: "Drapeaux du monde",    maxTime: 120, target: 5, total: 6 }
+      { lv: 1, label: "Enfant",  hint: "4 choix · 5s/question",  maxTime: 60, target: 6, total: 8 },
+      { lv: 2, label: "Adulte",  hint: "5 choix · 5s/question",  maxTime: 60, target: 6, total: 8 },
+      { lv: 3, label: "Maître",  hint: "5 choix · 5s/question",  maxTime: 60, target: 6, total: 8 }
     ]
   },
   { id: "capitales",  num: "08", cat: "Culture",  title: "Capitales",
-    desc: "Quelle est la capitale de ce pays ?",
+    desc: "Quelle est la capitale de ce pays ? 5 secondes par question.",
     levels: [
-      { lv: 1, label: "Enfant",  hint: "Pays voisins",           maxTime: 60,  target: 5, total: 6 },
-      { lv: 2, label: "Adulte",  hint: "Europe & monde courant", maxTime: 90,  target: 5, total: 6 },
-      { lv: 3, label: "Maître",  hint: "Capitales pointues",     maxTime: 120, target: 5, total: 6 }
+      { lv: 1, label: "Enfant",  hint: "4 choix · 5s/question",  maxTime: 60, target: 6, total: 8 },
+      { lv: 2, label: "Adulte",  hint: "5 choix · 5s/question",  maxTime: 60, target: 6, total: 8 },
+      { lv: 3, label: "Maître",  hint: "6 choix · 5s/question",  maxTime: 60, target: 6, total: 8 }
     ]
   },
   { id: "annee",      num: "09", cat: "Culture",  title: "Devine l'année",
-    desc: "Devine l'année d'un événement célèbre, à quelques années près.",
+    desc: "Devine l'année d'un événement célèbre à quelques années près. 5 secondes par question.",
     levels: [
-      { lv: 1, label: "Enfant",  hint: "1960–2025, ±10 ans",  maxTime: 60,  target: 4, total: 5 },
-      { lv: 2, label: "Adulte",  hint: "1880–2000, ±5 ans",   maxTime: 90,  target: 4, total: 5 },
-      { lv: 3, label: "Maître",  hint: "1300–1900, ±2 ans",   maxTime: 120, target: 4, total: 5 }
+      { lv: 1, label: "Enfant",  hint: "1960–2025 · ±10 ans · 5s/q",  maxTime: 60, target: 4, total: 6 },
+      { lv: 2, label: "Adulte",  hint: "1880–2000 · ±5 ans · 5s/q",   maxTime: 60, target: 4, total: 6 },
+      { lv: 3, label: "Maître",  hint: "1300–1900 · ±2 ans · 5s/q",   maxTime: 60, target: 4, total: 6 }
     ]
   },
 ];

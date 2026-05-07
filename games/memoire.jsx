@@ -18,7 +18,9 @@ function MemoireGame({ level, onHud, onFinish }) {
   const [phase, setPhase] = useState("preview");
   const [step, setStep] = useState(0);
   const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(null);
   const finishedRef = useRef(false);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     finishedRef.current = false;
@@ -27,6 +29,7 @@ function MemoireGame({ level, onHud, onFinish }) {
     setStep(0);
     setScore(0);
     setPhase("preview");
+    setTimeLeft(null);
   }, [level]);
 
   useEffect(() => { onHud({ score, total: config.len }); }, [score, level]);
@@ -53,6 +56,29 @@ function MemoireGame({ level, onHud, onFinish }) {
     return () => clearTimeout(t);
   }, [phase, seq]);
 
+  // start countdown when entering input phase
+  useEffect(() => {
+    if (phase === "input") {
+      setTimeLeft(10);
+    } else {
+      setTimeLeft(null);
+      if (timerRef.current) clearTimeout(timerRef.current);
+    }
+  }, [phase]);
+
+  // countdown tick
+  useEffect(() => {
+    if (phase !== "input" || timeLeft === null) return;
+    if (timeLeft === 0) {
+      setPhase("lose");
+      return;
+    }
+    timerRef.current = setTimeout(() => {
+      setTimeLeft((t) => t - 1);
+    }, 1000);
+    return () => clearTimeout(timerRef.current);
+  }, [timeLeft, phase]);
+
   // auto-finish
   useEffect(() => {
     if ((phase === "win" || phase === "lose") && !finishedRef.current) {
@@ -77,21 +103,37 @@ function MemoireGame({ level, onHud, onFinish }) {
     }
   };
 
-  return (
-    <div className="col" style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: 24 }}>
-      <div className="prompt" style={{ marginBottom: 8 }}>
-        <div className="prompt__instruction">
-          {phase === "preview" ? "Mémorise…" : phase === "input" ? "À ton tour" : phase === "win" ? "Bravo !" : "Raté"}
-        </div>
-        <div className="prompt__main">{phase === "input" ? `${step} / ${seq.length}` : `${seq.length} couleurs`}</div>
-      </div>
+  const instructionContent = () => {
+    if (phase === "preview") return "Mémorise…";
+    if (phase === "input") {
+      return (
+        React.createElement(React.Fragment, null,
+          "À ton tour · ",
+          React.createElement("span", {
+            style: { color: timeLeft <= 3 ? "var(--danger)" : undefined }
+          }, "⏱ ", timeLeft, "s")
+        )
+      );
+    }
+    if (phase === "win") return "Bravo !";
+    return "Raté";
+  };
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 96px)", gap: 16 }}>
-        {MEMOIRE_COLORS.map((c) => (
-          <button key={c.id}
-            onClick={() => tap(c.id)}
-            disabled={phase !== "input"}
-            style={{
+  return (
+    React.createElement("div", { className: "col", style: { flex: 1, alignItems: "center", justifyContent: "center", gap: 24 } },
+      React.createElement("div", { className: "prompt", style: { marginBottom: 8 } },
+        React.createElement("div", { className: "prompt__instruction" }, instructionContent()),
+        React.createElement("div", { className: "prompt__main" },
+          phase === "input" ? `${step} / ${seq.length}` : `${seq.length} couleurs`
+        )
+      ),
+      React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(3, 96px)", gap: 16 } },
+        MEMOIRE_COLORS.map((c) =>
+          React.createElement("button", {
+            key: c.id,
+            onClick: () => tap(c.id),
+            disabled: phase !== "input",
+            style: {
               width: 96, height: 96, borderRadius: 20,
               background: c.color,
               border: "2px solid rgba(201,162,74,0.4)",
@@ -100,17 +142,17 @@ function MemoireGame({ level, onHud, onFinish }) {
               transform: shown === c.id ? "scale(1.05)" : "scale(1)",
               boxShadow: shown === c.id ? "0 0 0 4px rgba(201,162,74,0.5)" : "none",
               transition: "opacity .15s, transform .15s, box-shadow .15s"
-            }}
-          />
-        ))}
-      </div>
-
-      {(phase === "win" || phase === "lose") && (
-        <div className={`feedback ${phase === "win" ? "ok" : "ko"}`}>
-          {phase === "win" ? `Séquence parfaite — ${seq.length}/${seq.length}` : `Erreur à la position ${step + 1}`}
-        </div>
-      )}
-    </div>
+            }
+          })
+        )
+      ),
+      (phase === "win" || phase === "lose") &&
+        React.createElement("div", { className: `feedback ${phase === "win" ? "ok" : "ko"}` },
+          phase === "win"
+            ? `Séquence parfaite — ${seq.length}/${seq.length}`
+            : `Erreur à la position ${step + 1}`
+        )
+    )
   );
 }
 

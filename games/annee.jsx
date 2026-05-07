@@ -1,6 +1,6 @@
 ;(function() {
 // games/annee.jsx — Devine l'année
-const { useState, useEffect } = React;
+const { useState, useEffect, useRef } = React;
 
 const EVENTS = {
   1: [
@@ -19,6 +19,11 @@ const EVENTS = {
     { y: 1971, e: "Création de Greenpeace" },
     { y: 1981, e: "Sortie du premier PC IBM" },
     { y: 1991, e: "Dissolution de l'URSS" },
+    { y: 1994, e: "Inauguration du tunnel sous la Manche" },
+    { y: 2000, e: "Explosion de la bulle internet (Dot-com crash)" },
+    { y: 2008, e: "Élection de Barack Obama à la présidence des États-Unis" },
+    { y: 2020, e: "Début de la pandémie de Covid-19" },
+    { y: 1986, e: "Catastrophe nucléaire de Tchernobyl" },
   ],
   2: [
     { y: 1914, e: "Début de la Première Guerre mondiale" },
@@ -29,12 +34,18 @@ const EVENTS = {
     { y: 1953, e: "Découverte de la structure de l'ADN par Watson et Crick" },
     { y: 1957, e: "Lancement du satellite Spoutnik 1" },
     { y: 1963, e: "Assassinat de John F. Kennedy" },
-    { y: 1969, e: "Premiers pas de l'homme sur la Lune" },
     { y: 1886, e: "Inauguration de la statue de la Liberté" },
     { y: 1889, e: "Inauguration de la tour Eiffel" },
     { y: 1903, e: "Premier vol motorisé des frères Wright" },
     { y: 1912, e: "Naufrage du Titanic" },
     { y: 1945, e: "Fin de la Seconde Guerre mondiale (capitulation du Japon)" },
+    { y: 1969, e: "Premiers pas de l'homme sur la Lune" },
+    { y: 1918, e: "Armistice de la Première Guerre mondiale" },
+    { y: 1944, e: "Débarquement allié en Normandie" },
+    { y: 1961, e: "Construction du mur de Berlin" },
+    { y: 1968, e: "Assassinat de Martin Luther King" },
+    { y: 1905, e: "Einstein publie la théorie de la relativité restreinte" },
+    { y: 1936, e: "Début de la guerre civile espagnole" },
   ],
   3: [
     { y: 1492, e: "Christophe Colomb arrive aux Bahamas" },
@@ -51,6 +62,12 @@ const EVENTS = {
     { y: 1431, e: "Exécution de Jeanne d'Arc à Rouen" },
     { y: 1517, e: "Luther publie ses 95 thèses" },
     { y: 1712, e: "Naissance de Jean-Jacques Rousseau" },
+    { y: 1509, e: "Érasme publie l'Éloge de la folie" },
+    { y: 1687, e: "Première publication des Principia de Newton" },
+    { y: 1440, e: "Gutenberg invente l'imprimerie à caractères mobiles" },
+    { y: 1610, e: "Galilée observe les lunes de Jupiter avec sa lunette" },
+    { y: 1756, e: "Début de la guerre de Sept Ans" },
+    { y: 1348, e: "Fondation de l'université de Prague" },
   ],
 };
 
@@ -60,48 +77,117 @@ const SLIDER = {
   3: { min: 1300, max: 1900, def: 1600 },
 };
 
-function pickEvent(level) {
-  const pool = EVENTS[level];
-  return pool[Math.floor(Math.random() * pool.length)];
-}
-
 function AnneeGame({ level, onHud, onFinish }) {
   const TOL = { 1: 10, 2: 5, 3: 2 }[level];
   const slider = SLIDER[level];
-  const TOTAL = 5;
+  const TOTAL = 6;
+  const usedRef = useRef(new Set());
+
+  function pickEventNoRepeat() {
+    const pool = EVENTS[level];
+    const available = pool.filter((_, i) => !usedRef.current.has(i));
+    const pickPool = available.length > 0 ? available : pool;
+    const item = pickPool[Math.floor(Math.random() * pickPool.length)];
+    const idx = pool.indexOf(item);
+    usedRef.current.add(idx);
+    return item;
+  }
+
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
-  const [q, setQ] = useState(() => pickEvent(level));
+  const [q, setQ] = useState(() => pickEventNoRepeat());
   const [val, setVal] = useState(slider.def);
   const [feedback, setFeedback] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(5);
+  const timerRef = useRef(null);
+  const valRef = useRef(slider.def);
 
-  useEffect(() => { setQ(pickEvent(level)); setVal(slider.def); setFeedback(null); }, [round]);
+  // Keep valRef in sync so the timer callback can read current slider value
+  useEffect(() => { valRef.current = val; }, [val]);
+
+  useEffect(() => {
+    setQ(pickEventNoRepeat());
+    setVal(slider.def);
+    valRef.current = slider.def;
+    setFeedback(null);
+    setTimeLeft(5);
+  }, [round]);
+
+  // Countdown timer — auto-submit at 0
+  useEffect(() => {
+    if (feedback) return;
+    setTimeLeft(5);
+    timerRef.current = setInterval(() => {
+      setTimeLeft(t => {
+        if (t <= 1) {
+          clearInterval(timerRef.current);
+          // Auto-submit current slider value
+          submitValue(valRef.current);
+          return 0;
+        }
+        return t - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timerRef.current);
+  }, [round]);
+
   useEffect(() => onHud({ score, total: TOTAL }), [score]);
 
-  const submit = () => {
-    if (feedback) return;
-    const diff = Math.abs(val - q.y);
+  function submitValue(currentVal) {
+    const diff = Math.abs(currentVal - q.y);
     let result;
     if (diff === 0) result = "perfect";
     else if (diff <= TOL) result = "ok";
     else result = "ko";
-    setFeedback({ result, diff });
+    setFeedback({ result, diff, year: q.y });
     const newScore = result !== "ko" ? score + 1 : score;
     if (result !== "ko") setScore(newScore);
     setTimeout(() => {
       if (round >= TOTAL) onFinish(newScore);
-      else setRound((r) => r + 1);
+      else setRound(r => r + 1);
     }, 1600);
+  }
+
+  const submit = () => {
+    if (feedback) return;
+    clearInterval(timerRef.current);
+    submitValue(val);
   };
 
   const mid = Math.round((slider.min + slider.max) / 2);
+  const timerColor = timeLeft <= 2 ? "var(--danger)" : "var(--komin-blue)";
 
   return (
     <div className="col" style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: 28 }}>
-      <div className="prompt">
+      <div className="prompt" style={{ position: "relative" }}>
         <div className="prompt__instruction">Manche {round} / {TOTAL} — En quelle année ?</div>
         <div className="prompt__main" style={{ fontSize: 26, maxWidth: 640, margin: "0 auto" }}>{q.e}</div>
+        {/* Countdown */}
+        {!feedback && (
+          <div style={{
+            position: "absolute", top: 0, right: 0,
+            fontFamily: "var(--font-brand)", fontWeight: 800,
+            fontSize: 32, lineHeight: 1,
+            color: timerColor,
+            transition: "color .3s",
+            minWidth: 36, textAlign: "right"
+          }}>
+            {timeLeft}
+          </div>
+        )}
       </div>
+
+      {/* Timer bar */}
+      {!feedback && (
+        <div style={{ width: "100%", maxWidth: 520, height: 4, background: "var(--komin-lightgray)", borderRadius: 2, overflow: "hidden" }}>
+          <div style={{
+            height: "100%",
+            width: `${(timeLeft / 5) * 100}%`,
+            background: timerColor,
+            transition: "width 1s linear, background .3s"
+          }} />
+        </div>
+      )}
 
       <div className="col" style={{ alignItems: "center", gap: 12, width: "100%", maxWidth: 520 }}>
         <div style={{
@@ -127,9 +213,9 @@ function AnneeGame({ level, onHud, onFinish }) {
         <button className="k-btn k-btn--brand k-btn--lg" onClick={submit}>Valider</button>
       )}
 
-      {feedback?.result === "perfect" && <div className="feedback ok">Pile dans le mille ! ({q.y})</div>}
-      {feedback?.result === "ok"      && <div className="feedback ok">Bien vu — c'était {q.y} (à {feedback.diff} an{feedback.diff > 1 ? "s" : ""})</div>}
-      {feedback?.result === "ko"      && <div className="feedback ko">C'était {q.y} ({feedback.diff} ans d'écart)</div>}
+      {feedback?.result === "perfect" && <div className="feedback ok">Pile dans le mille ! ({feedback.year})</div>}
+      {feedback?.result === "ok"      && <div className="feedback ok">Bien vu — c'était {feedback.year} (à {feedback.diff} an{feedback.diff > 1 ? "s" : ""})</div>}
+      {feedback?.result === "ko"      && <div className="feedback ko">C'était {feedback.year} ({feedback.diff} ans d'écart)</div>}
     </div>
   );
 }

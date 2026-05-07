@@ -1,51 +1,8 @@
 ;(function() {
 // games/drapeaux.jsx — Devine le drapeau
-const { useState, useEffect } = React;
+const { useState, useEffect, useRef } = React;
 
 // Simple SVG flag renderers — broad-stroke (good enough for a quiz).
-const FLAGS = {
-  // pools by level
-  1: [
-    { name: "France",      svg: vBands(["#0055A4", "#FFFFFF", "#EF4135"]) },
-    { name: "Italie",      svg: vBands(["#009246", "#FFFFFF", "#CE2B37"]) },
-    { name: "Allemagne",   svg: hBands(["#000000", "#DD0000", "#FFCE00"]) },
-    { name: "Espagne",     svg: hBands(["#AA151B", "#F1BF00", "#F1BF00", "#AA151B"], [1,2,2,1]) },
-    { name: "Belgique",    svg: vBands(["#000000", "#FAE042", "#ED2939"]) },
-    { name: "Pays-Bas",    svg: hBands(["#AE1C28", "#FFFFFF", "#21468B"]) },
-    { name: "Suisse",      svg: swiss() },
-    { name: "Japon",       svg: japan() },
-  ],
-  2: [
-    { name: "Portugal",    svg: portugal() },
-    { name: "Irlande",     svg: vBands(["#169B62", "#FFFFFF", "#FF883E"]) },
-    { name: "Grèce",       svg: greece() },
-    { name: "Suède",       svg: nordic("#006AA7", "#FECC00") },
-    { name: "Norvège",     svg: norway() },
-    { name: "Finlande",    svg: nordic("#FFFFFF", "#003580") },
-    { name: "Pologne",     svg: hBands(["#FFFFFF", "#DC143C"]) },
-    { name: "Autriche",    svg: hBands(["#ED2939", "#FFFFFF", "#ED2939"]) },
-    { name: "Hongrie",     svg: hBands(["#CE2939", "#FFFFFF", "#477050"]) },
-    { name: "Roumanie",    svg: vBands(["#002B7F", "#FCD116", "#CE1126"]) },
-    { name: "Brésil",      svg: brazil() },
-    { name: "Argentine",   svg: hBands(["#74ACDF", "#FFFFFF", "#74ACDF"]) },
-    { name: "Canada",      svg: canada() },
-    { name: "Mexique",     svg: vBands(["#006847", "#FFFFFF", "#CE1126"]) },
-  ],
-  3: [
-    { name: "Sénégal",     svg: vBandsWithStar(["#00853F", "#FDEF42", "#E31B23"], "#00853F") },
-    { name: "Ukraine",     svg: hBands(["#0057B7", "#FFD700"]) },
-    { name: "Indonésie",   svg: hBands(["#FF0000", "#FFFFFF"]) },
-    { name: "Mongolie",    svg: vBands(["#C4272F", "#0066B3", "#C4272F"]) },
-    { name: "Côte d'Ivoire", svg: vBands(["#FF8200", "#FFFFFF", "#009E60"]) },
-    { name: "Lituanie",    svg: hBands(["#FDB913", "#006A44", "#C1272D"]) },
-    { name: "Bulgarie",    svg: hBands(["#FFFFFF", "#00966E", "#D62612"]) },
-    { name: "Tchad",       svg: vBands(["#002664", "#FECB00", "#C60C30"]) },
-    { name: "Colombie",    svg: hBands(["#FCD116", "#FCD116", "#003893", "#CE1126"]) },
-    { name: "Vietnam",     svg: vietnam() },
-    { name: "Chili",       svg: chile() },
-    { name: "Estonie",     svg: hBands(["#0072CE", "#000000", "#FFFFFF"]) },
-  ]
-};
 
 function vBands(colors, weights) {
   const w = weights || colors.map(() => 1);
@@ -181,43 +138,181 @@ function vBandsWithStar(colors, starOn) {
     </svg>
   );
 }
-
-function pickFlagSet(level) {
-  const pool = FLAGS[level];
-  // pick 1 correct + 3 distractors
-  const correct = pool[Math.floor(Math.random() * pool.length)];
-  const others = pool.filter(f => f.name !== correct.name).sort(() => Math.random() - 0.5).slice(0, 3);
-  const choices = [correct, ...others].sort(() => Math.random() - 0.5);
-  return { correct, choices };
+function uk() {
+  // Union Jack approximation: blue field + white diagonals + red cross
+  return (
+    <svg viewBox="0 0 90 60" width="100%" height="100%" preserveAspectRatio="none">
+      <rect width="90" height="60" fill="#012169" />
+      {/* White diagonals (St Andrew + St Patrick outer) */}
+      <line x1="0" y1="0" x2="90" y2="60" stroke="#fff" strokeWidth="12" />
+      <line x1="90" y1="0" x2="0" y2="60" stroke="#fff" strokeWidth="12" />
+      {/* Red diagonals (St Patrick inner) */}
+      <line x1="0" y1="0" x2="90" y2="60" stroke="#CF142B" strokeWidth="6" />
+      <line x1="90" y1="0" x2="0" y2="60" stroke="#CF142B" strokeWidth="6" />
+      {/* White cross (St George outer) */}
+      <rect x="36" y="0" width="18" height="60" fill="#fff" />
+      <rect x="0" y="21" width="90" height="18" fill="#fff" />
+      {/* Red cross (St George) */}
+      <rect x="39" y="0" width="12" height="60" fill="#CF142B" />
+      <rect x="0" y="24" width="90" height="12" fill="#CF142B" />
+    </svg>
+  );
 }
 
+const FLAGS = {
+  1: [
+    { name: "France",        svg: vBands(["#0055A4", "#FFFFFF", "#EF4135"]) },
+    { name: "Italie",        svg: vBands(["#009246", "#FFFFFF", "#CE2B37"]) },
+    { name: "Allemagne",     svg: hBands(["#000000", "#DD0000", "#FFCE00"]) },
+    { name: "Espagne",       svg: hBands(["#AA151B", "#F1BF00", "#F1BF00", "#AA151B"], [1,2,2,1]) },
+    { name: "Belgique",      svg: vBands(["#000000", "#FAE042", "#ED2939"]) },
+    { name: "Pays-Bas",      svg: hBands(["#AE1C28", "#FFFFFF", "#21468B"]) },
+    { name: "Suisse",        svg: swiss() },
+    { name: "Japon",         svg: japan() },
+    { name: "Danemark",      svg: nordic("#C60C30", "#FFFFFF") },
+    { name: "Royaume-Uni",   svg: uk() },
+  ],
+  2: [
+    { name: "Portugal",      svg: portugal() },
+    { name: "Irlande",       svg: vBands(["#169B62", "#FFFFFF", "#FF883E"]) },
+    { name: "Grèce",         svg: greece() },
+    { name: "Suède",         svg: nordic("#006AA7", "#FECC00") },
+    { name: "Norvège",       svg: norway() },
+    { name: "Finlande",      svg: nordic("#FFFFFF", "#003580") },
+    { name: "Pologne",       svg: hBands(["#FFFFFF", "#DC143C"]) },
+    { name: "Autriche",      svg: hBands(["#ED2939", "#FFFFFF", "#ED2939"]) },
+    { name: "Hongrie",       svg: hBands(["#CE2939", "#FFFFFF", "#477050"]) },
+    { name: "Roumanie",      svg: vBands(["#002B7F", "#FCD116", "#CE1126"]) },
+    { name: "Brésil",        svg: brazil() },
+    { name: "Argentine",     svg: hBands(["#74ACDF", "#FFFFFF", "#74ACDF"]) },
+    { name: "Canada",        svg: canada() },
+    { name: "Mexique",       svg: vBands(["#006847", "#FFFFFF", "#CE1126"]) },
+    { name: "Pérou",         svg: vBands(["#D91023", "#FFFFFF", "#D91023"]) },
+    { name: "Ukraine",       svg: hBands(["#0057B7", "#FFD700"]) },
+  ],
+  3: [
+    { name: "Sénégal",       svg: vBandsWithStar(["#00853F", "#FDEF42", "#E31B23"], "#00853F") },
+    { name: "Indonésie",     svg: hBands(["#FF0000", "#FFFFFF"]) },
+    { name: "Mongolie",      svg: vBands(["#C4272F", "#0066B3", "#C4272F"]) },
+    { name: "Côte d'Ivoire", svg: vBands(["#FF8200", "#FFFFFF", "#009E60"]) },
+    { name: "Lituanie",      svg: hBands(["#FDB913", "#006A44", "#C1272D"]) },
+    { name: "Bulgarie",      svg: hBands(["#FFFFFF", "#00966E", "#D62612"]) },
+    { name: "Tchad",         svg: vBands(["#002664", "#FECB00", "#C60C30"]) },
+    { name: "Colombie",      svg: hBands(["#FCD116", "#FCD116", "#003893", "#CE1126"]) },
+    { name: "Vietnam",       svg: vietnam() },
+    { name: "Chili",         svg: chile() },
+    { name: "Estonie",       svg: hBands(["#0072CE", "#000000", "#FFFFFF"]) },
+    { name: "Arménie",       svg: hBands(["#D90012", "#0033A0", "#F2A800"]) },
+    { name: "Lettonie",      svg: hBands(["#9E3039", "#FFFFFF", "#9E3039"], [5,1,5]) },
+  ]
+};
+
+// NOTE: Ukraine was in level 3 originally but moved to level 2 pool;
+// it's now duplicated as level 2 entry above (removed from level 3).
+
 function DrapeauxGame({ level, onHud, onFinish }) {
-  const TOTAL = 6;
+  const TOTAL = 8;
+  const numChoices = level === 1 ? 4 : 5;
+  const usedRef = useRef(new Set());
+
+  function pickNoRepeat() {
+    const pool = FLAGS[level];
+    const available = pool.filter(f => !usedRef.current.has(f.name));
+    const pickPool = available.length >= numChoices ? available : pool;
+    const correct = pickPool[Math.floor(Math.random() * pickPool.length)];
+    usedRef.current.add(correct.name);
+    const others = pool
+      .filter(f => f.name !== correct.name)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, numChoices - 1);
+    return { correct, choices: [correct, ...others].sort(() => Math.random() - 0.5) };
+  }
+
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
-  const [data, setData] = useState(() => pickFlagSet(level));
+  const [data, setData] = useState(() => pickNoRepeat());
   const [picked, setPicked] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(5);
+  const timerRef = useRef(null);
 
-  useEffect(() => { setData(pickFlagSet(level)); setPicked(null); }, [round, level]);
+  // Advance to next round (or finish)
+  function advance(currentScore) {
+    clearInterval(timerRef.current);
+    if (round >= TOTAL) {
+      onFinish(currentScore);
+    } else {
+      setRound(r => r + 1);
+    }
+  }
+
+  // Reset question on new round
+  useEffect(() => {
+    setData(pickNoRepeat());
+    setPicked(null);
+    setTimeLeft(5);
+  }, [round]);
+
+  // Countdown timer
+  useEffect(() => {
+    if (picked) return;
+    setTimeLeft(5);
+    timerRef.current = setInterval(() => {
+      setTimeLeft(t => {
+        if (t <= 1) {
+          clearInterval(timerRef.current);
+          // Time out — mark as miss and advance
+          setPicked("__timeout__");
+          setTimeout(() => advance(score), 1100);
+          return 0;
+        }
+        return t - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timerRef.current);
+  }, [round]);
+
   useEffect(() => onHud({ score, total: TOTAL }), [score]);
 
   const choose = (name) => {
     if (picked) return;
+    clearInterval(timerRef.current);
     setPicked(name);
     const ok = name === data.correct.name;
     const newScore = ok ? score + 1 : score;
     if (ok) setScore(newScore);
-    setTimeout(() => {
-      if (round >= TOTAL) onFinish(newScore);
-      else setRound((r) => r + 1);
-    }, 1100);
+    setTimeout(() => advance(newScore), 1100);
   };
+
+  const timerColor = timeLeft <= 2 ? "var(--danger)" : "var(--komin-blue)";
 
   return (
     <div className="col" style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: 24 }}>
-      <div className="prompt" style={{ marginBottom: 0 }}>
+      <div className="prompt" style={{ marginBottom: 0, position: "relative" }}>
         <div className="prompt__instruction">Manche {round} / {TOTAL} — Quel pays ?</div>
+        {/* Countdown */}
+        <div style={{
+          position: "absolute", top: 0, right: 0,
+          fontFamily: "var(--font-brand)", fontWeight: 800,
+          fontSize: 28, lineHeight: 1,
+          color: timerColor,
+          transition: "color .3s",
+          minWidth: 32, textAlign: "right"
+        }}>
+          {picked ? "" : timeLeft}
+        </div>
       </div>
+
+      {/* Timer bar */}
+      {!picked && (
+        <div style={{ width: "100%", maxWidth: 480, height: 4, background: "var(--komin-lightgray)", borderRadius: 2, overflow: "hidden" }}>
+          <div style={{
+            height: "100%",
+            width: `${(timeLeft / 5) * 100}%`,
+            background: timerColor,
+            transition: "width 1s linear, background .3s"
+          }} />
+        </div>
+      )}
 
       <div style={{
         width: 240, height: 160, borderRadius: 12,
@@ -227,6 +322,12 @@ function DrapeauxGame({ level, onHud, onFinish }) {
       }}>
         {data.correct.svg}
       </div>
+
+      {picked === "__timeout__" && (
+        <div className="feedback ko" style={{ marginBottom: 0 }}>
+          Temps écoulé — c'était {data.correct.name}
+        </div>
+      )}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12, width: "100%", maxWidth: 480 }}>
         {data.choices.map((c) => {

@@ -2,6 +2,8 @@
 // games/reflexes.jsx — Tap dès que vert
 const { useState, useEffect, useRef } = React;
 
+const THRESHOLDS = { 1: 500, 2: 400, 3: 300 };
+
 function ReflexesGame({ level, onHud, onFinish }) {
   const [phase, setPhase] = useState("ready"); // ready | wait | go | trick | result | done
   const [start, setStart] = useState(0);
@@ -10,6 +12,8 @@ function ReflexesGame({ level, onHud, onFinish }) {
   const TOTAL = 5;
   const [times, setTimes] = useState([]);
   const timer = useRef(null);
+
+  const threshold = THRESHOLDS[level];
 
   useEffect(() => onHud({ score: times.length, total: TOTAL }), [times]);
   useEffect(() => () => clearTimeout(timer.current), []);
@@ -43,14 +47,12 @@ function ReflexesGame({ level, onHud, onFinish }) {
       return;
     }
     if (phase === "wait") {
-      // anticipation -> fail
       clearTimeout(timer.current);
       setPhase("ready");
       setReaction("fail");
       return;
     }
     if (phase === "trick") {
-      // clicked on red -> fail
       clearTimeout(timer.current);
       setPhase("ready");
       setReaction("fail-red");
@@ -64,8 +66,8 @@ function ReflexesGame({ level, onHud, onFinish }) {
       if (next.length >= TOTAL) {
         setPhase("done");
         const avg = Math.round(next.reduce((a, b) => a + b, 0) / next.length);
-        // score = number of valid reactions (0-5); cleaner: pass count
-        setTimeout(() => onFinish(next.length), 600);
+        const finalScore = avg < threshold ? 5 : 0;
+        setTimeout(() => onFinish(finalScore), 1600);
       } else {
         setPhase("result");
         setRound((r) => r + 1);
@@ -88,25 +90,50 @@ function ReflexesGame({ level, onHud, onFinish }) {
     : phase === "result" ? `${reaction} ms`
     : "Terminé";
 
+  const currentAvg = times.length
+    ? Math.round(times.reduce((a, b) => a + b, 0) / times.length)
+    : null;
+
   if (phase === "done") {
     const avg = times.length ? Math.round(times.reduce((a, b) => a + b, 0) / times.length) : 0;
+    const passed = avg < threshold;
     return (
-      <div className="col" style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: 16 }}>
-        <div className="prompt">
-          <div className="prompt__instruction">Terminé</div>
-          <div className="prompt__main">{avg} ms en moyenne</div>
-        </div>
-      </div>
+      React.createElement("div", { className: "col", style: { flex: 1, alignItems: "center", justifyContent: "center", gap: 16 } },
+        React.createElement("div", { className: "prompt" },
+          React.createElement("div", { className: "prompt__instruction" }, "Terminé"),
+          React.createElement("div", { className: "prompt__main" }, `${avg} ms en moyenne`)
+        ),
+        React.createElement("div", {
+          className: `feedback ${passed ? "ok" : "ko"}`,
+          style: { marginTop: 8 }
+        },
+          passed
+            ? `Excellent ! Sous les ${threshold} ms — objectif atteint`
+            : `Trop lent — cible : moy. < ${threshold} ms`
+        )
+      )
     );
   }
 
   return (
-    <div className="col" style={{ flex: 1, alignItems: "center", gap: 16 }}>
-      <div className="prompt" style={{ marginBottom: 0 }}>
-        <div className="prompt__instruction">Manche {Math.min(round, TOTAL)} / {TOTAL}</div>
-      </div>
-      <button onClick={click}
-        style={{
+    React.createElement("div", { className: "col", style: { flex: 1, alignItems: "center", gap: 16 } },
+      React.createElement("div", { className: "prompt", style: { marginBottom: 0 } },
+        React.createElement("div", {
+          className: "prompt__instruction",
+          style: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16 }
+        },
+          React.createElement("span", null, `Manche ${Math.min(round, TOTAL)} / ${TOTAL}`),
+          React.createElement("span", { style: { color: "var(--gold-soft)", fontSize: 13 } },
+            `Cible : moy. < ${threshold} ms`,
+            currentAvg != null
+              ? React.createElement("span", { style: { marginLeft: 8, color: "var(--pearl)" } }, `· moy. actuelle : ${currentAvg} ms`)
+              : null
+          )
+        )
+      ),
+      React.createElement("button", {
+        onClick: click,
+        style: {
           width: "100%", maxWidth: 560, minHeight: 320,
           borderRadius: 20,
           background: bg,
@@ -116,17 +143,15 @@ function ReflexesGame({ level, onHud, onFinish }) {
           fontSize: phase === "go" ? 56 : phase === "result" ? 64 : 28,
           letterSpacing: "-0.03em",
           cursor: "pointer", transition: "background .1s, color .1s, font-size .15s"
-        }}>
-        {txt}
-      </button>
-      {times.length > 0 && (
-        <div className="row" style={{ flexWrap: "wrap", gap: 6, justifyContent: "center" }}>
-          {times.map((t, i) => (
-            <span key={i} className="k-pill k-pill--light-primary k-pill--sm">{t} ms</span>
-          ))}
-        </div>
-      )}
-    </div>
+        }
+      }, txt),
+      times.length > 0 &&
+        React.createElement("div", { className: "row", style: { flexWrap: "wrap", gap: 6, justifyContent: "center" } },
+          times.map((t, i) =>
+            React.createElement("span", { key: i, className: "k-pill k-pill--light-primary k-pill--sm" }, `${t} ms`)
+          )
+        )
+    )
   );
 }
 

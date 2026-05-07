@@ -4,9 +4,9 @@ const { useState, useEffect, useRef } = React;
 
 // Fixed BPM target per level — player must match it, not just be self-consistent
 const CONFIGS = {
-  1: { bpm: 60,  interval: 1000, tolerance: 220, label: "60 BPM" },
-  2: { bpm: 90,  interval: Math.round(60000 / 90), tolerance: 130, label: "90 BPM" },
-  3: { bpm: 120, interval: 500,  tolerance: 70,  label: "120 BPM" },
+  1: { bpm: 60,  interval: 1000, tolerance: 220, label: "60 BPM",  hideAfter: null, hint: null },
+  2: { bpm: 90,  interval: Math.round(60000 / 90), tolerance: 130, label: "90 BPM",  hideAfter: 5, hint: "Mémorise — le repère va disparaître" },
+  3: { bpm: 120, interval: 500,  tolerance: 70,  label: "120 BPM", hideAfter: 2, hint: "Mémorise bien — seulement 2 repères" },
 };
 
 const TOTAL_TAPS = 10; // 9 intervals scored
@@ -16,15 +16,20 @@ function TempoGame({ level, onHud, onFinish }) {
   const [taps, setTaps] = useState([]);
   const [done, setDone] = useState(false);
   const [pulse, setPulse] = useState(false);
+  const tapsRef = useRef([]);
 
-  // Visual metronome — pulses at target BPM
+  // Sync ref so the interval callback always sees the latest taps count
+  useEffect(() => { tapsRef.current = taps; }, [taps]);
+
+  // Visual metronome — pulses at target BPM, hidden after hideAfter taps on levels 2 & 3
   useEffect(() => {
     const iv = setInterval(() => {
+      if (cfg.hideAfter !== null && tapsRef.current.length >= cfg.hideAfter) return;
       setPulse(true);
       setTimeout(() => setPulse(false), 80);
     }, cfg.interval);
     return () => clearInterval(iv);
-  }, [cfg.interval]);
+  }, [cfg.interval, cfg.hideAfter]);
 
   // Compute intervals vs fixed target (not vs own average)
   const intervals = [];
@@ -56,6 +61,9 @@ function TempoGame({ level, onHud, onFinish }) {
     );
   }
 
+  // Whether the metronome dot should be visible at all
+  const metronomeVisible = cfg.hideAfter === null || taps.length < cfg.hideAfter;
+
   return (
     <div className="col" style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: 20 }}>
       <div className="prompt" style={{ marginBottom: 0, textAlign: "center" }}>
@@ -63,16 +71,35 @@ function TempoGame({ level, onHud, onFinish }) {
         <div className="prompt__main">{taps.length} / {TOTAL_TAPS}</div>
       </div>
 
+      {/* Warning hint for levels 2 & 3 before metronome disappears */}
+      {cfg.hint && taps.length < cfg.hideAfter && (
+        <div style={{
+          fontSize: 12,
+          color: "var(--gold)",
+          background: "rgba(212,162,76,0.12)",
+          border: "1px solid rgba(212,162,76,0.3)",
+          borderRadius: 8,
+          padding: "6px 14px",
+          textAlign: "center",
+        }}>
+          {cfg.hint}
+        </div>
+      )}
+
       {/* Metronome dot */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12, color: "var(--secondary-high)" }}>
         <div style={{
           width: 14, height: 14, borderRadius: "50%",
-          background: pulse ? "var(--gold-bright)" : "rgba(212,162,76,0.2)",
-          boxShadow: pulse ? "0 0 10px var(--gold)" : "none",
+          background: metronomeVisible && pulse ? "var(--gold-bright)" : metronomeVisible ? "rgba(212,162,76,0.2)" : "transparent",
+          boxShadow: metronomeVisible && pulse ? "0 0 10px var(--gold)" : "none",
           transition: pulse ? "none" : "background .12s, box-shadow .12s",
-          flexShrink: 0
+          flexShrink: 0,
+          border: metronomeVisible ? "none" : "1px dashed rgba(212,162,76,0.2)"
         }} />
-        <span>Suis le point — tape en même temps que lui</span>
+        {metronomeVisible
+          ? <span>Suis le point — tape en même temps que lui</span>
+          : <span style={{ color: "var(--gold)", fontStyle: "italic" }}>Repère masqué — continue dans le rythme</span>
+        }
       </div>
 
       <button onClick={tap}

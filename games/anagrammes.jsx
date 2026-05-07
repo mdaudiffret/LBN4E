@@ -1,11 +1,20 @@
 ;(function() {
 // games/anagrammes.jsx — Anagrammes
-const { useState, useEffect } = React;
+const { useState, useEffect, useRef } = React;
 
 const ANAGRAM_WORDS = {
-  1: ["CHAT", "LUNE", "ROSE", "PAIN", "BLEU", "MAIN", "AMIE", "JEUX", "VENT", "OURS", "PLUME", "FRAISE"],
-  2: ["MAISON", "JARDIN", "GATEAU", "FLEUVE", "PIRATE", "TIGRES", "ORANGE", "BANANE", "FORETS", "CHATEAU", "VIOLON"],
-  3: ["MONTAGNE", "CAPITALE", "OLYMPIEN", "ASTRONOME", "ROYAUMES", "EXPLORER", "ETOILEES", "SYMPATHIE"]
+  1: [
+    "CHAT", "LUNE", "ROSE", "PAIN", "BLEU", "MAIN", "AMIE", "JEUX", "VENT", "OURS",
+    "PLUME", "FRAISE", "ARBRE", "PORTE", "SABLE", "COEUR", "FOIRE", "NAPPE", "LAMPE", "MANGE"
+  ],
+  2: [
+    "MAISON", "JARDIN", "GATEAU", "FLEUVE", "PIRATE", "TIGRES", "ORANGE", "BANANE",
+    "FORETS", "CHATEAU", "VIOLON", "CLOCHETON", "PASSION", "BOULEAU"
+  ],
+  3: [
+    "MONTAGNE", "CAPITALE", "OLYMPIEN", "ASTRONOME", "ROYAUMES", "EXPLORER",
+    "ETOILEES", "SYMPATHIE", "MYSTIQUE", "AVENTURE", "GALAXIES", "SOUVERAIN"
+  ]
 };
 
 function shuffle(s) {
@@ -26,6 +35,7 @@ function pickWord(level) {
 }
 
 const ANAGRAM_TOTAL = 5;
+const ANAGRAM_TIMER = 60;
 
 function AnagrammesGame({ level, onHud, onFinish }) {
   const [round, setRound] = useState(1);
@@ -34,6 +44,12 @@ function AnagrammesGame({ level, onHud, onFinish }) {
   const [letters, setLetters] = useState(() => shuffle(pickWord(level)));
   const [picked, setPicked] = useState([]);
   const [feedback, setFeedback] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(ANAGRAM_TIMER);
+  const doneRef = useRef(false);
+  const scoreRef = useRef(0);
+
+  // keep scoreRef in sync for the timer callback
+  useEffect(() => { scoreRef.current = score; }, [score]);
 
   useEffect(() => {
     const w = pickWord(level);
@@ -44,6 +60,23 @@ function AnagrammesGame({ level, onHud, onFinish }) {
   }, [round, level]);
 
   useEffect(() => { onHud({ score, total: ANAGRAM_TOTAL }); }, [score]);
+
+  // global countdown — starts on mount, never resets between rounds
+  useEffect(() => {
+    if (doneRef.current) return;
+    if (timeLeft <= 0) {
+      if (!doneRef.current) {
+        doneRef.current = true;
+        onFinish(scoreRef.current);
+      }
+      return;
+    }
+    const t = setTimeout(() => setTimeLeft((v) => v - 1), 1000);
+    return () => clearTimeout(t);
+  }, [timeLeft]);
+
+  const timerColor = timeLeft <= 15 ? "var(--danger)" : undefined;
+  const timerDisplay = `⏱ 0:${String(timeLeft).padStart(2, "0")}`;
 
   const tap = (i) => {
     if (feedback) return;
@@ -59,8 +92,13 @@ function AnagrammesGame({ level, onHud, onFinish }) {
         if (ok) { setScore(newScore); setFeedback("ok"); }
         else setFeedback("ko");
         setTimeout(() => {
-          if (round >= ANAGRAM_TOTAL) onFinish(newScore);
-          else setRound(r => r + 1);
+          if (doneRef.current) return;
+          if (round >= ANAGRAM_TOTAL) {
+            doneRef.current = true;
+            onFinish(newScore);
+          } else {
+            setRound(r => r + 1);
+          }
         }, 1100);
       }
     }
@@ -69,34 +107,44 @@ function AnagrammesGame({ level, onHud, onFinish }) {
   const reset = () => setPicked([]);
 
   return (
-    <div className="col" style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: 24 }}>
-      <div className="prompt">
-        <div className="prompt__instruction">Manche {round} / {ANAGRAM_TOTAL} — Reforme le mot</div>
-        <div className="prompt__main" style={{ fontSize: 28, color: "var(--gold-soft)" }}>{word.length} lettres</div>
-      </div>
+    React.createElement("div", { className: "col", style: { flex: 1, alignItems: "center", justifyContent: "center", gap: 24 } },
+      React.createElement("div", { className: "prompt" },
+        React.createElement("div", {
+          className: "prompt__instruction",
+          style: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16 }
+        },
+          React.createElement("span", null, `Manche ${round} / ${ANAGRAM_TOTAL} — Reforme le mot`),
+          React.createElement("span", { style: { color: timerColor, fontVariantNumeric: "tabular-nums" } }, timerDisplay)
+        ),
+        React.createElement("div", { className: "prompt__main", style: { fontSize: 28, color: "var(--gold-soft)" } },
+          `${word.length} lettres`
+        )
+      ),
 
-      <div style={{ display: "flex", gap: 8, minHeight: 64, alignItems: "center" }}>
-        {Array.from({ length: word.length }).map((_, i) => (
-          <div key={i} style={{
-            width: 48, height: 56, borderRadius: 10,
-            background: picked[i] != null ? "var(--gold)" : "transparent",
-            color: picked[i] != null ? "var(--ink)" : "var(--gold-soft)",
-            border: "2px solid " + (feedback === "ok" ? "var(--success)" : feedback === "ko" ? "var(--danger)" : "rgba(201,162,74,0.4)"),
-            display: "inline-flex", alignItems: "center", justifyContent: "center",
-            fontFamily: "var(--font-brand)", fontWeight: 800, fontSize: 28, letterSpacing: "-0.02em",
-            transition: "background .15s, border-color .15s"
-          }}>
-            {picked[i] != null ? letters[picked[i]] : ""}
-          </div>
-        ))}
-      </div>
+      React.createElement("div", { style: { display: "flex", gap: 8, minHeight: 64, alignItems: "center" } },
+        Array.from({ length: word.length }).map((_, i) =>
+          React.createElement("div", {
+            key: i,
+            style: {
+              width: 48, height: 56, borderRadius: 10,
+              background: picked[i] != null ? "var(--gold)" : "transparent",
+              color: picked[i] != null ? "var(--ink)" : "var(--gold-soft)",
+              border: "2px solid " + (feedback === "ok" ? "var(--success)" : feedback === "ko" ? "var(--danger)" : "rgba(201,162,74,0.4)"),
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              fontFamily: "var(--font-brand)", fontWeight: 800, fontSize: 28, letterSpacing: "-0.02em",
+              transition: "background .15s, border-color .15s"
+            }
+          }, picked[i] != null ? letters[picked[i]] : "")
+        )
+      ),
 
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", maxWidth: 480 }}>
-        {letters.split("").map((ch, i) => (
-          <button key={i}
-            onClick={() => tap(i)}
-            disabled={feedback === "ok" || feedback === "ko"}
-            style={{
+      React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", maxWidth: 480 } },
+        letters.split("").map((ch, i) =>
+          React.createElement("button", {
+            key: i,
+            onClick: () => tap(i),
+            disabled: feedback === "ok" || feedback === "ko",
+            style: {
               width: 48, height: 56, borderRadius: 10,
               background: picked.includes(i) ? "rgba(201,162,74,0.1)" : "var(--ink-3)",
               color: picked.includes(i) ? "rgba(245,239,226,0.4)" : "var(--parchment)",
@@ -105,20 +153,20 @@ function AnagrammesGame({ level, onHud, onFinish }) {
               cursor: "pointer",
               opacity: picked.includes(i) ? 0.5 : 1,
               transition: "all .15s"
-            }}
-          >
-            {ch}
-          </button>
-        ))}
-      </div>
+            }
+          }, ch)
+        )
+      ),
 
-      <button className="k-btn k-btn--sm k-btn--ghost" onClick={reset} disabled={picked.length === 0 || !!feedback}>
-        Effacer
-      </button>
+      React.createElement("button", {
+        className: "k-btn k-btn--sm k-btn--ghost",
+        onClick: reset,
+        disabled: picked.length === 0 || !!feedback
+      }, "Effacer"),
 
-      {feedback === "ok" && <div className="feedback ok">Bravo, c'était bien {word} !</div>}
-      {feedback === "ko" && <div className="feedback ko">Le mot était {word}</div>}
-    </div>
+      feedback === "ok" && React.createElement("div", { className: "feedback ok" }, `Bravo, c'était bien ${word} !`),
+      feedback === "ko" && React.createElement("div", { className: "feedback ko" }, `Le mot était ${word}`)
+    )
   );
 }
 
