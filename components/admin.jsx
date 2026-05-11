@@ -83,13 +83,51 @@ const IntendanceLogin = ({ onLogin }) => {
   );
 };
 
+/* ── Toast ───────────────────────────────────────────────────── */
+const Toast = ({ toast }) => {
+  if (!toast) return null;
+  const ok = toast.type === "ok";
+  return React.createElement("div", {
+    style: {
+      position: "fixed",
+      bottom: 28,
+      right: 28,
+      padding: "12px 20px",
+      background: ok ? "rgba(10,30,10,0.97)" : "rgba(30,10,10,0.97)",
+      border: `1px solid ${ok ? "var(--neon-green, #39ff14)" : "var(--neon-magenta, #ff2d78)"}`,
+      color: ok ? "var(--neon-green, #39ff14)" : "var(--neon-magenta, #ff2d78)",
+      fontFamily: "var(--font-mono)",
+      fontSize: 11,
+      letterSpacing: "0.18em",
+      textTransform: "uppercase",
+      zIndex: 9999,
+      pointerEvents: "none",
+    }
+  }, toast.msg);
+};
+
 /* ── Éditeur (page entière) ──────────────────────────────────── */
 const IntendanceEditor = ({ data, onUpdateData, onLogout }) => {
-  const [tab, setTab] = React.useState("dashboard");
-  const [d, setD]     = React.useState(data);
-  const set = (k, v)  => setD(prev => ({ ...prev, [k]: v }));
+  const [tab, setTab]   = React.useState("dashboard");
+  const [d, setD]       = React.useState(data);
+  const [saving, setSaving] = React.useState(false);
+  const [toast, setToast]   = React.useState(null);
+  const set = (k, v)    => setD(prev => ({ ...prev, [k]: v }));
 
-  const save = () => onUpdateData(d);
+  const isDirty     = JSON.stringify(d) !== JSON.stringify(data);
+  const canSceller  = (tab === "evenement" || tab === "jeux");
+
+  const showToast = (msg, type = "ok") => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const save = async () => {
+    setSaving(true);
+    const ok = await onUpdateData(d);
+    setSaving(false);
+    showToast(ok !== false ? "⚜ Modifications scellées" : "// Erreur · réessayez", ok !== false ? "ok" : "err");
+  };
 
   const tabs = [
     { id: "dashboard", label: "Dashboard" },
@@ -100,16 +138,37 @@ const IntendanceEditor = ({ data, onUpdateData, onLogout }) => {
 
   return (
     React.createElement("main", { className: "shell", style: { paddingTop: 40, paddingBottom: 80 } },
-      React.createElement("div", { className: "eyebrow", style: { marginBottom: 4 } }, "✠ Intendance · Mode Édition ✠"),
-      React.createElement("h1", {
-        style: {
-          fontFamily: "var(--font-display)",
-          fontSize: 28,
-          letterSpacing: "0.06em",
-          textTransform: "uppercase",
-          margin: "0 0 28px",
-        }
-      }, "Tenir les Registres"),
+
+      /* ── Header avec boutons ── */
+      React.createElement("div", {
+        style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }
+      },
+        React.createElement("div", null,
+          React.createElement("div", { className: "eyebrow", style: { marginBottom: 4 } }, "✠ Intendance · Mode Édition ✠"),
+          React.createElement("h1", {
+            style: {
+              fontFamily: "var(--font-display)",
+              fontSize: 28,
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              margin: 0,
+            }
+          }, "Tenir les Registres")
+        ),
+        React.createElement("div", { style: { display: "flex", gap: 10, alignItems: "center", paddingTop: 6 } },
+          canSceller && React.createElement("button", {
+            type: "button",
+            className: "btn btn--primary",
+            onClick: save,
+            disabled: !isDirty || saving,
+          }, saving ? "Scellement…" : "⚜ Sceller"),
+          React.createElement("button", {
+            type: "button",
+            className: "btn btn--ghost",
+            onClick: onLogout,
+          }, "Déconnexion")
+        )
+      ),
 
       React.createElement("div", { className: "admin-tabs", style: { marginBottom: 32 } },
         tabs.map(t =>
@@ -126,27 +185,7 @@ const IntendanceEditor = ({ data, onUpdateData, onLogout }) => {
       tab === "gazette"   && React.createElement(TabGazette, null),
       tab === "jeux"      && React.createElement(TabJeux, { d, set }),
 
-      tab !== "dashboard" && React.createElement("div", {
-        style: {
-          display: "flex",
-          gap: 12,
-          marginTop: 32,
-          paddingTop: 24,
-          borderTop: "1px solid var(--line-dim)",
-        }
-      },
-        React.createElement("button", {
-          type: "button",
-          className: "btn btn--primary",
-          style: { justifyContent: "center" },
-          onClick: save,
-        }, "⚜ Sceller les modifications"),
-        React.createElement("button", {
-          type: "button",
-          className: "btn btn--ghost",
-          onClick: onLogout,
-        }, "Déconnexion")
-      )
+      React.createElement(Toast, { toast })
     )
   );
 };

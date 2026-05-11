@@ -36,15 +36,15 @@ const useAppConfig = () => {
       .finally(() => setLoaded(true));
   }, []);
 
-  const saveConfig = (next) => {
+  const saveConfig = async (next) => {
     setData(next);
     const sb = window.__supabase;
-    if (!sb) return;
+    if (!sb) return true;
     // eslint-disable-next-line no-unused-vars
     const { posts: _posts, ...rest } = next;
-    sb.from("app_config")
-      .upsert({ id: 1, data: rest, updated_at: new Date().toISOString() })
-      .then(null, () => {});
+    const result = await sb.from("app_config")
+      .upsert({ id: 1, data: rest, updated_at: new Date().toISOString() });
+    return !result.error;
   };
 
   return [data, saveConfig, configLoaded];
