@@ -9,8 +9,13 @@
    --------------------------------------------------------------- */
 
 /* ── Page principale ─────────────────────────────────────────── */
-const IntendancePage = ({ data, onUpdateData, isAdmin, onLogin, onLogout }) => {
+const IntendancePage = ({ data, onUpdateData, isAdmin, onLogin, onLogout, configLoaded }) => {
   if (!isAdmin) return React.createElement(IntendanceLogin, { onLogin });
+  if (!configLoaded) return React.createElement("main", {
+    style: { minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center",
+             fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.18em",
+             color: "var(--bone)", opacity: 0.4, textTransform: "uppercase" }
+  }, "Chargement…");
   return React.createElement(IntendanceEditor, { data, onUpdateData, onLogout });
 };
 
@@ -83,13 +88,55 @@ const IntendanceLogin = ({ onLogin }) => {
   );
 };
 
+/* ── Toast ───────────────────────────────────────────────────── */
+const Toast = ({ toast }) => {
+  if (!toast) return null;
+  const ok = toast.type === "ok";
+  return React.createElement("div", {
+    style: {
+      position: "fixed",
+      bottom: 28,
+      right: 28,
+      padding: "12px 20px",
+      background: ok ? "rgba(10,30,10,0.97)" : "rgba(30,10,10,0.97)",
+      border: `1px solid ${ok ? "var(--neon-green, #39ff14)" : "var(--neon-magenta, #ff2d78)"}`,
+      color: ok ? "var(--neon-green, #39ff14)" : "var(--neon-magenta, #ff2d78)",
+      fontFamily: "var(--font-mono)",
+      fontSize: 11,
+      letterSpacing: "0.18em",
+      textTransform: "uppercase",
+      zIndex: 9999,
+      pointerEvents: "none",
+    }
+  }, toast.msg);
+};
+
 /* ── Éditeur (page entière) ──────────────────────────────────── */
 const IntendanceEditor = ({ data, onUpdateData, onLogout }) => {
-  const [tab, setTab] = React.useState("dashboard");
-  const [d, setD]     = React.useState(data);
-  const set = (k, v)  => setD(prev => ({ ...prev, [k]: v }));
+  const [tab, setTab]   = React.useState("dashboard");
+  const [d, setD]       = React.useState(data);
+  const [saving, setSaving] = React.useState(false);
+  const [toast, setToast]   = React.useState(null);
+  const set = (k, v)    => setD(prev => ({ ...prev, [k]: v }));
 
-  const save = () => onUpdateData(d);
+  const isDirty     = JSON.stringify(d) !== JSON.stringify(data);
+  const canSceller  = (tab === "evenement" || tab === "jeux");
+
+  const showToast = (msg, type = "ok") => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const ok = await onUpdateData(d);
+      showToast(ok !== false ? "⚜ Modifications scellées" : "// Erreur · réessayez", ok !== false ? "ok" : "err");
+    } catch (e) {
+      showToast("// Erreur · réessayez", "err");
+    }
+    setSaving(false);
+  };
 
   const tabs = [
     { id: "dashboard", label: "Dashboard" },
@@ -100,16 +147,37 @@ const IntendanceEditor = ({ data, onUpdateData, onLogout }) => {
 
   return (
     React.createElement("main", { className: "shell", style: { paddingTop: 40, paddingBottom: 80 } },
-      React.createElement("div", { className: "eyebrow", style: { marginBottom: 4 } }, "✠ Intendance · Mode Édition ✠"),
-      React.createElement("h1", {
-        style: {
-          fontFamily: "var(--font-display)",
-          fontSize: 28,
-          letterSpacing: "0.06em",
-          textTransform: "uppercase",
-          margin: "0 0 28px",
-        }
-      }, "Tenir les Registres"),
+
+      /* ── Header avec boutons ── */
+      React.createElement("div", {
+        style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }
+      },
+        React.createElement("div", null,
+          React.createElement("div", { className: "eyebrow", style: { marginBottom: 4 } }, "✠ Intendance · Mode Édition ✠"),
+          React.createElement("h1", {
+            style: {
+              fontFamily: "var(--font-display)",
+              fontSize: 28,
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              margin: 0,
+            }
+          }, "Tenir les Registres")
+        ),
+        React.createElement("div", { style: { display: "flex", gap: 10, alignItems: "center", paddingTop: 6 } },
+          canSceller && React.createElement("button", {
+            type: "button",
+            className: "btn btn--primary",
+            onClick: save,
+            disabled: !isDirty || saving,
+          }, saving ? "Scellement…" : "⚜ Sceller"),
+          React.createElement("button", {
+            type: "button",
+            className: "btn btn--ghost",
+            onClick: onLogout,
+          }, "Déconnexion")
+        )
+      ),
 
       React.createElement("div", { className: "admin-tabs", style: { marginBottom: 32 } },
         tabs.map(t =>
@@ -126,27 +194,7 @@ const IntendanceEditor = ({ data, onUpdateData, onLogout }) => {
       tab === "gazette"   && React.createElement(TabGazette, null),
       tab === "jeux"      && React.createElement(TabJeux, { d, set }),
 
-      tab !== "dashboard" && React.createElement("div", {
-        style: {
-          display: "flex",
-          gap: 12,
-          marginTop: 32,
-          paddingTop: 24,
-          borderTop: "1px solid var(--line-dim)",
-        }
-      },
-        React.createElement("button", {
-          type: "button",
-          className: "btn btn--primary",
-          style: { justifyContent: "center" },
-          onClick: save,
-        }, "⚜ Sceller les modifications"),
-        React.createElement("button", {
-          type: "button",
-          className: "btn btn--ghost",
-          onClick: onLogout,
-        }, "Déconnexion")
-      )
+      React.createElement(Toast, { toast })
     )
   );
 };
@@ -466,8 +514,9 @@ const AgendaEditor = ({ days, onChange }) => {
 };
 
 /* ── Tab: Événement ──────────────────────────────────────────── */
-const TabEvenement = ({ d, set }) => (
-  React.createElement("div", null,
+const TabEvenement = ({ d, set }) => {
+  const [pseudosRaw, setPseudosRaw] = React.useState((d.allowedPseudos || []).join("\n"));
+  return React.createElement("div", null,
 
     React.createElement("div", {
       style: { padding: "14px 16px", border: "1px solid var(--line-strong)", marginBottom: 20, background: "var(--char)" }
@@ -541,7 +590,7 @@ const TabEvenement = ({ d, set }) => (
       React.createElement("input", {
         className: "field-input",
         value: d.adminPseudo || "",
-        onChange: e => set("adminPseudo", e.target.value.trim()),
+        onChange: e => set("adminPseudo", e.target.value),
         placeholder: "Aramis",
         style: { maxWidth: 200 },
       })
@@ -559,8 +608,11 @@ const TabEvenement = ({ d, set }) => (
       React.createElement("textarea", {
         className: "field-textarea",
         rows: 8,
-        value: (d.allowedPseudos || []).join("\n"),
-        onChange: e => set("allowedPseudos", e.target.value.split("\n").map(s => s.trim()).filter(Boolean)),
+        value: pseudosRaw,
+        onChange: e => {
+          setPseudosRaw(e.target.value);
+          set("allowedPseudos", e.target.value.split("\n").map(s => s.trim()).filter(Boolean));
+        },
         placeholder: "Athos\nPorthos\nAramis\n…",
         style: { fontFamily: "var(--font-mono)", fontSize: 13, letterSpacing: "0.08em" },
       })
@@ -568,8 +620,8 @@ const TabEvenement = ({ d, set }) => (
 
     React.createElement(EquipementEditor, { items: d.equipement || [], onChange: v => set("equipement", v) }),
     React.createElement(AgendaEditor,     { days: d.agenda || [],    onChange: v => set("agenda", v) })
-  )
-);
+  );
+};
 
 /* ── Tab: Gazette ────────────────────────────────────────────── */
 const TabGazette = () => {

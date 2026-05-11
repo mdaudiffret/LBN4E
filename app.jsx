@@ -36,15 +36,20 @@ const useAppConfig = () => {
       .finally(() => setLoaded(true));
   }, []);
 
-  const saveConfig = (next) => {
+  const saveConfig = async (next) => {
     setData(next);
     const sb = window.__supabase;
-    if (!sb) return;
-    // eslint-disable-next-line no-unused-vars
-    const { posts: _posts, ...rest } = next;
-    sb.from("app_config")
-      .upsert({ id: 1, data: rest, updated_at: new Date().toISOString() })
-      .then(null, () => {});
+    if (!sb) return true;
+    try {
+      // eslint-disable-next-line no-unused-vars
+      const { posts: _posts, ...rest } = next;
+      const result = await sb.from("app_config")
+        .upsert({ id: 1, data: rest, updated_at: new Date().toISOString() }, { onConflict: "id" });
+      return !result.error;
+    } catch (e) {
+      console.error("[saveConfig]", e);
+      return false;
+    }
   };
 
   return [data, saveConfig, configLoaded];
@@ -151,7 +156,7 @@ const App = () => {
       {page === "maison"     && <MaisonPage  data={data} isAdmin={isAdmin} onUpdateData={saveConfig} user={user} />}
       {page === "gazette"    && <GazettePage isAdmin={isAdmin} />}
       {page === "jeux"       && <JeuxPage    data={data} user={user} onLogout={logoutUser} />}
-      {page === "intendance" && <IntendancePage data={data} onUpdateData={saveConfig} isAdmin={isAdmin} onLogin={onLogin} onLogout={onLogout} />}
+      {page === "intendance" && <IntendancePage data={data} onUpdateData={saveConfig} isAdmin={isAdmin} onLogin={onLogin} onLogout={onLogout} configLoaded={configLoaded} />}
       {page !== "intendance" && <Footer />}
       {!user && page !== "intendance" && (
         <UserLoginModal
