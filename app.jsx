@@ -43,7 +43,7 @@ const useAppConfig = () => {
     if (!sb) return;
     sb.from("app_config")
       .upsert({ id: 1, data: next, updated_at: new Date().toISOString() })
-      .catch(() => {});
+      .then(null, () => {});
   };
 
   return [data, saveConfig, configLoaded];

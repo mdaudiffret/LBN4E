@@ -546,7 +546,7 @@ function JeuxPage({ data, user, onLogout }) {
       game_id: gameId,
       level,
       unlocked_at: new Date().toISOString(),
-    }).catch(() => {});
+    }).then(null, () => {});
   };
 
   const filtered = React.useMemo(

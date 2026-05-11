@@ -196,7 +196,7 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
         if (newlyFound.length > 0) {
           await sb.from("user_codes").upsert(
             newlyFound.map(i => ({ user_id: user.id, code_index: i, found_at: new Date().toISOString() }))
-          ).catch(() => {});
+          ).then(null, () => {});
           setFoundIdx(prev => new Set([...prev, ...newlyFound]));
         }
       }
