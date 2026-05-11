@@ -1,7 +1,7 @@
 /* global React */
 
 // ── Modal de login utilisateur (saisie libre vérifiée contre liste admin) ──
-const UserLoginModal = ({ onLogin, allowedPseudos, configLoaded }) => {
+const UserLoginModal = ({ onLogin, allowedPseudos, adminPseudo, configLoaded }) => {
   const [pseudo, setPseudo]   = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [error, setError]     = React.useState(null);
@@ -20,11 +20,14 @@ const UserLoginModal = ({ onLogin, allowedPseudos, configLoaded }) => {
     const trimmed = pseudo.trim();
     if (!trimmed || loading || !configLoaded) return;
 
-    // Vérifier contre la liste prédéfinie (insensible à la casse)
-    const allowed = (allowedPseudos || []).map(p => p.toLowerCase());
-    if (!allowed.includes(trimmed.toLowerCase())) {
-      setError("Nom non reconnu · Point de passage");
-      return;
+    // L'adminPseudo bypass toujours la liste
+    const isAdmin = adminPseudo && trimmed.toLowerCase() === adminPseudo.toLowerCase();
+    if (!isAdmin) {
+      const allowed = (allowedPseudos || []).map(p => p.toLowerCase());
+      if (!allowed.includes(trimmed.toLowerCase())) {
+        setError("Nom non reconnu · Point de passage");
+        return;
+      }
     }
 
     setLoading(true);
