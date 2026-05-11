@@ -11,6 +11,7 @@ const AdminPanel = ({ open, onClose, isAdmin, onLogin, onLogout, data, onUpdateD
   return (
     React.createElement("div", {
       className: "modal-stage",
+      style: { zIndex: 500 },
       onClick: (e) => { if (e.target.classList.contains("modal-stage")) onClose(); }
     },
       !isAdmin

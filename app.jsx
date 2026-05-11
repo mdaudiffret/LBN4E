@@ -148,7 +148,7 @@ const App = () => {
       {page === "gazette" && <GazettePage data={data} isAdmin={isAdmin} />}
       {page === "jeux"    && <JeuxPage    data={data} user={user} onLogout={logoutUser} />}
       <Footer />
-      {!user && <UserLoginModal onLogin={loginUser} allowedPseudos={data.allowedPseudos || []} configLoaded={configLoaded} />}
+      {!user && <UserLoginModal onLogin={loginUser} allowedPseudos={data.allowedPseudos || []} adminPseudo={data.adminPseudo || ""} configLoaded={configLoaded} />}
       <AdminPanel
         open={adminOpen}
         onClose={() => setAdminOpen(false)}
