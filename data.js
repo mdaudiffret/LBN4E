@@ -5,6 +5,9 @@ const DEFAULT_DATA = {
   /* Liste des pseudos autorisés — configurée via admin, vide = personne ne peut accéder */
   allowedPseudos: [],
 
+  /* Pseudo admin — exclu du classement */
+  adminPseudo: "",
+
   /* Countdown target — ISO 8601, modifiable via admin */
   countdownISO: "2026-06-12T16:00:00",
 

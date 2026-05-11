@@ -420,6 +420,29 @@ const TabEvenement = ({ d, set }) => (
       )
     ),
 
+    /* Pseudo admin */
+    React.createElement("div", {
+      style: { marginTop: 20, padding: "14px 16px", border: "1px solid var(--line)", background: "var(--char)" }
+    },
+      React.createElement("div", {
+        style: {
+          fontFamily: "var(--font-mono)", fontSize: 10,
+          letterSpacing: "0.26em", color: "var(--gold)",
+          textTransform: "uppercase", marginBottom: 8,
+        }
+      }, "Pseudo admin (exclu du classement)"),
+      React.createElement("div", {
+        style: { fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 13, color: "var(--bone)", opacity: 0.6, marginBottom: 10 }
+      }, "Ce pseudo peut jouer normalement mais n'apparaît pas dans le tableau d'honneur."),
+      React.createElement("input", {
+        className: "field-input",
+        value: d.adminPseudo || "",
+        onChange: e => set("adminPseudo", e.target.value.trim()),
+        placeholder: "Aramis",
+        style: { maxWidth: 200 },
+      })
+    ),
+
     /* Pseudos autorisés */
     React.createElement("div", {
       style: { marginTop: 20, padding: "14px 16px", border: "1px solid var(--line)", background: "var(--char)" }
