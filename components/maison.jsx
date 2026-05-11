@@ -1,6 +1,6 @@
 /* global React */
 
-const MaisonPage = ({ data, isAdmin, onUpdateData }) => (
+const MaisonPage = ({ data, isAdmin, onUpdateData, user }) => (
   React.createElement("div", { className: "page" },
     React.createElement("div", { className: "shell" },
       React.createElement(Hero, { data }),
@@ -11,6 +11,7 @@ const MaisonPage = ({ data, isAdmin, onUpdateData }) => (
             isAdmin,
             revealCodes: data.revealCodes,
             onReveal: () => onUpdateData({ ...data, infosRevealed: true }),
+            user,
           })
     )
   )
@@ -126,17 +127,35 @@ const levenshtein = (a, b) => {
 const romans = ["I","II","III","IV","V","VI","VII","VIII","IX"];
 
 /* ---------- SEALED ---------- */
-const InfosSealed = ({ isAdmin, onReveal, revealCodes }) => {
+const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
   const codes = revealCodes || Array(9).fill("");
-  const [tick, setTick]       = React.useState(0);
-  const [inputs, setInputs]   = React.useState(Array(9).fill(""));
-  const [results, setResults] = React.useState(Array(9).fill(null)); // null | 'correct' | 'almost' | 'wrong'
+  const [tick, setTick]           = React.useState(0);
+  const [inputs, setInputs]       = React.useState(Array(9).fill(""));
+  const [results, setResults]     = React.useState(Array(9).fill(null)); // null | 'correct' | 'almost' | 'wrong'
   const [submitted, setSubmitted] = React.useState(false);
+  const [foundIdx, setFoundIdx]   = React.useState(new Set()); // indices déjà trouvés par cet utilisateur
 
   React.useEffect(() => {
     const id = setInterval(() => setTick(t => t + 1), 120);
     return () => clearInterval(id);
   }, []);
+
+  // Charger les codes déjà trouvés par l'utilisateur
+  React.useEffect(() => {
+    if (!user) return;
+    const sb = window.__supabase;
+    if (!sb) return;
+    sb.from("user_codes").select("code_index").eq("user_id", user.id)
+      .then(({ data: rows }) => {
+        if (!rows || rows.length === 0) return;
+        const found = new Set(rows.map(r => r.code_index));
+        setFoundIdx(found);
+        // Pré-remplir les inputs déjà trouvés
+        setInputs(prev => prev.map((v, i) => found.has(i) ? (codes[i] || "") : v));
+        setResults(prev => prev.map((v, i) => found.has(i) ? "correct" : v));
+      })
+      .catch(() => {});
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const glyphs = "▓▒░█◆◇※★✦";
   const noise = (n) => Array.from({ length: n }, (_, i) => glyphs[(i * 7 + tick) % glyphs.length]).join("");
@@ -154,18 +173,35 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes }) => {
     }
   };
 
-  const submitReveal = (e) => {
+  const submitReveal = async (e) => {
     e.preventDefault();
     const r = inputs.map((v, i) => {
       const target = (codes[i] || "").toLowerCase().trim();
       const val = v.toLowerCase().trim();
-      if (!target) return "correct"; // empty slot counts as correct
+      if (!target) return "correct";
       if (val === target) return "correct";
       if (levenshtein(val, target) <= 2) return "almost";
       return "wrong";
     });
     setResults(r);
     setSubmitted(true);
+
+    // Sauvegarder les nouveaux codes corrects dans Supabase
+    if (user) {
+      const sb = window.__supabase;
+      if (sb) {
+        const newlyFound = r
+          .map((status, i) => status === "correct" && !foundIdx.has(i) ? i : null)
+          .filter(i => i !== null);
+        if (newlyFound.length > 0) {
+          await sb.from("user_codes").upsert(
+            newlyFound.map(i => ({ user_id: user.id, code_index: i, found_at: new Date().toISOString() }))
+          ).catch(() => {});
+          setFoundIdx(prev => new Set([...prev, ...newlyFound]));
+        }
+      }
+    }
+
     if (r.every(s => s === "correct")) onReveal();
   };
 
@@ -317,6 +353,8 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes }) => {
                   autoComplete: "off",
                   autoCorrect: "off",
                   spellCheck: false,
+                  readOnly: foundIdx.has(i),
+                  title: foundIdx.has(i) ? "Code déjà trouvé ✓" : undefined,
                 }),
                 React.createElement("div", {
                   className: "code-status" + (results[i] ? " is-" + results[i] : "")

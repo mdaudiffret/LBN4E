@@ -142,11 +142,11 @@ const App = () => {
     <React.Fragment>
       <div className="bg-stage" />
       <Topbar route={route} isAdmin={isAdmin} onAdminClick={() => setAdminOpen(true)} />
-      {page === "maison"  && <MaisonPage  data={data} isAdmin={isAdmin} onUpdateData={saveConfig} />}
+      {page === "maison"  && <MaisonPage  data={data} isAdmin={isAdmin} onUpdateData={saveConfig} user={user} />}
       {page === "gazette" && <GazettePage data={data} isAdmin={isAdmin} />}
       {page === "jeux"    && <JeuxPage    data={data} user={user} onLogout={logoutUser} />}
       <Footer />
-      {!user && <UserLoginModal onLogin={loginUser} />}
+      {!user && <UserLoginModal onLogin={loginUser} allowedPseudos={data.allowedPseudos || []} />}
       <AdminPanel
         open={adminOpen}
         onClose={() => setAdminOpen(false)}
