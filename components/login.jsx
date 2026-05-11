@@ -1,11 +1,11 @@
 /* global React */
 
-// ── Modal de login utilisateur (choix dans liste prédéfinie) ───────
+// ── Modal de login utilisateur (saisie libre vérifiée contre liste admin) ──
 const UserLoginModal = ({ onLogin, allowedPseudos }) => {
-  const [loading, setLoading]   = React.useState(false);
-  const [error, setError]       = React.useState(null);
-  const [selected, setSelected] = React.useState(null);
-  const [tick, setTick]         = React.useState(0);
+  const [pseudo, setPseudo]   = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError]     = React.useState(null);
+  const [tick, setTick]       = React.useState(0);
 
   React.useEffect(() => {
     const id = setInterval(() => setTick(t => t + 1), 140);
@@ -15,29 +15,37 @@ const UserLoginModal = ({ onLogin, allowedPseudos }) => {
   const glyphs = "▓▒░█◆◇※★✦";
   const noise  = (n) => Array.from({ length: n }, (_, i) => glyphs[(i * 7 + tick) % glyphs.length]).join("");
 
-  const pseudos = allowedPseudos || [];
+  const submit = async (e) => {
+    e.preventDefault();
+    const trimmed = pseudo.trim();
+    if (!trimmed || loading) return;
 
-  const pick = async (pseudo) => {
-    if (loading) return;
-    setSelected(pseudo);
+    // Vérifier contre la liste prédéfinie (insensible à la casse)
+    const allowed = (allowedPseudos || []).map(p => p.toLowerCase());
+    if (allowed.length > 0 && !allowed.includes(trimmed.toLowerCase())) {
+      setError("Nom non reconnu · Point de passage");
+      return;
+    }
+
     setLoading(true);
     setError(null);
-    const result = await onLogin(pseudo);
+    // Utiliser le pseudo tel qu'il est dans la liste (casse canonique)
+    const canonical = (allowedPseudos || []).find(p => p.toLowerCase() === trimmed.toLowerCase()) || trimmed;
+    const result = await onLogin(canonical);
     if (!result.ok) {
       setError(result.error || "Erreur inconnue");
       setLoading(false);
-      setSelected(null);
     }
   };
 
   return (
     <div className="modal-stage" style={{ zIndex: 300 }}>
-      <div className="modal" style={{ maxWidth: 480 }}>
+      <div className="modal" style={{ maxWidth: 420 }}>
         <div className="modal-eyebrow">⚜ Identification du Mousquetaire ⚜</div>
         <h2 className="modal-title">Qui es-tu ?</h2>
         <p className="modal-sub">
-          Choisis ton nom dans la liste pour accéder au site.
-          Sur un autre appareil, sélectionne le même pour retrouver ta progression.
+          Entre ton nom pour accéder au site.
+          Sur un autre appareil, saisis le même pour retrouver ta progression.
         </p>
 
         <div style={{
@@ -54,46 +62,47 @@ const UserLoginModal = ({ onLogin, allowedPseudos }) => {
           {noise(32)}
         </div>
 
-        {pseudos.length === 0 ? (
-          <div style={{
-            fontFamily: "var(--font-serif)",
-            fontStyle: "italic",
-            fontSize: 15,
-            color: "var(--bone)",
-            opacity: 0.6,
-            textAlign: "center",
-            padding: "24px 0",
-          }}>
-            Aucun accès configuré — l'intendance doit d'abord renseigner la liste des participants.
+        <form onSubmit={submit}>
+          <div className="field">
+            <label className="field-label" style={{ textAlign: "center", display: "block" }}>
+              Ton nom
+            </label>
+            <input
+              type="text"
+              className="field-input"
+              value={pseudo}
+              onChange={e => { setPseudo(e.target.value); setError(null); }}
+              placeholder="Athos, Porthos, Aramis…"
+              maxLength={24}
+              autoFocus
+              disabled={loading}
+              style={{ textAlign: "center", letterSpacing: "0.1em", fontSize: 16 }}
+            />
           </div>
-        ) : (
-          <div className="pseudo-grid">
-            {pseudos.map(pseudo => (
-              <button
-                key={pseudo}
-                className={`pseudo-btn${selected === pseudo ? " is-loading" : ""}`}
-                onClick={() => pick(pseudo)}
-                disabled={loading}
-              >
-                {selected === pseudo && loading ? "…" : pseudo}
-              </button>
-            ))}
-          </div>
-        )}
 
-        {error && (
-          <div style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 10,
-            letterSpacing: "0.2em",
-            color: "var(--neon-magenta)",
-            textTransform: "uppercase",
-            textAlign: "center",
-            marginTop: 16,
-          }}>
-            // {error}
-          </div>
-        )}
+          {error && (
+            <div style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 10,
+              letterSpacing: "0.2em",
+              color: "var(--neon-magenta)",
+              textTransform: "uppercase",
+              textAlign: "center",
+              marginBottom: 12,
+            }}>
+              // {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            className="btn btn--primary"
+            style={{ width: "100%", justifyContent: "center", marginTop: 8, opacity: loading ? 0.6 : 1 }}
+            disabled={loading || !pseudo.trim()}
+          >
+            {loading ? "Vérification…" : "⚜ Entrer"}
+          </button>
+        </form>
 
         <div style={{
           marginTop: 28,
