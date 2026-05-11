@@ -428,14 +428,124 @@ function JeuxPlayView({ game, onClose, indices, unlockIndice, jeuxIndices }) {
   );
 }
 
+// ── Leaderboard ───────────────────────────────────────────────────
+const MEDALS = ["⚜", "✦", "◆"];
+
+function JeuxLeaderboard({ currentUserId }) {
+  const [board, setBoard]       = React.useState([]);
+  const [expanded, setExpanded] = React.useState(true);
+
+  const loadBoard = React.useCallback(async () => {
+    const sb = window.__supabase;
+    if (!sb) return;
+    const [{ data: allIdx }, { data: allUsers }] = await Promise.all([
+      sb.from("user_indices").select("user_id"),
+      sb.from("users").select("id, pseudo"),
+    ]);
+    if (!allIdx || !allUsers) return;
+    const counts = {};
+    allIdx.forEach(r => { counts[r.user_id] = (counts[r.user_id] || 0) + 1; });
+    const ranked = allUsers
+      .map(u => ({ id: u.id, pseudo: u.pseudo, count: counts[u.id] || 0 }))
+      .filter(u => u.count > 0)
+      .sort((a, b) => b.count - a.count || a.pseudo.localeCompare(b.pseudo));
+    setBoard(ranked);
+  }, []);
+
+  // Chargement initial + subscription realtime
+  React.useEffect(() => {
+    const sb = window.__supabase;
+    if (!sb) return;
+    loadBoard();
+    const channel = sb.channel("leaderboard-watch")
+      .on("postgres_changes", { event: "*", schema: "public", table: "user_indices" }, loadBoard)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "users" }, loadBoard)
+      .subscribe();
+    return () => sb.removeChannel(channel);
+  }, [loadBoard]);
+
+  if (board.length === 0) return null;
+
+  return (
+    <div className="jeux-leaderboard">
+      <button
+        className="jeux-leaderboard__toggle"
+        onClick={() => setExpanded(v => !v)}
+      >
+        <span className="jeux-leaderboard__title">
+          <span style={{ color: "var(--gold-bright)" }}>⚜</span> Tableau d'Honneur
+          <span className="jeux-leaderboard__live">● live</span>
+        </span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+          style={{ transform: expanded ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+
+      {expanded && (
+        <div className="jeux-leaderboard__body">
+          {board.map((row, i) => {
+            const isMe = row.id === currentUserId;
+            return (
+              <div
+                key={row.id}
+                className={`jeux-leaderboard__row${isMe ? " is-me" : ""}`}
+              >
+                <span className="jeux-leaderboard__rank">
+                  {i < 3 ? MEDALS[i] : <span style={{ opacity: 0.5 }}>{i + 1}</span>}
+                </span>
+                <span className="jeux-leaderboard__pseudo">
+                  {row.pseudo}{isMe && <span className="jeux-leaderboard__you"> (toi)</span>}
+                </span>
+                <span className="jeux-leaderboard__count tnum">
+                  {row.count}<span style={{ opacity: 0.4 }}>/27</span>
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main page ─────────────────────────────────────────────────────
-function JeuxPage({ data }) {
+function JeuxPage({ data, user, onLogout }) {
   const [filter, setFilter] = React.useState("all");
   const [openId, setOpenId] = React.useState(null);
   const [indices, setIndices] = React.useState({});
 
-  const unlockIndice = (key) => {
-    setIndices((prev) => ({ ...prev, [key]: { at: Date.now() } }));
+  // Charger les indices de l'utilisateur depuis Supabase
+  React.useEffect(() => {
+    if (!user) return;
+    const sb = window.__supabase;
+    if (!sb) return;
+    sb.from("user_indices").select("game_id, level, unlocked_at").eq("user_id", user.id)
+      .then(({ data: rows }) => {
+        if (!rows) return;
+        const idx = {};
+        rows.forEach(r => { idx[`${r.game_id}-${r.level}`] = { at: r.unlocked_at }; });
+        setIndices(idx);
+      });
+  }, [user]);
+
+  const unlockIndice = async (key) => {
+    // Mise à jour optimiste immédiate
+    setIndices(prev => ({ ...prev, [key]: { at: Date.now() } }));
+
+    if (!user) return;
+    const sb = window.__supabase;
+    if (!sb) return;
+    // key = "gameId-level" (ex: "memoire-1", "anagrammes-3")
+    const lastDash = key.lastIndexOf("-");
+    const gameId   = key.slice(0, lastDash);
+    const level    = parseInt(key.slice(lastDash + 1), 10);
+    await sb.from("user_indices").upsert({
+      user_id: user.id,
+      game_id: gameId,
+      level,
+      unlocked_at: new Date().toISOString(),
+    }).catch(() => {});
   };
 
   const filtered = React.useMemo(
@@ -451,6 +561,7 @@ function JeuxPage({ data }) {
 
   const open = openId ? GAMES_LIST.find(g => g.id === openId) : null;
   const jeuxIndices = data.jeuxIndices || {};
+  const myCount = Object.keys(indices).length;
 
   return (
     <div className="page jeux-page">
@@ -471,6 +582,33 @@ function JeuxPage({ data }) {
             Mieux vaut jouer face à l'énigme concernée.
           </p>
         </div>
+
+        {/* Bandeau joueur + progression */}
+        {user && (
+          <div className="jeux-player-bar">
+            <div className="jeux-player-bar__info">
+              <span className="jeux-player-bar__pseudo">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+                {user.pseudo}
+              </span>
+              <span className="jeux-player-bar__score tnum">
+                {myCount}<span style={{ opacity: 0.5 }}>/27 indices</span>
+              </span>
+            </div>
+            <button
+              className="k-btn k-btn--sm k-btn--outline"
+              onClick={onLogout}
+              title="Changer de joueur"
+            >
+              Changer
+            </button>
+          </div>
+        )}
+
+        {/* Leaderboard temps réel */}
+        <JeuxLeaderboard currentUserId={user?.id} />
 
         {/* Category filter */}
         <div className="jeux-filter-row">

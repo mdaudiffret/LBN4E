@@ -1,6 +1,5 @@
 /* global React, ReactDOM */
 
-// Disable browser scroll restoration so our anchor scroll isn't overridden
 if (history.scrollRestoration) history.scrollRestoration = "manual";
 
 const ADMIN_PWD_HASH = "cadc62047f58dce349fe916385c2b3802c37490b02bc2135b298253d8f17b6f7";
@@ -20,75 +19,85 @@ const useRoute = () => {
   return route;
 };
 
-const useStoredData = () => {
-  const [data, _set] = React.useState(() => {
+// ── Configuration de l'app (Supabase) ─────────────────────────────
+const useAppConfig = () => {
+  const [data, setData] = React.useState(window.DEFAULT_DATA);
+
+  React.useEffect(() => {
+    const sb = window.__supabase;
+    if (!sb) return;
+    sb.from("app_config").select("data").eq("id", 1).single()
+      .then(({ data: row }) => {
+        if (row?.data && Object.keys(row.data).length > 0) {
+          setData({ ...window.DEFAULT_DATA, ...row.data });
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const saveConfig = (next) => {
+    setData(next);
+    const sb = window.__supabase;
+    if (!sb) return;
+    sb.from("app_config")
+      .upsert({ id: 1, data: next, updated_at: new Date().toISOString() })
+      .catch(() => {});
+  };
+
+  return [data, saveConfig];
+};
+
+// ── Session utilisateur (pseudo → localStorage) ────────────────────
+const useUser = () => {
+  const [user, setUser] = React.useState(() => {
     try {
-      const raw = localStorage.getItem("lbn4e-data");
-      if (raw) return { ...window.DEFAULT_DATA, ...JSON.parse(raw) };
-    } catch(e) {}
-    return window.DEFAULT_DATA;
+      const raw = localStorage.getItem("lbn4e-user");
+      return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
   });
-  // Saves to React state + localStorage only (no sheet sync)
-  const saveLocal = (next) => {
-    _set(next);
-    try { localStorage.setItem("lbn4e-data", JSON.stringify(next)); } catch(e) {}
-  };
-  return [data, saveLocal];
-};
 
-const toUrlSafeBase64 = (obj) => {
-  const str = JSON.stringify(obj);
-  // encode UTF-8 → binary → base64, then make URL-safe
-  const b64 = btoa(unescape(encodeURIComponent(str)));
-  return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
-};
+  const loginUser = async (pseudo) => {
+    const sb = window.__supabase;
+    if (!sb) return { ok: false, error: "Supabase non configuré" };
 
-const sheetSync = (next) => {
-  const url = window.DEFAULT_DATA.sheetUrl;
-  const token = window.DEFAULT_DATA.sheetWriteToken;
-  if (!url || !token) return;
-  const { posts, sheetUrl: _u, sheetWriteToken: _t, infosRevealed: _r, ...infos } = next;
-  const postWrite = (action, data) => {
-    const body = new URLSearchParams({ action, token, data: JSON.stringify(data) });
-    fetch(url, { method: "POST", mode: "no-cors", body }).catch(() => {});
+    const trimmed = pseudo.trim();
+    if (trimmed.length < 2) return { ok: false, error: "Pseudo trop court (2 min)" };
+
+    // Chercher un utilisateur existant avec ce pseudo
+    const { data: existing } = await sb.from("users").select("*").eq("pseudo", trimmed).maybeSingle();
+    if (existing) {
+      localStorage.setItem("lbn4e-user", JSON.stringify(existing));
+      setUser(existing);
+      return { ok: true, user: existing };
+    }
+
+    // Créer un nouvel utilisateur
+    const { data: created, error } = await sb.from("users").insert({ pseudo: trimmed }).select().single();
+    if (error) {
+      if (error.code === "23505") return { ok: false, error: "Pseudo déjà pris" };
+      return { ok: false, error: "Erreur lors de la création" };
+    }
+    localStorage.setItem("lbn4e-user", JSON.stringify(created));
+    setUser(created);
+    return { ok: true, user: created };
   };
-  postWrite("write_infos", infos);
-  postWrite("write_posts", posts);
+
+  const logoutUser = () => {
+    localStorage.removeItem("lbn4e-user");
+    setUser(null);
+  };
+
+  return [user, loginUser, logoutUser];
 };
 
 const App = () => {
   const route = useRoute();
-  const [data, saveLocal] = useStoredData();
+  const [data, saveConfig] = useAppConfig();
+  const [user, loginUser, logoutUser] = useUser();
   const [adminOpen, setAdminOpen] = React.useState(false);
   const [isAdmin, setIsAdmin] = React.useState(() => {
     try { return sessionStorage.getItem("lbn4e-admin") === "1"; } catch(e) { return false; }
   });
-
-  // On mount: fetch latest data from sheet
-  React.useEffect(() => {
-    const url = window.DEFAULT_DATA.sheetUrl;
-    if (!url) return;
-    fetch(`${url}?t=${Date.now()}`)
-      .then(r => r.json())
-      .then(({ infos, posts: sheetPosts }) => {
-        const { infosRevealed: _r, ...safeInfos } = infos || {};
-        const next = { ...window.DEFAULT_DATA, ...data, ...safeInfos };
-        if (sheetPosts && sheetPosts.length) {
-          // Merge : préserve les posts locaux absents du sheet (sync raté)
-          const sheetById = Object.fromEntries(sheetPosts.map(p => [p.id, p]));
-          const localOnly = (data.posts || []).filter(p => !sheetById[p.id]);
-          next.posts = [...sheetPosts, ...localOnly].sort((a, b) => b.iso.localeCompare(a.iso));
-        }
-        saveLocal(next);
-      })
-      .catch(() => {});
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Saves locally + syncs to sheet (used for all admin/user writes)
-  const setData = (next) => {
-    saveLocal(next);
-    sheetSync(next);
-  };
 
   const onLogin = async (pwd) => {
     const h = await hashPassword(pwd);
@@ -130,24 +139,25 @@ const App = () => {
              : "maison";
 
   return (
-    React.createElement(React.Fragment, null,
-      React.createElement("div", { className: "bg-stage" }),
-      React.createElement(Topbar, { route, isAdmin, onAdminClick: () => setAdminOpen(true) }),
-      page === "maison"  && React.createElement(MaisonPage,  { data, isAdmin, onUpdateData: setData }),
-      page === "gazette" && React.createElement(GazettePage, { data, isAdmin }),
-      page === "jeux"    && React.createElement(JeuxPage,    { data }),
-      React.createElement(Footer, null),
-      React.createElement(AdminPanel, {
-        open: adminOpen,
-        onClose: () => setAdminOpen(false),
-        isAdmin,
-        onLogin,
-        onLogout,
-        data,
-        onUpdateData: setData,
-      })
-    )
+    <React.Fragment>
+      <div className="bg-stage" />
+      <Topbar route={route} isAdmin={isAdmin} onAdminClick={() => setAdminOpen(true)} />
+      {page === "maison"  && <MaisonPage  data={data} isAdmin={isAdmin} onUpdateData={saveConfig} />}
+      {page === "gazette" && <GazettePage data={data} isAdmin={isAdmin} />}
+      {page === "jeux"    && <JeuxPage    data={data} user={user} onLogout={logoutUser} />}
+      <Footer />
+      {!user && <UserLoginModal onLogin={loginUser} />}
+      <AdminPanel
+        open={adminOpen}
+        onClose={() => setAdminOpen(false)}
+        isAdmin={isAdmin}
+        onLogin={onLogin}
+        onLogout={onLogout}
+        data={data}
+        onUpdateData={saveConfig}
+      />
+    </React.Fragment>
   );
 };
 
-ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
