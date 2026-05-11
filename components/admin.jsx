@@ -420,6 +420,33 @@ const TabEvenement = ({ d, set }) => (
       )
     ),
 
+    /* Pseudos autorisés */
+    React.createElement("div", {
+      style: { marginTop: 20, padding: "14px 16px", border: "1px solid var(--line)", background: "var(--char)" }
+    },
+      React.createElement("div", {
+        style: {
+          fontFamily: "var(--font-mono)", fontSize: 10,
+          letterSpacing: "0.26em", color: "var(--gold)",
+          textTransform: "uppercase", marginBottom: 8,
+        }
+      }, "Participants · pseudos autorisés"),
+      React.createElement("div", {
+        style: {
+          fontFamily: "var(--font-serif)", fontStyle: "italic",
+          fontSize: 13, color: "var(--bone)", opacity: 0.6, marginBottom: 10,
+        }
+      }, "Un pseudo par ligne. Seuls ces noms pourront accéder au site."),
+      React.createElement("textarea", {
+        className: "field-textarea",
+        rows: 8,
+        value: (d.allowedPseudos || []).join("\n"),
+        onChange: e => set("allowedPseudos", e.target.value.split("\n").map(s => s.trim()).filter(Boolean)),
+        placeholder: "Athos\nPorthos\nAramis\n…",
+        style: { fontFamily: "var(--font-mono)", fontSize: 13, letterSpacing: "0.08em" },
+      })
+    ),
+
     React.createElement(EquipementEditor, {
       items: d.equipement || [],
       onChange: v => set("equipement", v),

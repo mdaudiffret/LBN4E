@@ -1122,6 +1122,36 @@ img { max-width: 100%; display: block; }
   flex-shrink: 0;
 }
 
+/* ── Grille de pseudos (UserLoginModal) ──────────────────────────── */
+.pseudo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.pseudo-btn {
+  padding: 10px 12px;
+  background: var(--char);
+  border: 1px solid var(--line);
+  color: var(--bone);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  text-align: center;
+}
+.pseudo-btn:hover:not(:disabled) {
+  border-color: var(--gold);
+  color: var(--gold-bright);
+  background: rgba(212,162,76,0.08);
+}
+.pseudo-btn.is-loading {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+}
+.pseudo-btn:disabled { opacity: 0.5; cursor: default; }
+
 /* Responsive */
 @media (max-width: 720px) {
   .shell { padding: 0 20px; }

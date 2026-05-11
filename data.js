@@ -2,6 +2,9 @@
 const DEFAULT_DATA = {
   infosRevealed: false,
 
+  /* Liste des pseudos autorisés — configurée via admin, vide = personne ne peut accéder */
+  allowedPseudos: [],
+
   /* Countdown target — ISO 8601, modifiable via admin */
   countdownISO: "2026-06-12T16:00:00",
 
