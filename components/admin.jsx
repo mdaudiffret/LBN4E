@@ -466,8 +466,9 @@ const AgendaEditor = ({ days, onChange }) => {
 };
 
 /* ── Tab: Événement ──────────────────────────────────────────── */
-const TabEvenement = ({ d, set }) => (
-  React.createElement("div", null,
+const TabEvenement = ({ d, set }) => {
+  const [pseudosRaw, setPseudosRaw] = React.useState((d.allowedPseudos || []).join("\n"));
+  return React.createElement("div", null,
 
     React.createElement("div", {
       style: { padding: "14px 16px", border: "1px solid var(--line-strong)", marginBottom: 20, background: "var(--char)" }
@@ -541,7 +542,7 @@ const TabEvenement = ({ d, set }) => (
       React.createElement("input", {
         className: "field-input",
         value: d.adminPseudo || "",
-        onChange: e => set("adminPseudo", e.target.value.trim()),
+        onChange: e => set("adminPseudo", e.target.value),
         placeholder: "Aramis",
         style: { maxWidth: 200 },
       })
@@ -559,8 +560,11 @@ const TabEvenement = ({ d, set }) => (
       React.createElement("textarea", {
         className: "field-textarea",
         rows: 8,
-        value: (d.allowedPseudos || []).join("\n"),
-        onChange: e => set("allowedPseudos", e.target.value.split("\n").map(s => s.trim()).filter(Boolean)),
+        value: pseudosRaw,
+        onChange: e => {
+          setPseudosRaw(e.target.value);
+          set("allowedPseudos", e.target.value.split("\n").map(s => s.trim()).filter(Boolean));
+        },
         placeholder: "Athos\nPorthos\nAramis\n…",
         style: { fontFamily: "var(--font-mono)", fontSize: 13, letterSpacing: "0.08em" },
       })
@@ -568,8 +572,8 @@ const TabEvenement = ({ d, set }) => (
 
     React.createElement(EquipementEditor, { items: d.equipement || [], onChange: v => set("equipement", v) }),
     React.createElement(AgendaEditor,     { days: d.agenda || [],    onChange: v => set("agenda", v) })
-  )
-);
+  );
+};
 
 /* ── Tab: Gazette ────────────────────────────────────────────── */
 const TabGazette = () => {
