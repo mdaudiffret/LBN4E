@@ -298,13 +298,13 @@ const DashboardTab = ({ data }) => {
                 ),
                 React.createElement("div", { className: "dash-badges" },
                   Array.from({ length: 9 }, (_, i) => {
-                    const found   = user.codes.some(c => c.code_index === i);
-                    const word    = revealCodes[i] || `·`;
+                    const found = user.codes.some(c => c.code_index === i);
+                    const word  = revealCodes[i] || `Code ${i + 1}`;
                     return React.createElement("span", {
                       key: i,
                       className: "dash-badge" + (found ? " dash-badge--found" : " dash-badge--missing"),
                       title: found ? word : `Code ${i + 1} non trouvé`,
-                    }, found ? word : "·");
+                    }, found ? String(i + 1) : "·");
                   })
                 )
               ),
