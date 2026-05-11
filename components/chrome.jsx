@@ -20,14 +20,15 @@ const Brand = () => (
   )
 );
 
-const Topbar = ({ route, isAdmin, onAdminClick }) => {
+const Topbar = ({ route }) => {
   const links = [
     { to: "#/", label: "Maison" },
     { to: "#/gazette", label: "Gazette" },
     { to: "#/jeux", label: "Jeux" },
   ];
-  const here = route.startsWith("#/gazette") ? "#/gazette"
-             : route.startsWith("#/jeux")    ? "#/jeux"
+  const here = route.startsWith("#/gazette")    ? "#/gazette"
+             : route.startsWith("#/jeux")       ? "#/jeux"
+             : route.startsWith("#/intendance") ? null
              : "#/";
   return (
     React.createElement("header", { className: "topbar" },
@@ -41,13 +42,6 @@ const Topbar = ({ route, isAdmin, onAdminClick }) => {
               className: "nav-link" + (here === l.to ? " is-active" : "")
             }, l.label)
           )
-        ),
-        React.createElement("button", {
-          className: "admin-pill" + (isAdmin ? " is-on" : ""),
-          onClick: onAdminClick
-        },
-          React.createElement("span", { className: "dot" }),
-          React.createElement("span", null, isAdmin ? "Intendance" : "Sceau")
         )
       )
     )
@@ -64,7 +58,16 @@ const Divider = () =>
 const Footer = () => (
   React.createElement("footer", { className: "footer" },
     React.createElement("div", { className: "shell" },
-      React.createElement("div", { className: "footer-ornament" }, "⚜ · · · ✠ · · · ⚔ · · · ✠ · · · ⚜"),
+      React.createElement("div", { className: "footer-ornament" },
+        "⚜ · · · ",
+        React.createElement("a", {
+          href: "#/intendance",
+          style: { color: "inherit", opacity: 0.12, textDecoration: "none" },
+          tabIndex: -1,
+          "aria-hidden": "true",
+        }, "✠"),
+        " · · · ⚔ · · · ✠ · · · ⚜"
+      ),
       React.createElement("div", { className: "footer-inner" },
         React.createElement("div", { className: "footer-mark" }, "⚜ Weekend LBN4E ⚜"),
         React.createElement("div", { className: "footer-meta" }, "Tous pour un · un pour tous.exe")
@@ -74,3 +77,4 @@ const Footer = () => (
 );
 
 Object.assign(window, { HexMark, Brand, Topbar, Footer, Divider });
+

@@ -19,7 +19,7 @@ const useRoute = () => {
   return route;
 };
 
-// ── Configuration de l'app (Supabase) ─────────────────────────────
+// ── Configuration de l'app (Supabase) ─────────────────────────
 const useAppConfig = () => {
   const [data, setData]           = React.useState(window.DEFAULT_DATA);
   const [configLoaded, setLoaded] = React.useState(false);
@@ -32,8 +32,7 @@ const useAppConfig = () => {
         if (row?.data && Object.keys(row.data).length > 0) {
           setData({ ...window.DEFAULT_DATA, ...row.data });
         }
-      })
-      .catch(() => {})
+      }, () => {})
       .finally(() => setLoaded(true));
   }, []);
 
@@ -49,7 +48,7 @@ const useAppConfig = () => {
   return [data, saveConfig, configLoaded];
 };
 
-// ── Session utilisateur (pseudo → localStorage) ────────────────────
+// ── Session utilisateur (pseudo → localStorage) ────────────────
 const useUser = () => {
   const [user, setUser] = React.useState(() => {
     try {
@@ -65,16 +64,19 @@ const useUser = () => {
     const trimmed = pseudo.trim();
     if (trimmed.length < 2) return { ok: false, error: "Pseudo trop court (2 min)" };
 
-    // Chercher un utilisateur existant avec ce pseudo
+    const now = new Date().toISOString();
     const { data: existing } = await sb.from("users").select("*").eq("pseudo", trimmed).maybeSingle();
     if (existing) {
-      localStorage.setItem("lbn4e-user", JSON.stringify(existing));
-      setUser(existing);
-      return { ok: true, user: existing };
+      await sb.from("users").update({ last_seen: now }).eq("id", existing.id).then(null, () => {});
+      const updated = { ...existing, last_seen: now };
+      localStorage.setItem("lbn4e-user", JSON.stringify(updated));
+      setUser(updated);
+      return { ok: true, user: updated };
     }
 
-    // Créer un nouvel utilisateur
-    const { data: created, error } = await sb.from("users").insert({ pseudo: trimmed }).select().single();
+    const { data: created, error } = await sb.from("users")
+      .insert({ pseudo: trimmed, last_seen: now })
+      .select().single();
     if (error) {
       if (error.code === "23505") return { ok: false, error: "Pseudo déjà pris" };
       return { ok: false, error: "Erreur lors de la création" };
@@ -95,8 +97,7 @@ const useUser = () => {
 const App = () => {
   const route = useRoute();
   const [data, saveConfig, configLoaded] = useAppConfig();
-  const [user, loginUser, logoutUser] = useUser();
-  const [adminOpen, setAdminOpen] = React.useState(false);
+  const [user, loginUser, logoutUser]    = useUser();
   const [isAdmin, setIsAdmin] = React.useState(() => {
     try { return sessionStorage.getItem("lbn4e-admin") === "1"; } catch(e) { return false; }
   });
@@ -136,28 +137,28 @@ const App = () => {
     }
   }, [route]);
 
-  const page = route.startsWith("#/gazette") ? "gazette"
-             : route.startsWith("#/jeux")   ? "jeux"
+  const page = route.startsWith("#/gazette")    ? "gazette"
+             : route.startsWith("#/jeux")       ? "jeux"
+             : route.startsWith("#/intendance") ? "intendance"
              : "maison";
 
   return (
     <React.Fragment>
       <div className="bg-stage" />
-      <Topbar route={route} isAdmin={isAdmin} onAdminClick={() => setAdminOpen(true)} />
-      {page === "maison"  && <MaisonPage  data={data} isAdmin={isAdmin} onUpdateData={saveConfig} user={user} />}
-      {page === "gazette" && <GazettePage data={data} isAdmin={isAdmin} />}
-      {page === "jeux"    && <JeuxPage    data={data} user={user} onLogout={logoutUser} />}
-      <Footer />
-      {!user && <UserLoginModal onLogin={loginUser} allowedPseudos={data.allowedPseudos || []} adminPseudo={data.adminPseudo || ""} configLoaded={configLoaded} />}
-      <AdminPanel
-        open={adminOpen}
-        onClose={() => setAdminOpen(false)}
-        isAdmin={isAdmin}
-        onLogin={onLogin}
-        onLogout={onLogout}
-        data={data}
-        onUpdateData={saveConfig}
-      />
+      <Topbar route={route} />
+      {page === "maison"     && <MaisonPage  data={data} isAdmin={isAdmin} onUpdateData={saveConfig} user={user} />}
+      {page === "gazette"    && <GazettePage data={data} isAdmin={isAdmin} />}
+      {page === "jeux"       && <JeuxPage    data={data} user={user} onLogout={logoutUser} />}
+      {page === "intendance" && <IntendancePage data={data} onUpdateData={saveConfig} isAdmin={isAdmin} onLogin={onLogin} onLogout={onLogout} />}
+      {page !== "intendance" && <Footer />}
+      {!user && page !== "intendance" && (
+        <UserLoginModal
+          onLogin={loginUser}
+          allowedPseudos={data.allowedPseudos || []}
+          adminPseudo={data.adminPseudo || ""}
+          configLoaded={configLoaded}
+        />
+      )}
     </React.Fragment>
   );
 };
