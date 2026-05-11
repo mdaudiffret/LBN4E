@@ -9,8 +9,13 @@
    --------------------------------------------------------------- */
 
 /* ── Page principale ─────────────────────────────────────────── */
-const IntendancePage = ({ data, onUpdateData, isAdmin, onLogin, onLogout }) => {
+const IntendancePage = ({ data, onUpdateData, isAdmin, onLogin, onLogout, configLoaded }) => {
   if (!isAdmin) return React.createElement(IntendanceLogin, { onLogin });
+  if (!configLoaded) return React.createElement("main", {
+    style: { minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center",
+             fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.18em",
+             color: "var(--bone)", opacity: 0.4, textTransform: "uppercase" }
+  }, "Chargement…");
   return React.createElement(IntendanceEditor, { data, onUpdateData, onLogout });
 };
 
@@ -124,9 +129,13 @@ const IntendanceEditor = ({ data, onUpdateData, onLogout }) => {
 
   const save = async () => {
     setSaving(true);
-    const ok = await onUpdateData(d);
+    try {
+      const ok = await onUpdateData(d);
+      showToast(ok !== false ? "⚜ Modifications scellées" : "// Erreur · réessayez", ok !== false ? "ok" : "err");
+    } catch (e) {
+      showToast("// Erreur · réessayez", "err");
+    }
     setSaving(false);
-    showToast(ok !== false ? "⚜ Modifications scellées" : "// Erreur · réessayez", ok !== false ? "ok" : "err");
   };
 
   const tabs = [
