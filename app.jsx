@@ -21,18 +21,20 @@ const useRoute = () => {
 
 // ── Configuration de l'app (Supabase) ─────────────────────────────
 const useAppConfig = () => {
-  const [data, setData] = React.useState(window.DEFAULT_DATA);
+  const [data, setData]           = React.useState(window.DEFAULT_DATA);
+  const [configLoaded, setLoaded] = React.useState(false);
 
   React.useEffect(() => {
     const sb = window.__supabase;
-    if (!sb) return;
+    if (!sb) { setLoaded(true); return; }
     sb.from("app_config").select("data").eq("id", 1).single()
       .then(({ data: row }) => {
         if (row?.data && Object.keys(row.data).length > 0) {
           setData({ ...window.DEFAULT_DATA, ...row.data });
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setLoaded(true));
   }, []);
 
   const saveConfig = (next) => {
@@ -44,7 +46,7 @@ const useAppConfig = () => {
       .catch(() => {});
   };
 
-  return [data, saveConfig];
+  return [data, saveConfig, configLoaded];
 };
 
 // ── Session utilisateur (pseudo → localStorage) ────────────────────
@@ -92,7 +94,7 @@ const useUser = () => {
 
 const App = () => {
   const route = useRoute();
-  const [data, saveConfig] = useAppConfig();
+  const [data, saveConfig, configLoaded] = useAppConfig();
   const [user, loginUser, logoutUser] = useUser();
   const [adminOpen, setAdminOpen] = React.useState(false);
   const [isAdmin, setIsAdmin] = React.useState(() => {
@@ -146,7 +148,7 @@ const App = () => {
       {page === "gazette" && <GazettePage data={data} isAdmin={isAdmin} />}
       {page === "jeux"    && <JeuxPage    data={data} user={user} onLogout={logoutUser} />}
       <Footer />
-      {!user && <UserLoginModal onLogin={loginUser} allowedPseudos={data.allowedPseudos || []} />}
+      {!user && <UserLoginModal onLogin={loginUser} allowedPseudos={data.allowedPseudos || []} configLoaded={configLoaded} />}
       <AdminPanel
         open={adminOpen}
         onClose={() => setAdminOpen(false)}

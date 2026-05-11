@@ -1,7 +1,7 @@
 /* global React */
 
 // ── Modal de login utilisateur (saisie libre vérifiée contre liste admin) ──
-const UserLoginModal = ({ onLogin, allowedPseudos }) => {
+const UserLoginModal = ({ onLogin, allowedPseudos, configLoaded }) => {
   const [pseudo, setPseudo]   = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [error, setError]     = React.useState(null);
@@ -18,11 +18,11 @@ const UserLoginModal = ({ onLogin, allowedPseudos }) => {
   const submit = async (e) => {
     e.preventDefault();
     const trimmed = pseudo.trim();
-    if (!trimmed || loading) return;
+    if (!trimmed || loading || !configLoaded) return;
 
     // Vérifier contre la liste prédéfinie (insensible à la casse)
     const allowed = (allowedPseudos || []).map(p => p.toLowerCase());
-    if (allowed.length > 0 && !allowed.includes(trimmed.toLowerCase())) {
+    if (!allowed.includes(trimmed.toLowerCase())) {
       setError("Nom non reconnu · Point de passage");
       return;
     }
@@ -98,9 +98,9 @@ const UserLoginModal = ({ onLogin, allowedPseudos }) => {
             type="submit"
             className="btn btn--primary"
             style={{ width: "100%", justifyContent: "center", marginTop: 8, opacity: loading ? 0.6 : 1 }}
-            disabled={loading || !pseudo.trim()}
+            disabled={loading || !pseudo.trim() || !configLoaded}
           >
-            {loading ? "Vérification…" : "⚜ Entrer"}
+            {!configLoaded ? "Chargement…" : loading ? "Vérification…" : "⚜ Entrer"}
           </button>
         </form>
 
