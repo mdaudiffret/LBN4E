@@ -117,54 +117,6 @@ const DEFAULT_DATA = {
     "annee-2":      "",
     "annee-3":      "",
   },
-
-  posts: [
-    {
-      id: "post-2026-04-28",
-      iso: "2026-04-28",
-      dateShort: "28·IV·MMXXVI",
-      dateLong: "Mardi 28 d'Avril · MMXXVI",
-      titre: "Les Lettres sont parties · La compaignie est constituée",
-      author: "Intendance · LBN4E",
-      imageKind: "manuscrit",
-      tags: ["Convocation", "Lignée", "Calendrier"],
-      paragraphes: [
-        "Oyez, oyez, mes très·honorez compaignons : ce jour, à la pointe de l'aube, vingt·et·trois pigeons messagers ont esté lâchez vers les quatre coings du royaume, portant en leur bec la convocation officielle au Weekend LBN4E.",
-        "La liste des conviez est close. Vingt·deux familles ont respondu présent, soit cinquante·et·une âmes au total — dont seize de la jeune lignée, qui constitueront la cohorte des cadets·mousquetaires. Le Cardinal lui·mesme n'aurait su rassembler plus brillante assemblée.",
-        "Les chambres sont attribuées par tirage au sort équitable. Le détail vous parviendra par messager dédié dès que les lettres auront esté ouvertes — patience, donc, jusqu'à ce que le sceau soit rompu sur la page d'infos pratiques."
-      ]
-    },
-    {
-      id: "post-2026-03-15",
-      iso: "2026-03-15",
-      dateShort: "15·III·MMXXVI",
-      dateLong: "Dimanche 15 de Mars · MMXXVI",
-      titre: "Le Chasteau a esté trouvé · Reconnaissance du terrain",
-      author: "Athos · Éclaireur",
-      imageKind: "chateau",
-      tags: ["Repérage", "Chasteau", "Logistique"],
-      paragraphes: [
-        "Au terme de quatre weekends d'errance par les routes de Normandie & de Brie, l'éclaireur·chef rapporte avoir mis la main sur la place·forte idéale : douves remplies, voûtes en ogive, & — ô surprise — fibre optique tirée jusqu'aux combles.",
-        "Le maistre des lieux nous accueille dès la mi·juin. Il dispose de seize chambres principales, d'une grange aménagée, & d'un dortoir pour la jeune lignée — soit de quoi loger toute la compaignie sous un mesme toit.",
-        "Photos & plans seront communiquez en temps utile. Pour l'heure, retenez seulement ceci : il y a une cour pavée, un jardin à la française, & un escalier d'honneur en colimaçon qui appelle indubitablement le duel à l'épée·néon."
-      ]
-    },
-    {
-      id: "post-2026-02-02",
-      iso: "2026-02-02",
-      dateShort: "02·II·MMXXVI",
-      dateLong: "Lundi 02 de Febvrier · MMXXVI",
-      titre: "Le projet est lancé · Les trois (et la quatrième) jurent fidélité",
-      author: "Aramis · Scribe",
-      imageKind: "duel",
-      tags: ["Lancement", "Manifeste", "Trois mousquetaires"],
-      paragraphes: [
-        "Hier soir, autour d'une table fort garnie & d'une cave fort éprouvée, les quatre intendants ont juré sur leur lame de mener à bien ce projet : un weekend entre amis, avec leurs enfants, dans un chasteau, sous le thème des trois mousquetaires — touche cyber·baroque obligatoire.",
-        "La devise est arrestée : Tous pour un · un pour tous·exe. Le budget par famille a esté validé à l'unanimité. Le calendrier vise un weekend de juin MMXXVI.",
-        "Trois rôles de mousquetaires sont distribuez (Athos · logistique, Porthos · tabula, Aramis · scribe). D'Artagnan reste vacant — peut·estre l'un d'entre vous le revendiquera·t·il sur place ?"
-      ]
-    },
-  ],
 };
 
 window.DEFAULT_DATA = DEFAULT_DATA;

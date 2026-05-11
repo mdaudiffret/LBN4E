@@ -40,8 +40,10 @@ const useAppConfig = () => {
     setData(next);
     const sb = window.__supabase;
     if (!sb) return;
+    // eslint-disable-next-line no-unused-vars
+    const { posts: _posts, ...rest } = next;
     sb.from("app_config")
-      .upsert({ id: 1, data: next, updated_at: new Date().toISOString() })
+      .upsert({ id: 1, data: rest, updated_at: new Date().toISOString() })
       .then(null, () => {});
   };
 
@@ -147,7 +149,7 @@ const App = () => {
       <div className="bg-stage" />
       <Topbar route={route} />
       {page === "maison"     && <MaisonPage  data={data} isAdmin={isAdmin} onUpdateData={saveConfig} user={user} />}
-      {page === "gazette"    && <GazettePage data={data} isAdmin={isAdmin} />}
+      {page === "gazette"    && <GazettePage isAdmin={isAdmin} />}
       {page === "jeux"       && <JeuxPage    data={data} user={user} onLogout={logoutUser} />}
       {page === "intendance" && <IntendancePage data={data} onUpdateData={saveConfig} isAdmin={isAdmin} onLogin={onLogin} onLogout={onLogout} />}
       {page !== "intendance" && <Footer />}

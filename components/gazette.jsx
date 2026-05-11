@@ -1,9 +1,37 @@
 /* global React */
 
-const GazettePage = ({ data, isAdmin }) => {
+const usePosts = () => {
+  const [posts, setPosts] = React.useState([]);
+
+  React.useEffect(() => {
+    const sb = window.__supabase;
+    if (!sb) return;
+
+    sb.from("posts").select("*").order("iso", { ascending: false })
+      .then(({ data }) => setPosts(data || []), () => {});
+
+    const ch = sb.channel("posts-rt")
+      .on("postgres_changes", { event: "*", schema: "public", table: "posts" }, (payload) => {
+        if (payload.eventType === "INSERT")
+          setPosts(prev => [payload.new, ...prev].sort((a, b) => b.iso.localeCompare(a.iso)));
+        if (payload.eventType === "UPDATE")
+          setPosts(prev => prev.map(p => p.id === payload.new.id ? payload.new : p));
+        if (payload.eventType === "DELETE")
+          setPosts(prev => prev.filter(p => p.id !== payload.old.id));
+      })
+      .subscribe();
+
+    return () => sb.removeChannel(ch);
+  }, []);
+
+  return posts;
+};
+
+const GazettePage = ({ isAdmin }) => {
+  const allPosts = usePosts();
   const [showAll, setShowAll] = React.useState(false);
   const now = new Date();
-  const posts = [...data.posts]
+  const posts = allPosts
     .filter(p => showAll || new Date(p.publishAt || p.iso + "T12:00:00") <= now)
     .sort((a, b) => b.iso.localeCompare(a.iso));
   return (
