@@ -431,7 +431,7 @@ function JeuxPlayView({ game, onClose, indices, unlockIndice, jeuxIndices }) {
 // ── Leaderboard ───────────────────────────────────────────────────
 const MEDALS = ["⚜", "✦", "◆"];
 
-function JeuxLeaderboard({ currentUserId }) {
+function JeuxLeaderboard({ currentUserId, adminPseudo }) {
   const [board, setBoard]       = React.useState([]);
   const [expanded, setExpanded] = React.useState(true);
 
@@ -446,6 +446,7 @@ function JeuxLeaderboard({ currentUserId }) {
     const counts = {};
     allIdx.forEach(r => { counts[r.user_id] = (counts[r.user_id] || 0) + 1; });
     const ranked = allUsers
+      .filter(u => !adminPseudo || u.pseudo.toLowerCase() !== adminPseudo.toLowerCase())
       .map(u => ({ id: u.id, pseudo: u.pseudo, count: counts[u.id] || 0 }))
       .filter(u => u.count > 0)
       .sort((a, b) => b.count - a.count || a.pseudo.localeCompare(b.pseudo));
@@ -608,7 +609,7 @@ function JeuxPage({ data, user, onLogout }) {
         )}
 
         {/* Leaderboard temps réel */}
-        <JeuxLeaderboard currentUserId={user?.id} />
+        <JeuxLeaderboard currentUserId={user?.id} adminPseudo={data.adminPseudo} />
 
         {/* Category filter */}
         <div className="jeux-filter-row">
