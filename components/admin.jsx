@@ -123,7 +123,7 @@ const IntendanceEditor = ({ data, onUpdateData, onLogout }) => {
 
       tab === "dashboard" && React.createElement(DashboardTab, { data: d }),
       tab === "evenement" && React.createElement(TabEvenement, { d, set }),
-      tab === "gazette"   && React.createElement(TabGazette, { d, setD }),
+      tab === "gazette"   && React.createElement(TabGazette, null),
       tab === "jeux"      && React.createElement(TabJeux, { d, set }),
 
       tab !== "dashboard" && React.createElement("div", {
@@ -572,28 +572,44 @@ const TabEvenement = ({ d, set }) => (
 );
 
 /* ── Tab: Gazette ────────────────────────────────────────────── */
-const TabGazette = ({ d, setD }) => {
+const TabGazette = () => {
+  const [posts, setPosts]     = React.useState([]);
   const [editing, setEditing] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
 
-  const posts = [...d.posts].sort((a, b) => b.iso.localeCompare(a.iso));
-
-  const deletePost = (id) => {
-    setD(prev => ({ ...prev, posts: prev.posts.filter(p => p.id !== id) }));
+  const loadPosts = () => {
+    const sb = window.__supabase;
+    if (!sb) { setLoading(false); return; }
+    sb.from("posts").select("*").order("iso", { ascending: false })
+      .then(({ data }) => { setPosts(data || []); setLoading(false); }, () => setLoading(false));
   };
 
-  const savePost = (post) => {
-    setD(prev => {
-      const exists = prev.posts.find(p => p.id === post.id);
-      const next = exists
-        ? prev.posts.map(p => p.id === post.id ? post : p)
-        : [post, ...prev.posts];
-      return { ...prev, posts: next };
+  React.useEffect(() => { loadPosts(); }, []);
+
+  const deletePost = async (id) => {
+    const sb = window.__supabase;
+    if (sb) await sb.from("posts").delete().eq("id", id).then(null, () => {});
+    setPosts(prev => prev.filter(p => p.id !== id));
+  };
+
+  const savePost = async (post) => {
+    const sb = window.__supabase;
+    if (sb) await sb.from("posts").upsert(post).then(null, () => {});
+    setPosts(prev => {
+      const exists = prev.find(p => p.id === post.id);
+      return exists
+        ? prev.map(p => p.id === post.id ? post : p)
+        : [post, ...prev].sort((a, b) => b.iso.localeCompare(a.iso));
     });
     setEditing(null);
   };
 
+  if (loading) return React.createElement("div", {
+    style: { padding: "32px 0", textAlign: "center", fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--bone)", opacity: 0.4 }
+  }, "Chargement…");
+
   if (editing !== null) {
-    const existing = editing === "new" ? null : d.posts.find(p => p.id === editing);
+    const existing = editing === "new" ? null : posts.find(p => p.id === editing);
     return React.createElement(PostForm, { post: existing, onSave: savePost, onCancel: () => setEditing(null) });
   }
 
@@ -643,6 +659,21 @@ const PostForm = ({ post, onSave, onCancel }) => {
   const [youtubeUrl, setYoutubeUrl]     = React.useState(post ? (post.youtubeUrl || "") : "");
   const [text1, setText1]               = React.useState(post ? post.paragraphes[0] : "");
   const [text2, setText2]               = React.useState(post ? (post.paragraphes[1] || "") : "");
+  const [uploading, setUploading]       = React.useState(false);
+
+  const uploadImage = async (file) => {
+    const sb = window.__supabase;
+    if (!sb || !file) return;
+    setUploading(true);
+    const ext      = file.name.split(".").pop().toLowerCase();
+    const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error } = await sb.storage.from("post-images").upload(filename, file, { upsert: false });
+    if (!error) {
+      const { data: urlData } = sb.storage.from("post-images").getPublicUrl(filename);
+      setImageUrl(urlData.publicUrl);
+    }
+    setUploading(false);
+  };
 
   const submit = (e) => {
     e.preventDefault();
@@ -720,7 +751,33 @@ const PostForm = ({ post, onSave, onCancel }) => {
           React.createElement("option", { value: "duel" }, "Duel")
         )
       ),
-      React.createElement(Field, { label: "URL d'illustration (remplace l'illustration par défaut)", value: imageUrl, onChange: setImageUrl, placeholder: "https://…", span: 2, disabled: noImage }),
+      React.createElement("div", { className: "field", style: { gridColumn: "1 / -1", opacity: noImage ? 0.4 : 1, pointerEvents: noImage ? "none" : "auto" } },
+        React.createElement("label", { className: "field-label" }, "URL d'illustration"),
+        React.createElement("div", { style: { display: "flex", gap: 8, alignItems: "center" } },
+          React.createElement("input", {
+            type: "text",
+            className: "field-input",
+            value: imageUrl,
+            onChange: e => setImageUrl(e.target.value),
+            placeholder: "https://… ou uploader ci-dessous",
+            style: { flex: 1 },
+          }),
+          React.createElement("label", {
+            className: "btn btn--ghost",
+            style: { cursor: "pointer", whiteSpace: "nowrap", padding: "8px 14px", fontSize: 11, opacity: uploading ? 0.5 : 1 },
+            title: "Uploader une image vers Supabase Storage",
+          },
+            uploading ? "Upload…" : "⬆ Uploader",
+            React.createElement("input", {
+              type: "file",
+              accept: "image/*",
+              style: { display: "none" },
+              disabled: uploading,
+              onChange: e => { if (e.target.files[0]) uploadImage(e.target.files[0]); },
+            })
+          )
+        )
+      ),
       React.createElement(Field, { label: "URL YouTube (vidéo affichée sous l'illustration)", value: youtubeUrl, onChange: setYoutubeUrl, placeholder: "https://youtu.be/…", span: 2 }),
 
       React.createElement("div", { className: "field" },
