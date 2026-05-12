@@ -158,6 +158,12 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
       .catch(() => {});
   }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Réappliquer le pre-fill quand app_config arrive après user_codes
+  React.useEffect(() => {
+    if (foundIdx.size === 0) return;
+    setInputs(prev => prev.map((v, i) => foundIdx.has(i) ? (codes[i] || "") : v));
+  }, [codes]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const glyphs = "▓▒░█◆◇※★✦";
   const noise = (n) => Array.from({ length: n }, (_, i) => glyphs[(i * 7 + tick) % glyphs.length]).join("");
 
