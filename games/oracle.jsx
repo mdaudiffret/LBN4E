@@ -2,17 +2,21 @@
 // games/oracle.jsx — L'Oracle
 const { useState, useEffect, useRef } = React;
 
+const MAX_TIMES = { 1: 55, 2: 45, 3: 35 };
+
 const ROUNDS = {
   1: [
     [
       { event: "Naissance de Jules César", year: -100 },
       { event: "Sacre de Charlemagne", year: 800 },
+      { event: "Croisades — prise de Jérusalem", year: 1099 },
       { event: "Prise de Constantinople", year: 1453 },
       { event: "Révolution française", year: 1789 },
     ],
     [
       { event: "Construction des pyramides de Gizeh", year: -2560 },
       { event: "Naissance de Jésus-Christ", year: 0 },
+      { event: "Invasion de l'Angleterre par Guillaume", year: 1066 },
       { event: "Invention de l'imprimerie par Gutenberg", year: 1450 },
       { event: "Premier pas sur la Lune", year: 1969 },
     ],
@@ -20,6 +24,7 @@ const ROUNDS = {
       { event: "Mort d'Alexandre le Grand", year: -323 },
       { event: "Chute de Rome occidentale", year: 476 },
       { event: "Découverte de l'Amérique par Colomb", year: 1492 },
+      { event: "Déclaration d'indépendance américaine", year: 1776 },
       { event: "Naissance de Napoléon Bonaparte", year: 1769 },
     ],
   ],
@@ -29,6 +34,7 @@ const ROUNDS = {
       { event: "Assassinat d'Henri IV", year: 1610 },
       { event: "Siège de La Rochelle", year: 1628 },
       { event: "Mort du Cardinal de Richelieu", year: 1642 },
+      { event: "Traité de Westphalie", year: 1648 },
       { event: "Traité des Pyrénées", year: 1659 },
     ],
     [
@@ -36,7 +42,16 @@ const ROUNDS = {
       { event: "Fronde des princes", year: 1648 },
       { event: "Mariage de Louis XIV", year: 1660 },
       { event: "Révocation de l'Édit de Nantes", year: 1685 },
+      { event: "Guerre de succession d'Espagne", year: 1701 },
       { event: "Mort de Louis XIV", year: 1715 },
+    ],
+    [
+      { event: "Naissance de Richelieu", year: 1585 },
+      { event: "Assassinat d'Henri IV", year: 1610 },
+      { event: "Création de l'Académie française", year: 1635 },
+      { event: "Mort de Richelieu", year: 1642 },
+      { event: "Mort de Louis XIII", year: 1643 },
+      { event: "Fronde parlementaire", year: 1648 },
     ],
   ],
   3: [
@@ -47,6 +62,7 @@ const ROUNDS = {
       { event: "Traité de paix de Cherasco", year: 1631 },
       { event: "Mort de Gustavus Adolphus à Lützen", year: 1632 },
       { event: "Exécution du duc de Montmorency", year: 1632 },
+      { event: "Mort du Cardinal de Richelieu", year: 1642 },
     ],
     [
       { event: "Mort du Cardinal Mazarin", year: 1661 },
@@ -55,6 +71,16 @@ const ROUNDS = {
       { event: "Création de l'Académie des sciences", year: 1666 },
       { event: "Invasion de la Hollande par Louis XIV", year: 1672 },
       { event: "Construction du château de Versailles achevée", year: 1682 },
+      { event: "Révocation de l'Édit de Nantes", year: 1685 },
+    ],
+    [
+      { event: "Naissance de d'Artagnan (Charles de Batz)", year: 1611 },
+      { event: "Création des Mousquetaires du Roi", year: 1622 },
+      { event: "Siège de l'île de Ré", year: 1627 },
+      { event: "Journée des dupes", year: 1630 },
+      { event: "Mort de Richelieu", year: 1642 },
+      { event: "Mort de Mazarin", year: 1661 },
+      { event: "Mort de d'Artagnan au siège de Maastricht", year: 1673 },
     ],
   ],
 };
@@ -69,7 +95,7 @@ function shuffle(arr) {
 }
 
 function OracleGame({ level, onHud, onFinish }) {
-  const MAX_TIME = 60;
+  const MAX_TIME = MAX_TIMES[level] || 55;
 
   // Pick a random round set from the level pool
   const roundDataRef = useRef(null);

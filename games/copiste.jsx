@@ -5,7 +5,7 @@ const { useState, useEffect, useRef, useCallback } = React;
 const LEVELS = {
   1: { lv: 1, hint: "≥ 20/25 mots · 60s", maxTime: 60, target: 20, total: 25 },
   2: { lv: 2, hint: "≥ 25/30 mots · 60s", maxTime: 60, target: 25, total: 30 },
-  3: { lv: 3, hint: "≥ 32/40 mots · 60s", maxTime: 60, target: 32, total: 40 },
+  3: { lv: 3, hint: "≥ 35/40 mots · 50s", maxTime: 50, target: 35, total: 40 },
 };
 
 const TEXTS = {
@@ -50,6 +50,12 @@ function CopisteGame({ level, onHud, onFinish }) {
   useEffect(() => {
     onHud({ score, total: cfg.total });
   }, [score]);
+
+  // Auto-finish when all words are typed
+  useEffect(() => {
+    if (over || cappedCompleted < cfg.total) return;
+    setOver(true);
+  }, [cappedCompleted, over]);
 
   // Timer
   useEffect(() => {

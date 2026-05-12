@@ -246,6 +246,23 @@ function FlammeGame({ level, onHud, onFinish }) {
             userSelect: "none",
           }
         }, "🕯️"),
+        // Custom cursor dot
+        cursorPos.current.x > -999 && React.createElement("div", {
+          style: {
+            position: "absolute",
+            left: cursorPos.current.x - 8,
+            top:  cursorPos.current.y - 8,
+            width: 16,
+            height: 16,
+            borderRadius: "50%",
+            background: inside ? "rgba(212,175,55,0.85)" : "rgba(245,239,226,0.7)",
+            border: `2px solid ${inside ? "var(--gold-bright)" : "var(--pearl)"}`,
+            boxShadow: inside ? "0 0 10px 3px rgba(212,175,55,0.5)" : "0 0 4px 1px rgba(0,0,0,0.4)",
+            pointerEvents: "none",
+            zIndex: 20,
+            transition: "background 0.08s, box-shadow 0.08s",
+          }
+        }),
         // Target hint bar
         React.createElement("div", {
           style: {
