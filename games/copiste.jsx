@@ -40,10 +40,19 @@ function CopisteGame({ level, onHud, onFinish }) {
   const completedCount = inputEndsSpace ? typedWords.length : Math.max(0, typedWords.length - 1);
   const cappedCompleted = Math.min(completedCount, cfg.total);
 
+  // Also consider the last word done if it exactly matches (no trailing space needed)
+  const lastIdx = cfg.total - 1;
+  const lastWordExact = !inputEndsSpace &&
+    typedWords.length >= cfg.total &&
+    typedWords[lastIdx] === targetWords[lastIdx];
+  const effectiveCompleted = lastWordExact ? cfg.total : cappedCompleted;
+
   let score = 0;
-  for (let i = 0; i < cappedCompleted; i++) {
+  for (let i = 0; i < effectiveCompleted; i++) {
     if (typedWords[i] === targetWords[i]) score++;
   }
+
+  const allGreen = score === cfg.total;
 
   useEffect(() => { scoreRef.current = score; }, [score]);
 
@@ -51,11 +60,11 @@ function CopisteGame({ level, onHud, onFinish }) {
     onHud({ score, total: cfg.total });
   }, [score]);
 
-  // Auto-finish when all words are typed
+  // Auto-finish when all words are correct (all green) OR all words typed
   useEffect(() => {
-    if (over || cappedCompleted < cfg.total) return;
+    if (over || !allGreen) return;
     setOver(true);
-  }, [cappedCompleted, over]);
+  }, [allGreen, over]);
 
   // Timer
   useEffect(() => {
@@ -120,17 +129,24 @@ function CopisteGame({ level, onHud, onFinish }) {
 
   const renderedWords = targetWords.map((word, i) => {
     let color, bgColor, fontWeight;
-    if (i < cappedCompleted) {
-      // Completed word
+    if (i < effectiveCompleted) {
+      // Completed word (including last word if exactly typed)
       const correct = typedWords[i] === word;
       color = correct ? "var(--success)" : "var(--danger)";
       bgColor = correct ? "rgba(80,180,80,0.12)" : "rgba(200,60,60,0.12)";
       fontWeight = 600;
     } else if (i === currentWordIdx) {
-      // Current word being typed
-      color = "var(--gold-bright)";
-      bgColor = "rgba(200,160,60,0.15)";
-      fontWeight = 700;
+      // Current word being typed — green if exact match already
+      const typed = typedWords[i] || "";
+      if (typed === word) {
+        color = "var(--success)";
+        bgColor = "rgba(80,180,80,0.12)";
+        fontWeight = 600;
+      } else {
+        color = "var(--gold-bright)";
+        bgColor = "rgba(200,160,60,0.15)";
+        fontWeight = 700;
+      }
     } else {
       color = "var(--bone)";
       bgColor = "transparent";
@@ -214,7 +230,7 @@ function CopisteGame({ level, onHud, onFinish }) {
       }),
       // Progress bar for words
       React.createElement("div", { style: { fontSize: 11, color: "var(--line)", fontFamily: "var(--font-mono)", textAlign: "right" } },
-        `${cappedCompleted} / ${cfg.total} mots saisis`
+        `${effectiveCompleted} / ${cfg.total} mots saisis`
       )
     )
   );

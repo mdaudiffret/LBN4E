@@ -9,13 +9,13 @@ const LEVELS = {
 };
 
 const FIELD_W_PCT = 1; // 100% of container
-const FIELD_H     = 280;
-const GROUND_Y    = 200; // from top of field
-const HORSE_X     = 90;
+const FIELD_H     = 220;
+const GROUND_Y    = 158; // from top of field
+const HORSE_X     = 70;
 const HORSE_W     = 44;
 const HORSE_H     = 44;
 const GRAVITY     = 1400; // px/s²
-const JUMP_VY     = -520; // px/s
+const JUMP_VY     = -540; // px/s — slightly stronger for small field
 
 function ChevaucheeGame({ level, onHud, onFinish }) {
   const cfg = LEVELS[level];
@@ -73,6 +73,11 @@ function ChevaucheeGame({ level, onHud, onFinish }) {
     } else if (phaseRef.current === "playing") {
       doJump();
     }
+  };
+
+  const handleTouchStart = (e) => {
+    e.preventDefault(); // prevent 300ms click delay and scroll
+    handleFieldClick();
   };
 
   const startGame = () => {
@@ -136,13 +141,13 @@ function ChevaucheeGame({ level, onHud, onFinish }) {
       // Spawn obstacles
       g.nextObsIn -= dt;
       if (g.nextObsIn <= 0) {
-        const h1 = 35 + Math.floor(Math.random() * 20);
+        const h1 = 26 + Math.floor(Math.random() * 18);
         const id = ++g.obsIdCount;
         g.obstacles.push({ id, x: g.fieldW + 30, w: 24, h: h1 });
 
         // Level 3: occasional double obstacle
         if (cfg.doubleObs && Math.random() < 0.35) {
-          const h2 = 35 + Math.floor(Math.random() * 20);
+          const h2 = 26 + Math.floor(Math.random() * 18);
           g.obstacles.push({ id: ++g.obsIdCount, x: g.fieldW + 30 + 60, w: 24, h: h2 });
         }
 
@@ -209,6 +214,7 @@ function ChevaucheeGame({ level, onHud, onFinish }) {
     return React.createElement("div", {
       ref: fieldRef,
       onClick: handleFieldClick,
+      onTouchStart: handleTouchStart,
       style: {
         position: "relative",
         width: "100%",
@@ -219,6 +225,7 @@ function ChevaucheeGame({ level, onHud, onFinish }) {
         overflow: "hidden",
         cursor: "pointer",
         userSelect: "none",
+        touchAction: "none",
       }
     },
       // Ground line
@@ -322,6 +329,7 @@ function ChevaucheeGame({ level, onHud, onFinish }) {
         ),
         React.createElement("div", { ref: fieldRef,
           onClick: handleFieldClick,
+          onTouchStart: handleTouchStart,
           style: {
             position: "relative",
             width: "100%",
@@ -334,6 +342,7 @@ function ChevaucheeGame({ level, onHud, onFinish }) {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            touchAction: "none",
           }
         },
           // Ground line
