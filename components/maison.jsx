@@ -626,7 +626,7 @@ const Leaderboard = ({ adminPseudo }) => {
         textTransform: "uppercase",
         margin: "0 0 24px",
       }
-    }, "Les Mousquetaires"),
+    }, "Les Chevaliers"),
     rows.map((row, i) =>
       React.createElement("div", { key: row.id, className: "lb-row" },
         React.createElement("span", { className: "lb-rank" }, `#${i + 1}`),
