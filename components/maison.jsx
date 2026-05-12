@@ -153,7 +153,6 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
         const found = new Set(rows.map(r => r.code_index));
         setFoundIdx(found);
         // Pré-remplir les inputs déjà trouvés
-        setInputs(prev => prev.map((v, i) => found.has(i) ? (codes[i] || "") : v));
         setResults(prev => prev.map((v, i) => found.has(i) ? "correct" : v));
       })
       .catch(() => {});
