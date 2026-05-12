@@ -11,11 +11,15 @@ const DEFAULT_DATA = {
   /* Countdown target — ISO 8601, modifiable via admin */
   countdownISO: "2026-06-12T16:00:00",
 
-  /* 9 codes de révélation — à distribuer via les posts de la Gazette */
+  /* 20 codes de révélation — à distribuer via les posts de la Gazette */
   revealCodes: [
     "athos", "porthos", "aramis",
     "dartagan", "rochefort", "buckingham",
-    "richelieu", "milady", "constance"
+    "richelieu", "milady", "constance",
+    "treville", "planchet", "grimaud",
+    "bazin", "mousqueton", "bonacieux",
+    "mazarin", "felton", "chevreuse",
+    "laporte", "jussac"
   ],
 
   chateau: "Chasteau de Beaumesnil",
@@ -113,9 +117,42 @@ const DEFAULT_DATA = {
     "capitales-1":  "",
     "capitales-2":  "",
     "capitales-3":  "",
-    "annee-1":      "",
-    "annee-2":      "",
-    "annee-3":      "",
+    "annee-1":       "",
+    "annee-2":       "",
+    "annee-3":       "",
+    "mastermind-1":  "",
+    "mastermind-2":  "",
+    "mastermind-3":  "",
+    "intrus-1":      "",
+    "intrus-2":      "",
+    "intrus-3":      "",
+    "flamme-1":      "",
+    "flamme-2":      "",
+    "flamme-3":      "",
+    "chevauchee-1":  "",
+    "chevauchee-2":  "",
+    "chevauchee-3":  "",
+    "catapulte-1":   "",
+    "catapulte-2":   "",
+    "catapulte-3":   "",
+    "archives-1":    "",
+    "archives-2":    "",
+    "archives-3":    "",
+    "copiste-1":     "",
+    "copiste-2":     "",
+    "copiste-3":     "",
+    "blason-1":      "",
+    "blason-2":      "",
+    "blason-3":      "",
+    "escrime-1":     "",
+    "escrime-2":     "",
+    "escrime-3":     "",
+    "cartographe-1": "",
+    "cartographe-2": "",
+    "cartographe-3": "",
+    "oracle-1":      "",
+    "oracle-2":      "",
+    "oracle-3":      "",
   },
 };
 
