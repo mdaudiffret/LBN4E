@@ -11,11 +11,15 @@ const DEFAULT_DATA = {
   /* Countdown target — ISO 8601, modifiable via admin */
   countdownISO: "2026-06-12T16:00:00",
 
-  /* 9 codes de révélation — à distribuer via les posts de la Gazette */
+  /* 20 codes de révélation — à distribuer via les posts de la Gazette */
   revealCodes: [
     "athos", "porthos", "aramis",
     "dartagan", "rochefort", "buckingham",
-    "richelieu", "milady", "constance"
+    "richelieu", "milady", "constance",
+    "treville", "planchet", "grimaud",
+    "bazin", "mousqueton", "bonacieux",
+    "mazarin", "felton", "chevreuse",
+    "laporte", "jussac"
   ],
 
   chateau: "Chasteau de Beaumesnil",

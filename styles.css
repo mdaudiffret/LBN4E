@@ -531,7 +531,7 @@ img { max-width: 100%; display: block; }
 /* Reveal codes grid */
 .codes-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
   margin-top: 24px;
 }
@@ -603,7 +603,7 @@ img { max-width: 100%; display: block; }
   text-transform: uppercase;
 }
 @media (max-width: 480px) {
-  .codes-grid { grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .codes-grid { grid-template-columns: repeat(2, 1fr); gap: 7px; }
   .code-input { font-size: 11px; padding: 8px 6px; }
 }
 

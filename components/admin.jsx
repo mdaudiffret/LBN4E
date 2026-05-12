@@ -299,10 +299,10 @@ const DashboardTab = ({ data }) => {
               /* Codes */
               React.createElement("div", { className: "dash-row" },
                 React.createElement("span", { className: "dash-label" },
-                  `Codes ${user.codes.length}/9`
+                  `Codes ${user.codes.length}/20`
                 ),
                 React.createElement("div", { className: "dash-badges" },
-                  Array.from({ length: 9 }, (_, i) => {
+                  Array.from({ length: 20 }, (_, i) => {
                     const found = user.codes.some(c => c.code_index === i);
                     const word  = revealCodes[i] || `Code ${i + 1}`;
                     return React.createElement("span", {
@@ -563,16 +563,16 @@ const TabEvenement = ({ d, set }) => {
     },
       React.createElement("div", {
         style: { fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.26em", color: "var(--gold)", textTransform: "uppercase", marginBottom: 12 }
-      }, "Codes de révélation (9)"),
-      React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 } },
-        ["I","II","III","IV","V","VI","VII","VIII","IX"].map((roman, i) =>
+      }, "Codes de révélation (20)"),
+      React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 } },
+        ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX"].map((roman, i) =>
           React.createElement("div", { key: i, className: "field", style: { margin: 0 } },
             React.createElement("label", { className: "field-label" }, "Code ", roman),
             React.createElement("input", {
               className: "field-input",
               value: (d.revealCodes || [])[i] || "",
               onChange: e => {
-                const next = [...(d.revealCodes || Array(9).fill(""))];
+                const next = [...(d.revealCodes || Array(20).fill(""))];
                 next[i] = e.target.value;
                 set("revealCodes", next);
               },
