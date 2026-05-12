@@ -203,10 +203,11 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
           .map((status, i) => status === "correct" && !foundIdx.has(i) ? i : null)
           .filter(i => i !== null);
         if (newlyFound.length > 0) {
-          await sb.from("user_codes").upsert(
+          const { error } = await sb.from("user_codes").upsert(
             newlyFound.map(i => ({ user_id: user.id, code_index: i, found_at: new Date().toISOString() }))
-          ).then(null, () => {});
-          setFoundIdx(prev => new Set([...prev, ...newlyFound]));
+          );
+          if (error) { console.error("[user_codes upsert]", error); }
+          else { setFoundIdx(prev => new Set([...prev, ...newlyFound])); }
         }
       }
     }
