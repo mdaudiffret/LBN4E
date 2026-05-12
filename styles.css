@@ -1353,6 +1353,9 @@ img { max-width: 100%; display: block; }
   .topbar-inner { height: 56px; gap: 12px; }
   .nav-link { padding: 6px 8px; font-size: 10px; letter-spacing: 0.16em; }
   .admin-pill span { display: none; }
+  .user-chip .user-chip__pseudo { display: none; }
+  .user-chip { padding: 6px 10px; }
+  .btn, .k-btn { width: 100%; justify-content: center; }
   .kv { grid-template-columns: 1fr; gap: 4px; }
   .page { padding: 36px 0 56px; }
   .modal { padding: 24px 20px; }

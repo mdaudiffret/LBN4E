@@ -58,7 +58,7 @@ const UserChip = ({ user, onLogout }) => {
     React.createElement("button", {
       className: "user-chip" + (open ? " is-open" : ""),
       onClick: () => setOpen(v => !v),
-    }, React.createElement(Icon), user.pseudo),
+    }, React.createElement(Icon), React.createElement("span", { className: "user-chip__pseudo" }, user.pseudo)),
 
     open && React.createElement("div", { className: "user-dropdown" },
       React.createElement("div", { className: "user-dropdown__pseudo" }, user.pseudo),
