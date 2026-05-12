@@ -5,7 +5,7 @@
    Tab 0 — Dashboard  : liste des participants + stats
    Tab 1 — Événement  : toggle infos + champs événement
    Tab 2 — Gazette    : liste / ajout / édition / suppression posts
-   Tab 3 — Jeux       : 27 indices configurables
+   Tab 3 — Jeux       : 60 indices configurables
    --------------------------------------------------------------- */
 
 /* ── Page principale ─────────────────────────────────────────── */
@@ -204,6 +204,10 @@ const GAME_LABELS = {
   memoire: "Mémoire", suite: "Suite", anagrammes: "Anagrammes",
   reflexes: "Réflexes", cible: "Cible", tempo: "Tempo",
   drapeaux: "Drapeaux", capitales: "Capitales", annee: "Année",
+  mastermind: "Code Coffre", intrus: "Imposteur", flamme: "Flamme",
+  chevauchee: "Chevauchée", catapulte: "Siège", archives: "Archives",
+  copiste: "Copiste", blason: "Héraldiste", escrime: "Escrimeur",
+  cartographe: "Cartographe", oracle: "Oracle",
 };
 
 const DashboardTab = ({ data }) => {
@@ -242,7 +246,7 @@ const DashboardTab = ({ data }) => {
   React.useEffect(() => { load(); }, []);
 
   const revealCodes = data.revealCodes || [];
-  const adminPseudo = (data.adminPseudo || "").toLowerCase();
+  const adminPseudos = (data.adminPseudos || (data.adminPseudo ? [data.adminPseudo] : [])).map(p => p.toLowerCase());
 
   const fmtDate = (iso) => {
     if (!iso) return "—";
@@ -255,7 +259,7 @@ const DashboardTab = ({ data }) => {
     style: { padding: "40px 0", textAlign: "center", fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--bone)", opacity: 0.5 }
   }, "Chargement…");
 
-  const participants = users.filter(u => u.pseudo.toLowerCase() !== adminPseudo);
+  const participants = users.filter(u => !adminPseudos.includes(u.pseudo.toLowerCase()));
 
   return (
     React.createElement("div", null,
@@ -299,10 +303,10 @@ const DashboardTab = ({ data }) => {
               /* Codes */
               React.createElement("div", { className: "dash-row" },
                 React.createElement("span", { className: "dash-label" },
-                  `Codes ${user.codes.length}/9`
+                  `Codes ${user.codes.length}/20`
                 ),
                 React.createElement("div", { className: "dash-badges" },
-                  Array.from({ length: 9 }, (_, i) => {
+                  Array.from({ length: 20 }, (_, i) => {
                     const found = user.codes.some(c => c.code_index === i);
                     const word  = revealCodes[i] || `Code ${i + 1}`;
                     return React.createElement("span", {
@@ -521,6 +525,7 @@ const AgendaEditor = ({ days, onChange }) => {
 /* ── Tab: Événement ──────────────────────────────────────────── */
 const TabEvenement = ({ d, set }) => {
   const [pseudosRaw, setPseudosRaw] = React.useState((d.allowedPseudos || []).join("\n"));
+  const [adminPseudosRaw, setAdminPseudosRaw] = React.useState((d.adminPseudos || (d.adminPseudo ? [d.adminPseudo] : [])).join("\n"));
   return React.createElement("div", null,
 
     React.createElement("div", {
@@ -563,16 +568,16 @@ const TabEvenement = ({ d, set }) => {
     },
       React.createElement("div", {
         style: { fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.26em", color: "var(--gold)", textTransform: "uppercase", marginBottom: 12 }
-      }, "Codes de révélation (9)"),
-      React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 } },
-        ["I","II","III","IV","V","VI","VII","VIII","IX"].map((roman, i) =>
+      }, "Codes de révélation (20)"),
+      React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 } },
+        ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX"].map((roman, i) =>
           React.createElement("div", { key: i, className: "field", style: { margin: 0 } },
             React.createElement("label", { className: "field-label" }, "Code ", roman),
             React.createElement("input", {
               className: "field-input",
               value: (d.revealCodes || [])[i] || "",
               onChange: e => {
-                const next = [...(d.revealCodes || Array(9).fill(""))];
+                const next = [...(d.revealCodes || Array(20).fill(""))];
                 next[i] = e.target.value;
                 set("revealCodes", next);
               },
@@ -588,16 +593,20 @@ const TabEvenement = ({ d, set }) => {
     },
       React.createElement("div", {
         style: { fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.26em", color: "var(--gold)", textTransform: "uppercase", marginBottom: 8 }
-      }, "Pseudo admin (exclu du classement)"),
+      }, "Pseudos admin (exclus du classement)"),
       React.createElement("div", {
         style: { fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 13, color: "var(--bone)", opacity: 0.6, marginBottom: 10 }
-      }, "Ce pseudo peut jouer normalement mais n'apparaît pas dans le tableau d'honneur."),
-      React.createElement("input", {
-        className: "field-input",
-        value: d.adminPseudo || "",
-        onChange: e => set("adminPseudo", e.target.value),
-        placeholder: "Aramis",
-        style: { maxWidth: 200 },
+      }, "Un pseudo par ligne. Ces pseudos peuvent jouer normalement mais n'apparaissent pas dans les tableaux d'honneur."),
+      React.createElement("textarea", {
+        className: "field-textarea",
+        rows: 4,
+        value: adminPseudosRaw,
+        onChange: e => {
+          setAdminPseudosRaw(e.target.value);
+          set("adminPseudos", e.target.value.split("\n").map(s => s.trim()).filter(Boolean));
+        },
+        placeholder: "Aramis\nAthos\n…",
+        style: { fontFamily: "var(--font-mono)", fontSize: 13, letterSpacing: "0.08em" },
       })
     ),
 
@@ -874,15 +883,26 @@ const Field = ({ label, value, onChange, span = 1, type = "text", placeholder = 
 
 /* ── Tab: Jeux ───────────────────────────────────────────────── */
 const JEUX_ADMIN_GAMES = [
-  { id: "memoire",    num: "01", title: "Mémoire flash" },
-  { id: "suite",      num: "02", title: "Suite logique" },
-  { id: "anagrammes", num: "03", title: "Anagrammes" },
-  { id: "reflexes",   num: "04", title: "Réflexes" },
-  { id: "cible",      num: "05", title: "Cible mobile" },
-  { id: "tempo",      num: "06", title: "Tap-tempo" },
-  { id: "drapeaux",   num: "07", title: "Drapeaux" },
-  { id: "capitales",  num: "08", title: "Capitales" },
-  { id: "annee",      num: "09", title: "Devine l'année" },
+  { id: "memoire",     num: "01", title: "Mémoire flash" },
+  { id: "suite",       num: "02", title: "Suite logique" },
+  { id: "anagrammes",  num: "03", title: "Anagrammes" },
+  { id: "reflexes",    num: "04", title: "Réflexes" },
+  { id: "cible",       num: "05", title: "Cible mobile" },
+  { id: "tempo",       num: "06", title: "Tap-tempo" },
+  { id: "drapeaux",    num: "07", title: "Drapeaux" },
+  { id: "capitales",   num: "08", title: "Capitales" },
+  { id: "annee",       num: "09", title: "Devine l'année" },
+  { id: "mastermind",  num: "10", title: "Code du Coffre" },
+  { id: "intrus",      num: "11", title: "L'Imposteur" },
+  { id: "flamme",      num: "12", title: "La Flamme Vacillante" },
+  { id: "chevauchee",  num: "13", title: "La Chevauchée" },
+  { id: "catapulte",   num: "14", title: "Le Siège" },
+  { id: "archives",    num: "15", title: "Les Archives" },
+  { id: "copiste",     num: "16", title: "Le Copiste" },
+  { id: "blason",      num: "17", title: "L'Héraldiste" },
+  { id: "escrime",     num: "18", title: "L'Escrimeur" },
+  { id: "cartographe", num: "19", title: "Le Cartographe" },
+  { id: "oracle",      num: "20", title: "L'Oracle" },
 ];
 
 const TabJeux = ({ d, set }) => {

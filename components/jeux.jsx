@@ -1,9 +1,9 @@
-// components/jeux.jsx — Page des 9 mini-jeux LBN4E
+// components/jeux.jsx — Page des 20 mini-jeux LBN4E
 /* global React */
 
 
 const GAMES_LIST = [
-  { id: "memoire",    num: "01", cat: "Logique",  title: "Mémoire flash",
+  { id: "memoire",     num: "01", cat: "Logique",  title: "Mémoire flash",
     desc: "Reproduis la séquence de couleurs dans le bon ordre. 10 secondes par séquence.",
     levels: [
       { lv: 1, label: "Enfant",  hint: "4 couleurs · 10s/séquence",  maxTime: 60,  target: 4, total: 4 },
@@ -11,7 +11,7 @@ const GAMES_LIST = [
       { lv: 3, label: "Maître",  hint: "8 couleurs · 10s/séquence",  maxTime: 120, target: 8, total: 8 }
     ]
   },
-  { id: "suite",      num: "02", cat: "Logique",  title: "Suite logique",
+  { id: "suite",       num: "02", cat: "Logique",  title: "Suite logique",
     desc: "Trouve le nombre qui complète la suite. 1 minute pour tout résoudre.",
     levels: [
       { lv: 1, label: "Enfant",  hint: "5 suites · 1:00",  maxTime: 120, target: 3, total: 5 },
@@ -19,7 +19,7 @@ const GAMES_LIST = [
       { lv: 3, label: "Maître",  hint: "5 suites · 1:00",  maxTime: 120, target: 3, total: 5 }
     ]
   },
-  { id: "anagrammes", num: "03", cat: "Logique",  title: "Anagrammes",
+  { id: "anagrammes",  num: "03", cat: "Logique",  title: "Anagrammes",
     desc: "Remets les lettres dans l'ordre pour former un mot. 1 minute pour tout résoudre.",
     levels: [
       { lv: 1, label: "Enfant",  hint: "5 mots · 1:00",  maxTime: 120, target: 3, total: 5 },
@@ -27,7 +27,7 @@ const GAMES_LIST = [
       { lv: 3, label: "Maître",  hint: "5 mots · 1:00",  maxTime: 120, target: 3, total: 5 }
     ]
   },
-  { id: "reflexes",   num: "04", cat: "Adresse",  title: "Réflexes",
+  { id: "reflexes",    num: "04", cat: "Adresse",  title: "Réflexes",
     desc: "Clique dès que la cible passe au vert. L'objectif est une moyenne de temps de réaction suffisamment basse.",
     levels: [
       { lv: 1, label: "Enfant",  hint: "Moy. < 500 ms",                  maxTime: 60, target: 5, total: 5 },
@@ -35,7 +35,7 @@ const GAMES_LIST = [
       { lv: 3, label: "Maître",  hint: "Moy. < 300 ms · feintes rouges",  maxTime: 60, target: 5, total: 5 }
     ]
   },
-  { id: "cible",      num: "05", cat: "Adresse",  title: "Cible mobile",
+  { id: "cible",       num: "05", cat: "Adresse",  title: "Cible mobile",
     desc: "Touche un maximum de cibles en 30s. Au niveau 3, les cibles rouges font perdre un point.",
     levels: [
       { lv: 1, label: "Enfant",  hint: "≥ 15 cibles · 30s",               maxTime: 35, target: 15, total: 50 },
@@ -43,7 +43,7 @@ const GAMES_LIST = [
       { lv: 3, label: "Maître",  hint: "≥ 45 cibles · leurres rouges −1", maxTime: 35, target: 45, total: 70 }
     ]
   },
-  { id: "tempo",      num: "06", cat: "Adresse",  title: "Tap-tempo",
+  { id: "tempo",       num: "06", cat: "Adresse",  title: "Tap-tempo",
     desc: "Tape 10 fois en suivant le point clignotant au rythme imposé.",
     levels: [
       { lv: 1, label: "Enfant",  hint: "60 BPM · ±220 ms",                      maxTime: 60, target: 60, total: 100 },
@@ -51,7 +51,7 @@ const GAMES_LIST = [
       { lv: 3, label: "Maître",  hint: "120 BPM · repère masqué après 2 taps",  maxTime: 60, target: 80, total: 100 }
     ]
   },
-  { id: "drapeaux",   num: "07", cat: "Culture",  title: "Drapeaux",
+  { id: "drapeaux",    num: "07", cat: "Culture",  title: "Drapeaux",
     desc: "Identifie le pays correspondant au drapeau affiché. 5 secondes par question.",
     levels: [
       { lv: 1, label: "Enfant",  hint: "4 choix · 5s/question",  maxTime: 60, target: 6, total: 8 },
@@ -59,7 +59,7 @@ const GAMES_LIST = [
       { lv: 3, label: "Maître",  hint: "6 choix · 5s/question",  maxTime: 60, target: 6, total: 8 }
     ]
   },
-  { id: "capitales",  num: "08", cat: "Culture",  title: "Capitales",
+  { id: "capitales",   num: "08", cat: "Culture",  title: "Capitales",
     desc: "Quelle est la capitale de ce pays ? 5 secondes par question.",
     levels: [
       { lv: 1, label: "Enfant",  hint: "4 choix · 5s/question",  maxTime: 60, target: 6, total: 8 },
@@ -67,12 +67,100 @@ const GAMES_LIST = [
       { lv: 3, label: "Maître",  hint: "6 choix · 5s/question",  maxTime: 60, target: 6, total: 8 }
     ]
   },
-  { id: "annee",      num: "09", cat: "Culture",  title: "Devine l'année",
+  { id: "annee",       num: "09", cat: "Culture",  title: "Devine l'année",
     desc: "Devine l'année d'un événement célèbre à quelques années près. 5 secondes par question.",
     levels: [
       { lv: 1, label: "Enfant",  hint: "2000–2025 · ±10 ans · 10s/q",  maxTime: 90, target: 4, total: 6 },
       { lv: 2, label: "Adulte",  hint: "1880–2000 · ±5 ans · 10s/q",   maxTime: 90, target: 4, total: 6 },
       { lv: 3, label: "Maître",  hint: "1300–1900 · ±2 ans · 10s/q",   maxTime: 90, target: 4, total: 6 }
+    ]
+  },
+  { id: "mastermind",  num: "10", cat: "Logique",  title: "Code du Coffre",
+    desc: "Déchiffre la combinaison secrète du coffre en plaçant des gemmes. Chaque essai révèle les bien placées et les mal placées.",
+    levels: [
+      { lv: 1, label: "Enfant",  hint: "4 positions · 5 couleurs · 8 essais",  maxTime: 300, target: 1, total: 1 },
+      { lv: 2, label: "Adulte",  hint: "4 positions · 6 couleurs · 7 essais",  maxTime: 240, target: 1, total: 1 },
+      { lv: 3, label: "Maître",  hint: "5 positions · 6 couleurs · 6 essais",  maxTime: 240, target: 1, total: 1 }
+    ]
+  },
+  { id: "intrus",      num: "11", cat: "Logique",  title: "L'Imposteur",
+    desc: "Cinq mots sont présentés : l'un n'appartient pas au groupe. Identifie le traître avant que le sablier ne se vide.",
+    levels: [
+      { lv: 1, label: "Enfant",  hint: "6 séries · catégories évidentes · 20s/q",      maxTime: 120, target: 4, total: 6 },
+      { lv: 2, label: "Adulte",  hint: "6 séries · catégories subtiles · 12s/q",        maxTime: 90,  target: 4, total: 6 },
+      { lv: 3, label: "Maître",  hint: "6 séries · leurres orthographiques · 8s/q",     maxTime: 60,  target: 4, total: 6 }
+    ]
+  },
+  { id: "flamme",      num: "12", cat: "Adresse",  title: "La Flamme Vacillante",
+    desc: "Maintiens ton curseur dans le cercle lumineux qui erre et rétrécit. Chaque seconde à l'intérieur compte.",
+    levels: [
+      { lv: 1, label: "Enfant",  hint: "≥ 22s dans le cercle · cercle lent",          maxTime: 35, target: 22, total: 30 },
+      { lv: 2, label: "Adulte",  hint: "≥ 22s · cercle rapide",                        maxTime: 35, target: 22, total: 30 },
+      { lv: 3, label: "Maître",  hint: "≥ 22s · cercle erratique · rétrécissant",      maxTime: 35, target: 22, total: 30 }
+    ]
+  },
+  { id: "chevauchee",  num: "13", cat: "Adresse",  title: "La Chevauchée",
+    desc: "Fais sauter ton destrier par-dessus les herses du château. Espace ou clic pour sauter — double tap pour le saut prolongé.",
+    levels: [
+      { lv: 1, label: "Enfant",  hint: "Survive 25s · obstacles lents",         maxTime: 30, target: 25, total: 30 },
+      { lv: 2, label: "Adulte",  hint: "Survive 35s · vitesse croissante",       maxTime: 40, target: 35, total: 40 },
+      { lv: 3, label: "Maître",  hint: "Survive 45s · doubles herses",           maxTime: 50, target: 45, total: 50 }
+    ]
+  },
+  { id: "catapulte",   num: "14", cat: "Adresse",  title: "Le Siège",
+    desc: "Ajuste l'angle et la puissance de ta catapulte pour démolir les créneaux. Le vent complique la trajectoire.",
+    levels: [
+      { lv: 1, label: "Enfant",  hint: "≥ 3/5 · cible fixe · sans vent",                maxTime: 90, target: 3, total: 5 },
+      { lv: 2, label: "Adulte",  hint: "≥ 3/5 · cible surélevée · vent léger",           maxTime: 90, target: 3, total: 5 },
+      { lv: 3, label: "Maître",  hint: "≥ 4/5 · créneaux mobiles · vent puissant",       maxTime: 90, target: 4, total: 5 }
+    ]
+  },
+  { id: "archives",    num: "15", cat: "Logique",  title: "Les Archives",
+    desc: "Retourne les parchemins deux par deux pour trouver les armoiries identiques. Retrouve-les toutes dans le temps imparti.",
+    levels: [
+      { lv: 1, label: "Enfant",  hint: "8 paires · 2:00",   maxTime: 120, target: 8,  total: 8  },
+      { lv: 2, label: "Adulte",  hint: "10 paires · 1:30",  maxTime: 90,  target: 10, total: 10 },
+      { lv: 3, label: "Maître",  hint: "12 paires · 1:00",  maxTime: 60,  target: 12, total: 12 }
+    ]
+  },
+  { id: "copiste",     num: "16", cat: "Adresse",  title: "Le Copiste",
+    desc: "Transcris le parchemin ancien avant que la bougie s'éteigne. Chaque faute de frappe ralentit la plume.",
+    levels: [
+      { lv: 1, label: "Enfant",  hint: "≥ 20/25 mots · 60s",  maxTime: 60, target: 20, total: 25 },
+      { lv: 2, label: "Adulte",  hint: "≥ 25/30 mots · 60s",  maxTime: 60, target: 25, total: 30 },
+      { lv: 3, label: "Maître",  hint: "≥ 32/40 mots · 60s",  maxTime: 60, target: 32, total: 40 }
+    ]
+  },
+  { id: "blason",      num: "17", cat: "Culture",  title: "L'Héraldiste",
+    desc: "Un blason est décrit en langage héraldique. Identifie-le parmi les propositions avant que le sablier se vide.",
+    levels: [
+      { lv: 1, label: "Enfant",  hint: "4 choix · blasons simples · 15s/q",        maxTime: 90, target: 4, total: 6 },
+      { lv: 2, label: "Adulte",  hint: "5 choix · terminologie précise · 10s/q",   maxTime: 90, target: 4, total: 6 },
+      { lv: 3, label: "Maître",  hint: "6 choix · blasonnement complet · 8s/q",    maxTime: 90, target: 4, total: 6 }
+    ]
+  },
+  { id: "escrime",     num: "18", cat: "Adresse",  title: "L'Escrimeur",
+    desc: "Des épées jaillissent des meurtrières — pare-les en cliquant au bon moment. Une fausse parade coûte un point.",
+    levels: [
+      { lv: 1, label: "Enfant",  hint: "≥ 12/15 · rythme lent",              maxTime: 30, target: 12, total: 15 },
+      { lv: 2, label: "Adulte",  hint: "≥ 14/18 · rythme soutenu",           maxTime: 30, target: 14, total: 18 },
+      { lv: 3, label: "Maître",  hint: "≥ 16/20 · rythme rapide · feintes",  maxTime: 30, target: 16, total: 20 }
+    ]
+  },
+  { id: "cartographe", num: "19", cat: "Culture",  title: "Le Cartographe",
+    desc: "Une province est surlignée sur la carte ancienne — nomme-la avant que le sablier se vide.",
+    levels: [
+      { lv: 1, label: "Enfant",  hint: "Régions de France · 4 choix · 8s/q",      maxTime: 90, target: 4, total: 6 },
+      { lv: 2, label: "Adulte",  hint: "Provinces historiques · 5 choix · 6s/q",  maxTime: 90, target: 4, total: 6 },
+      { lv: 3, label: "Maître",  hint: "Europe du XVIIe · 6 choix · 5s/q",        maxTime: 90, target: 4, total: 6 }
+    ]
+  },
+  { id: "oracle",      num: "20", cat: "Culture",  title: "L'Oracle",
+    desc: "Des parchemins décrivent des événements historiques. Remets-les dans l'ordre chronologique exact.",
+    levels: [
+      { lv: 1, label: "Enfant",  hint: "4 événements · siècles distincts",   maxTime: 60, target: 1, total: 1 },
+      { lv: 2, label: "Adulte",  hint: "5 événements · même siècle",         maxTime: 60, target: 1, total: 1 },
+      { lv: 3, label: "Maître",  hint: "6 événements · même décennie",       maxTime: 60, target: 1, total: 1 }
     ]
   },
 ];
@@ -431,7 +519,7 @@ function JeuxPlayView({ game, onClose, indices, unlockIndice, jeuxIndices }) {
 // ── Leaderboard ───────────────────────────────────────────────────
 const MEDALS = ["⚜", "✦", "◆"];
 
-function JeuxLeaderboard({ currentUserId, adminPseudo }) {
+function JeuxLeaderboard({ currentUserId, adminPseudos }) {
   const [board, setBoard]       = React.useState([]);
   const [expanded, setExpanded] = React.useState(true);
 
@@ -446,7 +534,7 @@ function JeuxLeaderboard({ currentUserId, adminPseudo }) {
     const counts = {};
     allIdx.forEach(r => { counts[r.user_id] = (counts[r.user_id] || 0) + 1; });
     const ranked = allUsers
-      .filter(u => !adminPseudo || u.pseudo.toLowerCase() !== adminPseudo.toLowerCase())
+      .filter(u => !(adminPseudos || []).map(p => p.toLowerCase()).includes(u.pseudo.toLowerCase()))
       .map(u => ({ id: u.id, pseudo: u.pseudo, count: counts[u.id] || 0 }))
       .filter(u => u.count > 0)
       .sort((a, b) => b.count - a.count || a.pseudo.localeCompare(b.pseudo));
@@ -499,7 +587,7 @@ function JeuxLeaderboard({ currentUserId, adminPseudo }) {
                   {row.pseudo}{isMe && <span className="jeux-leaderboard__you"> (toi)</span>}
                 </span>
                 <span className="jeux-leaderboard__count tnum">
-                  {row.count}<span style={{ opacity: 0.4 }}>/27</span>
+                  {row.count}<span style={{ opacity: 0.4 }}>/60</span>
                 </span>
               </div>
             );
@@ -570,10 +658,10 @@ function JeuxPage({ data, user, onLogout }) {
 
         {/* Header */}
         <div className="jeux-header">
-          <div className="eyebrow">⚜ Tournoi · 9 épreuves</div>
+          <div className="eyebrow">⚜ Tournoi · 20 épreuves</div>
           <h1 className="page-title">Les Jeux du <em>Chasteau</em></h1>
           <p className="page-subtitle">
-            Remporte chaque épreuve pour débloquer les 27 indices qui éclairent les neuf codes du puzzle final.
+            Remporte chaque épreuve pour débloquer les indices qui éclairent les 20 codes du puzzle final.
             Trois niveaux par jeu — du plus clément au plus ardu.
           </p>
           <p className="page-subtitle" style={{ marginTop: 10 }}>
@@ -584,32 +672,8 @@ function JeuxPage({ data, user, onLogout }) {
           </p>
         </div>
 
-        {/* Bandeau joueur + progression */}
-        {user && (
-          <div className="jeux-player-bar">
-            <div className="jeux-player-bar__info">
-              <span className="jeux-player-bar__pseudo">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                </svg>
-                {user.pseudo}
-              </span>
-              <span className="jeux-player-bar__score tnum">
-                {myCount}<span style={{ opacity: 0.5 }}>/27 indices</span>
-              </span>
-            </div>
-            <button
-              className="k-btn k-btn--sm k-btn--outline"
-              onClick={onLogout}
-              title="Changer de joueur"
-            >
-              Changer
-            </button>
-          </div>
-        )}
-
         {/* Leaderboard temps réel */}
-        <JeuxLeaderboard currentUserId={user?.id} adminPseudo={data.adminPseudo} />
+        <JeuxLeaderboard currentUserId={user?.id} adminPseudos={data.adminPseudos || (data.adminPseudo ? [data.adminPseudo] : [])} />
 
         {/* Category filter */}
         <div className="jeux-filter-row">

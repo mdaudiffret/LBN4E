@@ -152,7 +152,7 @@ const App = () => {
   return (
     <React.Fragment>
       <div className="bg-stage" />
-      <Topbar route={route} />
+      <Topbar route={route} user={user} onLogout={logoutUser} />
       {page === "maison"     && <MaisonPage  data={data} isAdmin={isAdmin} onUpdateData={saveConfig} user={user} />}
       {page === "gazette"    && <GazettePage isAdmin={isAdmin} />}
       {page === "jeux"       && <JeuxPage    data={data} user={user} onLogout={logoutUser} />}
@@ -162,7 +162,7 @@ const App = () => {
         <UserLoginModal
           onLogin={loginUser}
           allowedPseudos={data.allowedPseudos || []}
-          adminPseudo={data.adminPseudo || ""}
+          adminPseudos={data.adminPseudos || (data.adminPseudo ? [data.adminPseudo] : [])}
           configLoaded={configLoaded}
         />
       )}

@@ -1,7 +1,7 @@
 /* global React */
 
 // ── Modal de login utilisateur (saisie libre vérifiée contre liste admin) ──
-const UserLoginModal = ({ onLogin, allowedPseudos, adminPseudo, configLoaded }) => {
+const UserLoginModal = ({ onLogin, allowedPseudos, adminPseudos, configLoaded }) => {
   const [pseudo, setPseudo]   = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [error, setError]     = React.useState(null);
@@ -20,8 +20,9 @@ const UserLoginModal = ({ onLogin, allowedPseudos, adminPseudo, configLoaded }) 
     const trimmed = pseudo.trim();
     if (!trimmed || loading || !configLoaded) return;
 
-    // L'adminPseudo bypass toujours la liste
-    const isAdmin = adminPseudo && trimmed.toLowerCase() === adminPseudo.toLowerCase();
+    // Un adminPseudo bypass toujours la liste
+    const admins = (adminPseudos || []).map(p => p.toLowerCase());
+    const isAdmin = admins.includes(trimmed.toLowerCase());
     if (!isAdmin) {
       const allowed = (allowedPseudos || []).map(p => p.toLowerCase());
       if (!allowed.includes(trimmed.toLowerCase())) {
