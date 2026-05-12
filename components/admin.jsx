@@ -225,7 +225,12 @@ const DashboardTab = ({ data }) => {
       const list = (u.data || []).map(user => ({
         ...user,
         codes:  codesData.filter(x => x.user_id === user.id),
-        games: [...new Set(indicesData.filter(x => x.user_id === user.id).map(x => x.game_id))],
+        games: Object.entries(
+          indicesData.filter(x => x.user_id === user.id).reduce((acc, x) => {
+            acc[x.game_id] = Math.max(acc[x.game_id] || 0, x.level || 1);
+            return acc;
+          }, {})
+        ).map(([game_id, maxLevel]) => ({ game_id, maxLevel })),
       }));
       list.sort((a, b) => b.codes.length - a.codes.length || a.pseudo.localeCompare(b.pseudo));
       setUsers(list);
@@ -304,7 +309,7 @@ const DashboardTab = ({ data }) => {
                       key: i,
                       className: "dash-badge" + (found ? " dash-badge--found" : " dash-badge--missing"),
                       title: found ? word : `Code ${i + 1} non trouvé`,
-                    }, found ? String(i + 1) : "·");
+                    }, found ? word : "·");
                   })
                 )
               ),
@@ -315,9 +320,9 @@ const DashboardTab = ({ data }) => {
                   `Jeux ${user.games.length}/9`
                 ),
                 React.createElement("div", { className: "dash-badges" },
-                  user.games.map(g =>
-                    React.createElement("span", { key: g, className: "dash-badge dash-badge--game" },
-                      GAME_LABELS[g] || g
+                  user.games.map(({ game_id, maxLevel }) =>
+                    React.createElement("span", { key: game_id, className: "dash-badge dash-badge--game" },
+                      (GAME_LABELS[game_id] || game_id) + " ·" + maxLevel
                     )
                   )
                 )
