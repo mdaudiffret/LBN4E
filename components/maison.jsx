@@ -12,7 +12,9 @@ const MaisonPage = ({ data, isAdmin, onUpdateData, user }) => (
             revealCodes: data.revealCodes,
             onReveal: () => onUpdateData({ ...data, infosRevealed: true }),
             user,
-          })
+          }),
+      React.createElement(Divider, null),
+      React.createElement(Leaderboard, { adminPseudo: data.adminPseudo })
     )
   )
 );
@@ -575,6 +577,67 @@ const InfosRevealed = ({ data, isAdmin, onUpdateData }) => {
         React.createElement("button", { className: "btn btn--ghost", onClick: seal },
           "↺ Re-sceller (admin)"
         )
+      )
+    )
+  );
+};
+
+/* ── Leaderboard ─────────────────────────────────────────────── */
+const Leaderboard = ({ adminPseudo }) => {
+  const [rows, setRows] = React.useState(null);
+
+  React.useEffect(() => {
+    const sb = window.__supabase;
+    if (!sb) { setRows([]); return; }
+
+    const load = () =>
+      Promise.all([
+        sb.from("users").select("id, pseudo"),
+        sb.from("user_codes").select("user_id"),
+      ]).then(([u, c]) => {
+        const admin = (adminPseudo || "").toLowerCase();
+        const users = (u.data || []).filter(p => p.pseudo.toLowerCase() !== admin);
+        const counts = {};
+        (c.data || []).forEach(r => { counts[r.user_id] = (counts[r.user_id] || 0) + 1; });
+        const list = users
+          .map(p => ({ ...p, count: counts[p.id] || 0 }))
+          .sort((a, b) => b.count - a.count || a.pseudo.localeCompare(b.pseudo));
+        setRows(list);
+      }, () => setRows([]));
+
+    load();
+
+    const ch = sb.channel("lb-rt")
+      .on("postgres_changes", { event: "*", schema: "public", table: "user_codes" }, load)
+      .subscribe();
+    return () => sb.removeChannel(ch);
+  }, [adminPseudo]);
+
+  if (!rows || rows.length === 0) return null;
+
+  return React.createElement("section", { style: { paddingBottom: 32 } },
+    React.createElement("div", { className: "eyebrow", style: { marginBottom: 6 } }, "Tableau d'honneur"),
+    React.createElement("h2", {
+      style: {
+        fontFamily: "var(--font-display)",
+        fontSize: 28,
+        letterSpacing: "0.04em",
+        color: "var(--pearl)",
+        textTransform: "uppercase",
+        margin: "0 0 24px",
+      }
+    }, "Les Mousquetaires"),
+    rows.map((row, i) =>
+      React.createElement("div", { key: row.id, className: "lb-row" },
+        React.createElement("span", { className: "lb-rank" }, `#${i + 1}`),
+        React.createElement("span", { className: "lb-pseudo" }, row.pseudo),
+        React.createElement("div", { className: "lb-bar-wrap" },
+          React.createElement("div", {
+            className: "lb-bar",
+            style: { width: `${Math.round((row.count / 9) * 100)}%` },
+          })
+        ),
+        React.createElement("span", { className: "lb-count" }, `${row.count}/9`)
       )
     )
   );
