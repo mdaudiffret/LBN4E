@@ -525,6 +525,7 @@ const AgendaEditor = ({ days, onChange }) => {
 /* ── Tab: Événement ──────────────────────────────────────────── */
 const TabEvenement = ({ d, set }) => {
   const [pseudosRaw, setPseudosRaw] = React.useState((d.allowedPseudos || []).join("\n"));
+  const [adminPseudosRaw, setAdminPseudosRaw] = React.useState((d.adminPseudos || (d.adminPseudo ? [d.adminPseudo] : [])).join("\n"));
   return React.createElement("div", null,
 
     React.createElement("div", {
@@ -599,8 +600,11 @@ const TabEvenement = ({ d, set }) => {
       React.createElement("textarea", {
         className: "field-textarea",
         rows: 4,
-        value: (d.adminPseudos || (d.adminPseudo ? [d.adminPseudo] : [])).join("\n"),
-        onChange: e => set("adminPseudos", e.target.value.split("\n").map(s => s.trim()).filter(Boolean)),
+        value: adminPseudosRaw,
+        onChange: e => {
+          setAdminPseudosRaw(e.target.value);
+          set("adminPseudos", e.target.value.split("\n").map(s => s.trim()).filter(Boolean));
+        },
         placeholder: "Aramis\nAthos\n…",
         style: { fontFamily: "var(--font-mono)", fontSize: 13, letterSpacing: "0.08em" },
       })
