@@ -126,14 +126,14 @@ const levenshtein = (a, b) => {
   return dp[m][n];
 };
 
-const romans = ["I","II","III","IV","V","VI","VII","VIII","IX"];
+const romans = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX"];
 
 /* ---------- SEALED ---------- */
 const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
-  const codes = revealCodes || Array(9).fill("");
+  const codes = revealCodes || Array(20).fill("");
   const [tick, setTick]           = React.useState(0);
-  const [inputs, setInputs]       = React.useState(Array(9).fill(""));
-  const [results, setResults]     = React.useState(Array(9).fill(null)); // null | 'correct' | 'almost' | 'wrong'
+  const [inputs, setInputs]       = React.useState(Array(20).fill(""));
+  const [results, setResults]     = React.useState(Array(20).fill(null)); // null | 'correct' | 'almost' | 'wrong'
   const [submitted, setSubmitted] = React.useState(false);
   const [foundIdx, setFoundIdx]   = React.useState(new Set()); // indices déjà trouvés par cet utilisateur
 
@@ -268,10 +268,10 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
           }
         }, "⚜ Ordonnance de l'Intendance ⚜"),
         [
-          "Neuf codes scellent ces pages — chacun estant un mot. Pour chacun d'iceux, trois indices ont esté cachés en la Gazette — du plus ardu au plus clément — soit vingt & sept dépêches en tout, publiées chaque vendredi à XII heures sonnantes.",
-          "Chaque indice vous révèle la position du code parmy les neuf, & quelque indice sur le mot qu'il vous faut trouver. Point n'est besoin d'attendre le dernier : si le premier vous illumine l'esprit, saisissez le mot sans délai.",
-          "Soumettez vos neuf codes en mesme temps : si l'un est juste, son encadré s'allume en bleu. En orange s'il n'est qu'à deux lettres près — vous n'estes point loin. En rouge, point du tout.",
-          "Encore faut-il les ranger dans le bon ordre. Le sceau ne se rompt que si les neuf sont exacts & bien ordonnez. Bonne chasse, mes très-honorez compaignons.",
+          "Vingt codes scellent ces pages — chacun estant un mot. Pour chacun d'iceux, un indice est caché en les Gazettes publiées chaque vendredi à XII heures sonnantes.",
+          "Chaque indice vous révèle la position du code parmy les vingt, & quelque indice sur le mot qu'il vous faut trouver.",
+          "Soumettez vos vingt codes en mesme temps : si l'un est juste, son encadré s'allume en bleu. En orange s'il n'est qu'à deux lettres près — vous n'estes point loin. En rouge, point du tout.",
+          "Encore faut-il les ranger dans le bon ordre. Le sceau ne se rompt que si les vingt sont exacts & bien ordonnez. Bonne chasse, mes très-honorez compaignons.",
         ].map((line, i) =>
           React.createElement("p", {
             key: i,
@@ -370,7 +370,7 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
               className: "btn btn--primary",
             }, "⚜ Soumettre les codes"),
             submitted && !allCorrect && React.createElement("span", { className: "codes-hint" },
-              countCorrect, " / 9 · ", results.filter(s => s === "almost").length, " approché(s)"
+              countCorrect, " / 20 · ", results.filter(s => s === "almost").length, " approché(s)"
             )
           )
         ),
@@ -634,10 +634,10 @@ const Leaderboard = ({ adminPseudo }) => {
         React.createElement("div", { className: "lb-bar-wrap" },
           React.createElement("div", {
             className: "lb-bar",
-            style: { width: `${Math.round((row.count / 9) * 100)}%` },
+            style: { width: `${Math.round((row.count / 20) * 100)}%` },
           })
         ),
-        React.createElement("span", { className: "lb-count" }, `${row.count}/9`)
+        React.createElement("span", { className: "lb-count" }, `${row.count}/20`)
       )
     )
   );

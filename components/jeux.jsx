@@ -573,7 +573,7 @@ function JeuxPage({ data, user, onLogout }) {
           <div className="eyebrow">⚜ Tournoi · 9 épreuves</div>
           <h1 className="page-title">Les Jeux du <em>Chasteau</em></h1>
           <p className="page-subtitle">
-            Remporte chaque épreuve pour débloquer les 27 indices qui éclairent les neuf codes du puzzle final.
+            Remporte chaque épreuve pour débloquer les indices qui éclairent les 20 codes du puzzle final.
             Trois niveaux par jeu — du plus clément au plus ardu.
           </p>
           <p className="page-subtitle" style={{ marginTop: 10 }}>
@@ -583,30 +583,6 @@ function JeuxPage({ data, user, onLogout }) {
             Mieux vaut jouer face à l'énigme concernée.
           </p>
         </div>
-
-        {/* Bandeau joueur + progression */}
-        {user && (
-          <div className="jeux-player-bar">
-            <div className="jeux-player-bar__info">
-              <span className="jeux-player-bar__pseudo">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                </svg>
-                {user.pseudo}
-              </span>
-              <span className="jeux-player-bar__score tnum">
-                {myCount}<span style={{ opacity: 0.5 }}>/27 indices</span>
-              </span>
-            </div>
-            <button
-              className="k-btn k-btn--sm k-btn--outline"
-              onClick={onLogout}
-              title="Changer de joueur"
-            >
-              Changer
-            </button>
-          </div>
-        )}
 
         {/* Leaderboard temps réel */}
         <JeuxLeaderboard currentUserId={user?.id} adminPseudo={data.adminPseudo} />
