@@ -259,7 +259,9 @@ const DashboardTab = ({ data }) => {
     style: { padding: "40px 0", textAlign: "center", fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--bone)", opacity: 0.5 }
   }, "Chargement…");
 
-  const participants = users.filter(u => !adminPseudos.includes(u.pseudo.toLowerCase()));
+  // Dashboard shows everyone; leaderboards (maison/jeux) filter admins separately
+  const participants = users;
+  const isAdminUser = (u) => adminPseudos.includes(u.pseudo.toLowerCase());
 
   return (
     React.createElement("div", null,
@@ -281,8 +283,8 @@ const DashboardTab = ({ data }) => {
       React.createElement("div", {
         style: { fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--gold)", marginBottom: 24, letterSpacing: "0.12em" }
       },
-        `${participants.length} participant${participants.length !== 1 ? "s" : ""} · `,
-        `${participants.reduce((s, u) => s + u.codes.length, 0)} codes trouvés`
+        `${participants.filter(u => !isAdminUser(u)).length} participant${participants.filter(u => !isAdminUser(u)).length !== 1 ? "s" : ""} · `,
+        `${participants.filter(u => !isAdminUser(u)).reduce((s, u) => s + u.codes.length, 0)} codes trouvés`
       ),
 
       /* Liste des participants */
@@ -291,12 +293,15 @@ const DashboardTab = ({ data }) => {
             style: { textAlign: "center", padding: "60px 0", fontStyle: "italic", color: "var(--bone)", opacity: 0.35 }
           }, "Aucun participant enregistré.")
         : participants.map((user, rank) =>
-            React.createElement("div", { key: user.id, className: "dash-user" },
+            React.createElement("div", { key: user.id, className: "dash-user", style: isAdminUser(user) ? { opacity: 0.7, borderColor: "var(--gold)" } : {} },
 
               /* En-tête ligne */
               React.createElement("div", { className: "dash-user-head" },
                 React.createElement("span", { className: "dash-rank" }, `#${rank + 1}`),
                 React.createElement("span", { className: "dash-pseudo" }, user.pseudo),
+                isAdminUser(user) && React.createElement("span", {
+                  style: { fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.18em", color: "var(--gold)", textTransform: "uppercase", padding: "2px 6px", border: "1px solid var(--gold)", borderRadius: 3, opacity: 0.8 }
+                }, "admin"),
                 React.createElement("span", { className: "dash-meta" }, fmtDate(user.last_seen))
               ),
 
