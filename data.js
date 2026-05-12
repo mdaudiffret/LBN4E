@@ -58,7 +58,7 @@ const DEFAULT_DATA = {
       evts: [
         { h: "09h00", t: "Petit·desjeuner royal · viennoiseries & matcha" },
         { h: "10h30", t: "Tournoi des escrimeurs · cour pavée · enfants & parents" },
-        { h: "12h30", t: "Pique·nique des mousquetaires · sur les douves" },
+        { h: "12h30", t: "Pique·nique des chevaliers · sur les douves" },
         { h: "15h00", t: "Course au trésor : la rançon de Buckingham (jeune lignée)" },
         { h: "17h00", t: "Goûter · chocolat chaud · macarons" },
         { h: "20h00", t: "Bal du Cardinal · costumé · DJ et clavecin · jusqu'à plus·d'heure" },

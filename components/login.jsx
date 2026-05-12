@@ -44,7 +44,7 @@ const UserLoginModal = ({ onLogin, allowedPseudos, adminPseudo, configLoaded }) 
   return (
     <div className="modal-stage" style={{ zIndex: 300 }}>
       <div className="modal" style={{ maxWidth: 420 }}>
-        <div className="modal-eyebrow">⚜ Identification du Mousquetaire ⚜</div>
+        <div className="modal-eyebrow">⚜ Identification du Chevalier ⚜</div>
         <h2 className="modal-title">Qui es-tu ?</h2>
         <p className="modal-sub">
           Entre ton nom pour accéder au site.
