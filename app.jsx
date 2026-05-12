@@ -162,7 +162,7 @@ const App = () => {
         <UserLoginModal
           onLogin={loginUser}
           allowedPseudos={data.allowedPseudos || []}
-          adminPseudo={data.adminPseudo || ""}
+          adminPseudos={data.adminPseudos || (data.adminPseudo ? [data.adminPseudo] : [])}
           configLoaded={configLoaded}
         />
       )}

@@ -246,7 +246,7 @@ const DashboardTab = ({ data }) => {
   React.useEffect(() => { load(); }, []);
 
   const revealCodes = data.revealCodes || [];
-  const adminPseudo = (data.adminPseudo || "").toLowerCase();
+  const adminPseudos = (data.adminPseudos || (data.adminPseudo ? [data.adminPseudo] : [])).map(p => p.toLowerCase());
 
   const fmtDate = (iso) => {
     if (!iso) return "—";
@@ -259,7 +259,7 @@ const DashboardTab = ({ data }) => {
     style: { padding: "40px 0", textAlign: "center", fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--bone)", opacity: 0.5 }
   }, "Chargement…");
 
-  const participants = users.filter(u => u.pseudo.toLowerCase() !== adminPseudo);
+  const participants = users.filter(u => !adminPseudos.includes(u.pseudo.toLowerCase()));
 
   return (
     React.createElement("div", null,
@@ -592,16 +592,17 @@ const TabEvenement = ({ d, set }) => {
     },
       React.createElement("div", {
         style: { fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.26em", color: "var(--gold)", textTransform: "uppercase", marginBottom: 8 }
-      }, "Pseudo admin (exclu du classement)"),
+      }, "Pseudos admin (exclus du classement)"),
       React.createElement("div", {
         style: { fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 13, color: "var(--bone)", opacity: 0.6, marginBottom: 10 }
-      }, "Ce pseudo peut jouer normalement mais n'apparaît pas dans le tableau d'honneur."),
-      React.createElement("input", {
-        className: "field-input",
-        value: d.adminPseudo || "",
-        onChange: e => set("adminPseudo", e.target.value),
-        placeholder: "Aramis",
-        style: { maxWidth: 200 },
+      }, "Un pseudo par ligne. Ces pseudos peuvent jouer normalement mais n'apparaissent pas dans les tableaux d'honneur."),
+      React.createElement("textarea", {
+        className: "field-textarea",
+        rows: 4,
+        value: (d.adminPseudos || (d.adminPseudo ? [d.adminPseudo] : [])).join("\n"),
+        onChange: e => set("adminPseudos", e.target.value.split("\n").map(s => s.trim()).filter(Boolean)),
+        placeholder: "Aramis\nAthos\n…",
+        style: { fontFamily: "var(--font-mono)", fontSize: 13, letterSpacing: "0.08em" },
       })
     ),
 

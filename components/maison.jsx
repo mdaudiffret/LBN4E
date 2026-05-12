@@ -14,7 +14,7 @@ const MaisonPage = ({ data, isAdmin, onUpdateData, user }) => (
             user,
           }),
       React.createElement(Divider, null),
-      React.createElement(Leaderboard, { adminPseudo: data.adminPseudo })
+      React.createElement(Leaderboard, { adminPseudos: data.adminPseudos || (data.adminPseudo ? [data.adminPseudo] : []) })
     )
   )
 );
@@ -583,7 +583,7 @@ const InfosRevealed = ({ data, isAdmin, onUpdateData }) => {
 };
 
 /* ── Leaderboard ─────────────────────────────────────────────── */
-const Leaderboard = ({ adminPseudo }) => {
+const Leaderboard = ({ adminPseudos }) => {
   const [rows, setRows] = React.useState(null);
 
   React.useEffect(() => {
@@ -595,8 +595,8 @@ const Leaderboard = ({ adminPseudo }) => {
         sb.from("users").select("id, pseudo"),
         sb.from("user_codes").select("user_id"),
       ]).then(([u, c]) => {
-        const admin = (adminPseudo || "").toLowerCase();
-        const users = (u.data || []).filter(p => p.pseudo.toLowerCase() !== admin);
+        const admins = (adminPseudos || []).map(p => p.toLowerCase());
+        const users = (u.data || []).filter(p => !admins.includes(p.pseudo.toLowerCase()));
         const counts = {};
         (c.data || []).forEach(r => { counts[r.user_id] = (counts[r.user_id] || 0) + 1; });
         const list = users
@@ -611,7 +611,7 @@ const Leaderboard = ({ adminPseudo }) => {
       .on("postgres_changes", { event: "*", schema: "public", table: "user_codes" }, load)
       .subscribe();
     return () => sb.removeChannel(ch);
-  }, [adminPseudo]);
+  }, [adminPseudos]);
 
   if (!rows || rows.length === 0) return null;
 
