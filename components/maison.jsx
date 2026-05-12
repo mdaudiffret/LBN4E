@@ -178,9 +178,11 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
   const submitReveal = async (e) => {
     e.preventDefault();
     const r = inputs.map((v, i) => {
+      if (foundIdx.has(i)) return "correct"; // déjà enregistré en DB
       const target = (codes[i] || "").toLowerCase().trim();
       const val = v.toLowerCase().trim();
       if (!target) return "correct";
+      if (!val) return null; // champ vide → neutre
       if (val === target) return "correct";
       if (levenshtein(val, target) <= 2) return "almost";
       return "wrong";
