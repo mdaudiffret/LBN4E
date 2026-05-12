@@ -245,7 +245,7 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
           margin: "0 0 32px",
         }
       },
-        "Les détails du séjour — adresse, dates, agenda — demeurent en lieu sceuré. Patience encores quelques tours d'horloge, l'intendance ne tardera point."
+        "Les détails du séjour sont tenus en lieu fort secret, & seuls les plus hardis d'entre vous pourront les découvrir. Aurez-vous l'audace, le courage & l'intelligence d'arriver au bout de ceste queste, & de dévoiler en premier le lieu caché de ceste rencontre ?"
       ),
 
       /* Instructions for the 9-code system */
