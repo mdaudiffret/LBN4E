@@ -152,7 +152,7 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
         if (!rows || rows.length === 0) return;
         const found = new Set(rows.map(r => r.code_index));
         setFoundIdx(found);
-        setInputs(prev => prev.map((v, i) => found.has(i) ? (codes[i] || "") : v));
+        setInputs(prev => prev.map((v, i) => found.has(i) ? "••••" : v));
         setResults(prev => prev.map((v, i) => found.has(i) ? "correct" : v));
       })
       .catch(() => {});
@@ -161,7 +161,7 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
   // Réappliquer le pre-fill quand app_config arrive après user_codes
   React.useEffect(() => {
     if (foundIdx.size === 0) return;
-    setInputs(prev => prev.map((v, i) => foundIdx.has(i) ? (codes[i] || "") : v));
+    setInputs(prev => prev.map((v, i) => foundIdx.has(i) ? "••••" : v));
   }, [codes]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const glyphs = "▓▒░█◆◇※★✦";
