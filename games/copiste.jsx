@@ -25,6 +25,9 @@ function CopisteGame({ level, onHud, onFinish }) {
   // Cap to cfg.total
   const targetWords = sourceWords.slice(0, cfg.total);
 
+  // Actual word count available in text (may be < cfg.total)
+  const wordCount = targetWords.length;
+
   const [input, setInput] = useState("");
   const [time, setTime] = useState(cfg.maxTime);
   const [over, setOver] = useState(false);
@@ -33,34 +36,33 @@ function CopisteGame({ level, onHud, onFinish }) {
 
   // Derive typed words from input
   const typedWords = input.split(/\s+/);
-  // If input ends with space, last "word" is empty — typed words count includes that
   const inputEndsSpace = input.endsWith(" ");
 
-  // Score: count correct words among completed words (ones followed by space or if game over)
+  // Count completed words (confirmed by trailing space)
   const completedCount = inputEndsSpace ? typedWords.length : Math.max(0, typedWords.length - 1);
-  const cappedCompleted = Math.min(completedCount, cfg.total);
+  const cappedCompleted = Math.min(completedCount, wordCount);
 
   // Also consider the last word done if it exactly matches (no trailing space needed)
-  const lastIdx = cfg.total - 1;
+  const lastIdx = wordCount - 1;
   const lastWordExact = !inputEndsSpace &&
-    typedWords.length >= cfg.total &&
+    typedWords.length > lastIdx &&
     typedWords[lastIdx] === targetWords[lastIdx];
-  const effectiveCompleted = lastWordExact ? cfg.total : cappedCompleted;
+  const effectiveCompleted = lastWordExact ? wordCount : cappedCompleted;
 
   let score = 0;
   for (let i = 0; i < effectiveCompleted; i++) {
     if (typedWords[i] === targetWords[i]) score++;
   }
 
-  const allGreen = score === cfg.total;
+  const allGreen = score === wordCount;
 
   useEffect(() => { scoreRef.current = score; }, [score]);
 
   useEffect(() => {
-    onHud({ score, total: cfg.total });
+    onHud({ score, total: wordCount });
   }, [score]);
 
-  // Auto-finish when all words are correct (all green) OR all words typed
+  // Auto-finish when all words are correct (all green)
   useEffect(() => {
     if (over || !allGreen) return;
     setOver(true);
@@ -90,13 +92,13 @@ function CopisteGame({ level, onHud, onFinish }) {
     const words = val.split(/\s+/);
     const endsSpace = val.endsWith(" ");
     const filledCount = endsSpace ? words.length : Math.max(0, words.length - 1);
-    if (filledCount >= cfg.total) {
-      // Allow up to cfg.total words + 1 space
+    if (filledCount >= wordCount) {
+      // Allow up to wordCount words + 1 space
       const maxAllowed = targetWords.join(" ") + " ";
       if (val.length > maxAllowed.length + 10) return;
     }
     setInput(val);
-  }, [over, cfg.total, targetWords]);
+  }, [over, wordCount, targetWords]);
 
   const formatTime = (s) => {
     const m = Math.floor(s / 60);
@@ -110,7 +112,7 @@ function CopisteGame({ level, onHud, onFinish }) {
       React.createElement("div", { className: "col", style: { flex: 1, alignItems: "center", justifyContent: "center", gap: 16 } },
         React.createElement("div", { className: "prompt" },
           React.createElement("div", { className: "prompt__instruction" }, "Copie terminée"),
-          React.createElement("div", { className: "prompt__main" }, `${scoreRef.current} mot${scoreRef.current > 1 ? "s" : ""} correct${scoreRef.current > 1 ? "s" : ""}`)
+          React.createElement("div", { className: "prompt__main" }, `${scoreRef.current}/${wordCount} mots corrects`)
         ),
         React.createElement("div", { className: `feedback ${passed ? "ok" : "ko"}` },
           passed
@@ -171,7 +173,7 @@ function CopisteGame({ level, onHud, onFinish }) {
       React.createElement("div", { className: "row", style: { justifyContent: "space-between", alignItems: "center" } },
         React.createElement("div", { style: { fontFamily: "var(--font-serif)", color: "var(--bone)", fontSize: 13 } },
           React.createElement("span", { style: { color: "var(--success)", fontWeight: 700 } }, score),
-          React.createElement("span", { style: { color: "var(--line)" } }, ` / ${cfg.total} mots corrects`)
+          React.createElement("span", { style: { color: "var(--line)" } }, ` / ${wordCount} mots corrects`)
         ),
         React.createElement("div", { style: { fontFamily: "var(--font-mono)", fontSize: 22, fontWeight: 700, color: timerColor } },
           formatTime(time)
@@ -228,9 +230,16 @@ function CopisteGame({ level, onHud, onFinish }) {
         autoCorrect: "off",
         autoCapitalize: "off"
       }),
-      // Progress bar for words
-      React.createElement("div", { style: { fontSize: 11, color: "var(--line)", fontFamily: "var(--font-mono)", textAlign: "right" } },
-        `${effectiveCompleted} / ${cfg.total} mots saisis`
+      // Submit button + word count
+      React.createElement("div", { className: "row", style: { justifyContent: "space-between", alignItems: "center" } },
+        React.createElement("div", { style: { fontSize: 11, color: "var(--line)", fontFamily: "var(--font-mono)" } },
+          `${effectiveCompleted} / ${wordCount} mots saisis`
+        ),
+        React.createElement("button", {
+          className: "k-btn k-btn--brand k-btn--sm",
+          onClick: () => { if (!over) setOver(true); },
+          disabled: over,
+        }, "Valider ⚜")
       )
     )
   );
