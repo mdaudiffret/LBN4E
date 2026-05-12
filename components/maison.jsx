@@ -163,14 +163,14 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
   const noise = (n) => Array.from({ length: n }, (_, i) => glyphs[(i * 7 + tick) % glyphs.length]).join("");
 
   const setInput = (i, v) => {
+    if (foundIdx.has(i)) return; // code déjà enregistré en DB — non modifiable
     const next = [...inputs];
     next[i] = v;
     setInputs(next);
-    if (submitted) {
+    // Réinitialise l'indicateur : seul le bouton Soumettre teste ET enregistre
+    if (submitted && results[i] !== null) {
       const r = [...results];
-      const target = (codes[i] || "").toLowerCase().trim();
-      const val = v.toLowerCase().trim();
-      r[i] = val === "" ? null : val === target ? "correct" : levenshtein(val, target) <= 2 ? "almost" : "wrong";
+      r[i] = null;
       setResults(r);
     }
   };
