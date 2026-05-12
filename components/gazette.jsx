@@ -27,7 +27,8 @@ const usePosts = () => {
   return posts;
 };
 
-const GazettePage = ({ isAdmin }) => {
+const GazettePage = ({ isAdmin, isAdminUser }) => {
+  const canPreview = isAdmin || isAdminUser;
   const allPosts = usePosts();
   const [showAll, setShowAll] = React.useState(false);
   const now = new Date();
@@ -48,7 +49,7 @@ const GazettePage = ({ isAdmin }) => {
           React.createElement("p", { className: "page-subtitle", style: { margin: 0 } },
             "Du plus récent au plus ancien."
           ),
-          isAdmin && React.createElement("label", {
+          canPreview && React.createElement("label", {
             className: "switch" + (showAll ? " is-on" : ""),
             onClick: () => setShowAll(v => !v),
             style: { cursor: "pointer", flexShrink: 0 },
