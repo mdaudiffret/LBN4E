@@ -1240,6 +1240,49 @@ img { max-width: 100%; display: block; }
   border-color: rgba(212, 162, 76, 0.3);
 }
 
+/* ── Leaderboard ─────────────────────────────────────────────── */
+.lb-row {
+  display: grid;
+  grid-template-columns: 32px 1fr 140px 40px;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line-dim);
+}
+.lb-rank {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  opacity: 0.6;
+}
+.lb-pseudo {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: var(--pearl);
+  letter-spacing: 0.03em;
+}
+.lb-bar-wrap {
+  height: 2px;
+  background: var(--line-dim);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.lb-bar {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+.lb-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--bone);
+  opacity: 0.5;
+  text-align: right;
+}
+
 /* Responsive */
 @media (max-width: 720px) {
   .shell { padding: 0 20px; }
@@ -1252,4 +1295,5 @@ img { max-width: 100%; display: block; }
   .countdown-box { gap: 10px; padding: 16px 16px; }
   .countdown-cell { min-width: 48px; }
   .countdown-sep { font-size: 20px; padding-top: 6px; }
+  .lb-row { grid-template-columns: 24px 1fr 80px 28px; gap: 10px; }
 }
