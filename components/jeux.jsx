@@ -107,12 +107,12 @@ const GAMES_LIST = [
       { lv: 3, label: "Maître",  hint: "Survive 45s · doubles herses",           maxTime: 50, target: 45, total: 50 }
     ]
   },
-  { id: "catapulte",   num: "14", cat: "Adresse",  title: "Le Siège",
-    desc: "Ajuste l'angle et la puissance de ta catapulte pour démolir les créneaux. Le vent complique la trajectoire.",
+  { id: "differences", num: "14", cat: "Logique",  title: "Les 7 Différences",
+    desc: "Trouve les 7 différences entre les deux images. Clique sur une différence dans l'une ou l'autre moitié pour la marquer.",
     levels: [
-      { lv: 1, label: "Enfant",  hint: "≥ 3/5 · cible fixe · sans vent",                maxTime: 90, target: 3, total: 5 },
-      { lv: 2, label: "Adulte",  hint: "≥ 3/5 · cible surélevée · vent léger",           maxTime: 90, target: 3, total: 5 },
-      { lv: 3, label: "Maître",  hint: "≥ 4/5 · créneaux mobiles · vent puissant",       maxTime: 90, target: 4, total: 5 }
+      { lv: 1, label: "Enfant",  hint: "7 diff. · 3:00 · chevalier",         maxTime: 180, target: 7, total: 7 },
+      { lv: 2, label: "Adulte",  hint: "7 diff. · 2:30 · tapisserie",        maxTime: 150, target: 7, total: 7 },
+      { lv: 3, label: "Maître",  hint: "7 diff. · 2:00 · très difficiles",   maxTime: 120, target: 7, total: 7 }
     ]
   },
   { id: "archives",    num: "15", cat: "Logique",  title: "Les Archives",
