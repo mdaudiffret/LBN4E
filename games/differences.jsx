@@ -60,6 +60,19 @@ function dist(ax, ay, bx, by) {
   return Math.sqrt((ax - bx) ** 2 + (ay - by) ** 2);
 }
 
+// Rect réel de l'image rendue avec object-fit:contain dans son conteneur
+function getImageRect(container, img) {
+  const cr = container.getBoundingClientRect();
+  const nw = img.naturalWidth  || img.width  || cr.width;
+  const nh = img.naturalHeight || img.height || cr.height;
+  const ca = cr.width / cr.height;
+  const ia = nw / nh;
+  let w, h, ox, oy;
+  if (ia > ca) { w = cr.width;  h = cr.width / ia;  ox = 0; oy = (cr.height - h) / 2; }
+  else         { h = cr.height; w = cr.height * ia;  oy = 0; ox = (cr.width  - w) / 2; }
+  return { left: cr.left + ox, top: cr.top + oy, width: w, height: h };
+}
+
 // Click (px, py) en % du conteneur → coords normalisées dans la demi-image
 // Retourne { normX, normY } en % ou null si inclassable
 function normalize(px, py, split) {
@@ -95,6 +108,7 @@ function DifferencesGame({ level, onHud, onFinish }) {
   const [wrong,     setWrong]     = useState(null);   // { x, y, ts }
   const [time,      setTime]      = useState(cfg.maxTime);
   const [over,      setOver]      = useState(false);
+  const containerRef              = useRef(null);
   const imgRef                    = useRef(null);
   const foundRef                  = useRef(new Set());
 
@@ -123,7 +137,10 @@ function DifferencesGame({ level, onHud, onFinish }) {
 
   const handleClick = useCallback((e) => {
     if (over) return;
-    const rect = imgRef.current.getBoundingClientRect();
+    const rect = getImageRect(containerRef.current, imgRef.current);
+    // Ignorer les clics hors de l'image réelle (zones letterbox)
+    if (e.clientX < rect.left || e.clientX > rect.left + rect.width ||
+        e.clientY < rect.top  || e.clientY > rect.top  + rect.height) return;
     const px = ((e.clientX - rect.left) / rect.width)  * 100;
     const py = ((e.clientY - rect.top)  / rect.height) * 100;
 
@@ -233,26 +250,31 @@ function DifferencesGame({ level, onHud, onFinish }) {
     ),
     // Image + overlay
     React.createElement("div", {
-      ref: imgRef,
+      ref: containerRef,
       onClick: handleClick,
       style: {
         position: "relative",
-        flex: 1,
         cursor: "crosshair",
         borderRadius: 8,
         overflow: "hidden",
         border: "1px solid var(--line)",
         userSelect: "none",
         touchAction: "none",
-        minHeight: 0,
+        width: "100%",
+        maxHeight: "65vh",
+        background: "var(--ink)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }
     },
       React.createElement("img", {
+        ref: imgRef,
         src: cfg.image,
         draggable: false,
         style: {
-          width: "100%",
-          height: "100%",
+          maxWidth: "100%",
+          maxHeight: "65vh",
           objectFit: "contain",
           display: "block",
           pointerEvents: "none",
