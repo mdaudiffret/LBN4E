@@ -14,13 +14,13 @@ const CONFIGS = {
     tolerance: 10,
     maxTime: 180,
     diffs: [
-      { id: 1, x: 50,  y: 9  }, // panache casque
-      { id: 2, x: 30,  y: 40 }, // cape
-      { id: 3, x: 27,  y: 52 }, // bouclier
-      { id: 4, x: 64,  y: 55 }, // gemme épée
-      { id: 5, x: 87,  y: 19 }, // drapeau château
-      { id: 6, x: 14,  y: 14 }, // soleil / nuage
-      { id: 7, x: 84,  y: 83 }, // fleurs / rochers
+      { id: 1, x: 44,  y: 17 }, // panache casque  (plume rouge→bleue)
+      { id: 2, x: 36,  y: 78 }, // cape             (verte→orange, bas)
+      { id: 3, x: 36,  y: 56 }, // bouclier         (rayé→rouge)
+      { id: 4, x: 66,  y: 65 }, // gemme épée       (absente→rouge)
+      { id: 5, x: 84,  y: 39 }, // drapeau château  (violet→vert)
+      { id: 6, x: 17,  y: 15 }, // soleil / nuage   (nuage blanc→foncé)
+      { id: 7, x: 84,  y: 87 }, // fleurs / rochers (rochers→fleurs)
     ],
   },
   2: {
@@ -29,13 +29,13 @@ const CONFIGS = {
     tolerance: 8,
     maxTime: 150,
     diffs: [
-      { id: 1, x: 18,  y: 12 },
-      { id: 2, x: 55,  y: 8  },
-      { id: 3, x: 78,  y: 22 },
-      { id: 4, x: 30,  y: 48 },
-      { id: 5, x: 62,  y: 55 },
-      { id: 6, x: 82,  y: 68 },
-      { id: 7, x: 45,  y: 80 },
+      { id: 1, x: 63,  y: 16 }, // drapeaux château centre-droit
+      { id: 2, x: 40,  y: 15 }, // drapeaux château centre-gauche
+      { id: 3, x: 63,  y: 65 }, // champ tournoi centre-droit
+      { id: 4, x: 40,  y: 84 }, // cour royale bas centre
+      { id: 5, x: 78,  y: 43 }, // tente tournoi droite
+      { id: 6, x: 32,  y: 38 }, // balcon dames
+      { id: 7, x: 80,  y: 76 }, // tente / personnages bas droite
     ],
   },
   3: {
@@ -44,13 +44,13 @@ const CONFIGS = {
     tolerance: 6,
     maxTime: 120,
     diffs: [
-      { id: 1, x: 10,  y: 12 },
-      { id: 2, x: 50,  y: 8  },
-      { id: 3, x: 28,  y: 30 },
-      { id: 4, x: 65,  y: 48 },
-      { id: 5, x: 42,  y: 65 },
-      { id: 6, x: 78,  y: 72 },
-      { id: 7, x: 18,  y: 78 },
+      { id: 1, x: 53,  y: 56 }, // centre-droit bas
+      { id: 2, x: 21,  y: 34 }, // gauche milieu
+      { id: 3, x: 29,  y: 64 }, // centre-gauche bas
+      { id: 4, x: 89,  y: 72 }, // droite bas
+      { id: 5, x: 62,  y: 77 }, // centre-droite bas
+      { id: 6, x: 91,  y: 42 }, // droite milieu
+      { id: 7, x: 76,  y: 34 }, // droite haut-milieu
     ],
   },
 };
