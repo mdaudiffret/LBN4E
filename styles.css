@@ -1038,6 +1038,45 @@ img { max-width: 100%; display: block; }
   pointer-events: none;
 }
 .jeux-indice-card::after { top: auto; bottom: 14px; }
+
+/* Just-unlocked: glow + pulse animation */
+.jeux-indice-card--unlocked {
+  border-color: var(--gold-bright);
+  background: linear-gradient(180deg, rgba(212,162,76,0.28), rgba(212,162,76,0.08));
+  box-shadow: 0 0 0 1px rgba(212,162,76,0.4), 0 0 32px rgba(212,162,76,0.28), 0 0 64px rgba(212,162,76,0.12);
+  animation: indice-appear 0.5s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes indice-appear {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.jeux-indice-card--unlocked .jeux-indice-card__label {
+  font-size: 13px; color: var(--gold-bright);
+}
+.jeux-indice-card--unlocked .jeux-indice-card__code {
+  font-size: 72px;
+  text-shadow: 0 0 24px rgba(212,162,76,0.5);
+}
+.jeux-indice-card--unlocked .jeux-indice-card__text {
+  font-size: 16px; color: var(--pearl);
+}
+
+/* Compact version used in the persistent strip */
+.jeux-indice-card--compact {
+  margin: 0 auto; padding: 14px 20px;
+  border-radius: 10px;
+}
+.jeux-indice-card--compact .jeux-indice-card__code { font-size: 40px; }
+.jeux-indice-card--compact .jeux-indice-card__text { font-size: 13px; }
+
+/* Persistent indice strip between game body and footer */
+.play__indice-strip {
+  padding: 12px 22px 14px;
+  border-top: 1px solid rgba(212,162,76,0.28);
+  background: rgba(212,162,76,0.04);
+  flex-shrink: 0;
+}
+
 .jeux-indice-card__label {
   font-size: 11px; font-weight: 700; letter-spacing: 0.16em;
   color: var(--gold-bright); text-transform: uppercase; margin-bottom: 14px;

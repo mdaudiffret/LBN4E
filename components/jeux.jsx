@@ -312,11 +312,11 @@ function PlayHud({ time, score, total }) {
 }
 
 // ── Indice card ───────────────────────────────────────────────────
-function JeuxIndiceCard({ game, level, justUnlocked, indiceText }) {
+function JeuxIndiceCard({ game, level, justUnlocked, indiceText, compact }) {
   return (
-    <div className="jeux-indice-card">
+    <div className={`jeux-indice-card${justUnlocked ? " jeux-indice-card--unlocked" : ""}${compact ? " jeux-indice-card--compact" : ""}`}>
       <div className="jeux-indice-card__label">
-        {justUnlocked ? "★ Indice débloqué" : "Indice"}
+        {justUnlocked ? "★ Indice débloqué !" : "⚜ Indice débloqué"}
       </div>
       <div className="jeux-indice-card__code">
         {game.num}<span className="lv">·{level}</span>
@@ -404,6 +404,7 @@ function JeuxPlayView({ game, onClose, indices, unlockIndice, jeuxIndices }) {
   }, [onClose]);
 
   const getIndiceText = (lv) => (jeuxIndices || {})[indiceKey(game.id, lv)] || "";
+  const alreadyUnlocked = !!indices[indiceKey(game.id, level)];
 
   return (
     <div className="play-overlay" onClick={(e) => { if (e.target.classList.contains("play-overlay")) onClose(); }}>
@@ -500,6 +501,13 @@ function JeuxPlayView({ game, onClose, indices, unlockIndice, jeuxIndices }) {
             </div>
           )}
         </div>
+
+        {/* Indice strip — always visible when level already unlocked and not in result screen */}
+        {alreadyUnlocked && !finished && (
+          <div className="play__indice-strip">
+            <JeuxIndiceCard game={game} level={level} indiceText={getIndiceText(level)} compact />
+          </div>
+        )}
 
         {/* Footer */}
         <div className="play__footer">
