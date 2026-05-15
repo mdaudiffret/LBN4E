@@ -25,19 +25,19 @@ const CONFIGS = {
     maxTime: 150,
     intrus: [
       { id: 1,  x: 39, y: 16, label: "Bouteille d'eau" },         // sur le heaume
-      { id: 2,  x: 38, y: 24, label: "Lunettes de soleil" },      // visage du chevalier
-      { id: 3,  x: 47, y: 56, label: "Caméra GoPro" },            // flanc de la selle
-      { id: 4,  x: 19, y: 72, label: "Mini-cône bleu" },          // chemin forêt gauche
-      { id: 5,  x: 13, y: 82, label: "Télécommande" },            // herbe premier plan gauche
+      { id: 2,  x: 38, y: 46, label: "Lunettes de soleil" },      // visière du chevalier / bras gauche
+      { id: 3,  x: 37, y: 57, label: "Caméra GoPro" },            // flanc de la selle
+      { id: 4,  x: 19, y: 44, label: "Mini-cône bleu" },          // chemin forêt gauche
+      { id: 5,  x: 13, y: 83, label: "Télécommande" },            // herbe premier plan gauche
       { id: 6,  x: 53, y: 59, label: "Montre connectée" },        // poignet droit de l'écuyer
-      { id: 7,  x: 52, y: 66, label: "Canard en plastique" },     // rivière
-      { id: 8,  x: 79, y: 56, label: "Sac à main" },              // tenu par la dame droite
-      { id: 9,  x: 74, y: 47, label: "Parapluie multicolore" },   // ombrelle de la dame
+      { id: 7,  x: 57, y: 66, label: "Canard en plastique" },     // rivière
+      { id: 8,  x: 78, y: 57, label: "Sac à main" },              // tenu par la dame droite
+      { id: 9,  x: 72, y: 52, label: "Parapluie multicolore" },   // ombrelle de la dame
       { id: 10, x: 83, y: 65, label: "Ordinateur portable" },     // posé sur le muret
-      { id: 11, x: 83, y: 74, label: "Coccinelle" },              // devant la porte du château
-      { id: 12, x: 86, y: 20, label: "Antenne parabolique" },     // tour principale du château
-      { id: 13, x: 80, y: 32, label: "Tube de chips" },           // rempart à côté du garde
-      { id: 14, x: 94, y: 91, label: "QR Code" },                 // bordure décorative bas-droit
+      { id: 11, x: 82, y: 57, label: "Coccinelle" },              // devant le château droite
+      { id: 12, x: 86, y: 14, label: "Antenne parabolique" },     // tour principale du château
+      { id: 13, x: 81, y: 26, label: "Tube de chips" },           // rempart à côté du garde
+      { id: 14, x: 93, y: 85, label: "QR Code" },                 // bordure décorative bas-droit
     ],
   },
   3: {
