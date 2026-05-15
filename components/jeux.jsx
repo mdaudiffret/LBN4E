@@ -536,7 +536,6 @@ function JeuxLeaderboard({ currentUserId, adminPseudos }) {
     const ranked = allUsers
       .filter(u => !(adminPseudos || []).map(p => p.toLowerCase()).includes(u.pseudo.toLowerCase()))
       .map(u => ({ id: u.id, pseudo: u.pseudo, count: counts[u.id] || 0 }))
-      .filter(u => u.count > 0)
       .sort((a, b) => b.count - a.count || a.pseudo.localeCompare(b.pseudo));
     setBoard(ranked);
   }, []);
