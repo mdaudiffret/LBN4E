@@ -10,13 +10,13 @@ const CONFIGS = {
     tolerance: 5,
     maxTime: 180,
     intrus: [
-      { id: 1, x: 9,  y: 73, label: "Trottinette électrique" },  // bas-gauche, barrière
-      { id: 2, x: 33, y: 67, label: "Montre numérique" },         // poignet droit chevalier (côté gauche image)
-      { id: 3, x: 40, y: 70, label: "Gourde en plastique" },      // main droite chevalier, bouteille arc-en-ciel
-      { id: 4, x: 41, y: 19, label: "Lunettes de soleil" },       // sur le casque
-      { id: 5, x: 60, y: 46, label: "Smartphone" },               // main gauche chevalier (côté droit image)
-      { id: 6, x: 63, y: 22, label: "Drone" },                    // ciel, entre chevalier et château
-      { id: 7, x: 82, y: 62, label: "Poubelle à roulettes" },     // droite, à côté du château
+      { id: 1, x: 12, y: 71, label: "Trottinette électrique" },  // bas-gauche, appuyée sur la barrière
+      { id: 2, x: 36, y: 58, label: "Montre numérique" },         // poignet gauche du chevalier
+      { id: 3, x: 42, y: 68, label: "Gourde en plastique" },      // bouteille arc-en-ciel dans la main gauche
+      { id: 4, x: 45, y: 26, label: "Lunettes de soleil" },       // lunettes sur le casque (face)
+      { id: 5, x: 58, y: 48, label: "Smartphone" },               // téléphone tenu dans la main droite
+      { id: 6, x: 54, y: 27, label: "Drone" },                    // drone dans le ciel au-dessus
+      { id: 7, x: 85, y: 63, label: "Poubelle à roulettes" },     // poubelle verte à droite
     ],
   },
   2: {
