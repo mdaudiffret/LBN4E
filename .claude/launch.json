@@ -3,9 +3,10 @@
   "configurations": [
     {
       "name": "LBN4E-worktree",
-      "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8744"],
-      "port": 8744
+      "runtimeExecutable": "/bin/sh",
+      "runtimeArgs": ["-c", "/opt/homebrew/bin/python3 -m http.server ${PORT:-8744}"],
+      "port": 8744,
+      "autoPort": true
     }
   ]
 }

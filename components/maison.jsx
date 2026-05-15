@@ -279,7 +279,8 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
         [
           "Vingt codes scellent ces pages — chacun estant un mot. Pour chacun d'iceux, un indice est caché en les Gazettes publiées chaque vendredi à XII heures sonnantes.",
           "Chaque indice vous révèle la position du code parmy les vingt, & quelque indice sur le mot qu'il vous faut trouver.",
-          "Soumettez vos vingt codes en mesme temps : si l'un est juste, son encadré s'allume en bleu. En orange s'il n'est qu'à deux lettres près — vous n'estes point loin. En rouge, point du tout.",
+          "Point n'est besoin d'attendre que tous les indices soient connus : soumettez vos codes au fil de chaque dépêche, & les bonnes réponses seront aussitôt enregistrées & conservées pour vous.",
+          "Si un code est juste, son encadré s'allume en bleu & il est sauvegardé — vous ne pouvez plus le modifier. En orange s'il n'est qu'à deux lettres près — vous n'estes point loin. En rouge, point du tout.",
           "Encore faut-il les ranger dans le bon ordre. Le sceau ne se rompt que si les vingt sont exacts & bien ordonnez. Bonne chasse, mes très-honorez compaignons.",
         ].map((line, i) =>
           React.createElement("p", {
