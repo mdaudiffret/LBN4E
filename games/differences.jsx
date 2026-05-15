@@ -7,65 +7,65 @@ const { useState, useEffect, useRef, useCallback } = React;
 const CONFIGS = {
   1: {
     image: "assets/differences/lv1.png",
-    tolerance: 7,
+    tolerance: 5,
     maxTime: 180,
     intrus: [
-      { id: 1, x: 8,  y: 73, label: "Trottinette électrique" },  // bas-gauche, barrière
-      { id: 2, x: 36, y: 62, label: "Montre numérique" },         // poignet droit chevalier (vue gauche)
-      { id: 3, x: 32, y: 68, label: "Gourde en plastique" },      // main droite chevalier
-      { id: 4, x: 41, y: 22, label: "Lunettes de soleil" },       // casque
-      { id: 5, x: 50, y: 55, label: "Smartphone" },               // main gauche chevalier
-      { id: 6, x: 70, y: 8,  label: "Drone" },                    // ciel haut-droite
-      { id: 7, x: 83, y: 65, label: "Poubelle à roulettes" },     // droite, château
+      { id: 1, x: 9,  y: 73, label: "Trottinette électrique" },  // bas-gauche, barrière
+      { id: 2, x: 33, y: 67, label: "Montre numérique" },         // poignet droit chevalier (côté gauche image)
+      { id: 3, x: 40, y: 70, label: "Gourde en plastique" },      // main droite chevalier, bouteille arc-en-ciel
+      { id: 4, x: 41, y: 19, label: "Lunettes de soleil" },       // sur le casque
+      { id: 5, x: 60, y: 46, label: "Smartphone" },               // main gauche chevalier (côté droit image)
+      { id: 6, x: 63, y: 22, label: "Drone" },                    // ciel, entre chevalier et château
+      { id: 7, x: 82, y: 62, label: "Poubelle à roulettes" },     // droite, à côté du château
     ],
   },
   2: {
     image: "assets/differences/lv2.png",
-    tolerance: 6,
+    tolerance: 4,
     maxTime: 150,
     intrus: [
-      { id: 1,  x: 39, y: 17, label: "Bouteille d'eau" },         // heaume chevalier
-      { id: 2,  x: 38, y: 23, label: "Lunettes de soleil" },      // visage chevalier
-      { id: 3,  x: 46, y: 55, label: "Caméra GoPro" },            // flanc selle
-      { id: 4,  x: 19, y: 73, label: "Mini-cône bleu" },          // chemin forêt gauche
-      { id: 5,  x: 14, y: 81, label: "Télécommande" },            // herbe premier plan gauche
-      { id: 6,  x: 53, y: 60, label: "Montre connectée" },        // poignet droit écuyer
-      { id: 7,  x: 52, y: 67, label: "Canard en plastique" },     // rivière
-      { id: 8,  x: 79, y: 55, label: "Sac à main" },              // dame droite
-      { id: 9,  x: 75, y: 48, label: "Parapluie multicolore" },   // dame droite
-      { id: 10, x: 83, y: 66, label: "Ordinateur portable" },     // muret pierre
-      { id: 11, x: 84, y: 73, label: "Coccinelle" },              // porte château
-      { id: 12, x: 85, y: 21, label: "Antenne parabolique" },     // tour château
-      { id: 13, x: 81, y: 33, label: "Tube de chips" },           // rempart, garde
-      { id: 14, x: 94, y: 90, label: "QR Code" },                 // bordure déco, bas-droit
+      { id: 1,  x: 39, y: 16, label: "Bouteille d'eau" },         // sur le heaume
+      { id: 2,  x: 38, y: 24, label: "Lunettes de soleil" },      // visage du chevalier
+      { id: 3,  x: 47, y: 56, label: "Caméra GoPro" },            // flanc de la selle
+      { id: 4,  x: 19, y: 72, label: "Mini-cône bleu" },          // chemin forêt gauche
+      { id: 5,  x: 13, y: 82, label: "Télécommande" },            // herbe premier plan gauche
+      { id: 6,  x: 53, y: 59, label: "Montre connectée" },        // poignet droit de l'écuyer
+      { id: 7,  x: 52, y: 66, label: "Canard en plastique" },     // rivière
+      { id: 8,  x: 79, y: 56, label: "Sac à main" },              // tenu par la dame droite
+      { id: 9,  x: 74, y: 47, label: "Parapluie multicolore" },   // ombrelle de la dame
+      { id: 10, x: 83, y: 65, label: "Ordinateur portable" },     // posé sur le muret
+      { id: 11, x: 83, y: 74, label: "Coccinelle" },              // devant la porte du château
+      { id: 12, x: 86, y: 20, label: "Antenne parabolique" },     // tour principale du château
+      { id: 13, x: 80, y: 32, label: "Tube de chips" },           // rempart à côté du garde
+      { id: 14, x: 94, y: 91, label: "QR Code" },                 // bordure décorative bas-droit
     ],
   },
   3: {
     image: "assets/differences/lv3.png",
-    tolerance: 5,
+    tolerance: 4,
     maxTime: 120,
     intrus: [
       { id: 1,  x: 10, y: 5,  label: "Drones" },                  // ciel haut-gauche
-      { id: 2,  x: 38, y: 13, label: "Parabole satellite" },      // clocher église
-      { id: 3,  x: 68, y: 10, label: "Éoliennes" },               // collines fond
-      { id: 4,  x: 96, y: 44, label: "Poteau électrique" },       // extrême droite
-      { id: 5,  x: 67, y: 33, label: "Panneaux solaires" },       // arbre centre-droit
-      { id: 6,  x: 83, y: 52, label: "Cabine WC bleue" },         // arrière-plan droit
-      { id: 7,  x: 82, y: 64, label: "Bicyclette noire" },        // sous cabine WC
-      { id: 8,  x: 10, y: 63, label: "Caisse enregistreuse" },    // table marchande gauche
-      { id: 9,  x: 7,  y: 74, label: "Panneaux signalisation" },  // premier plan gauche
-      { id: 10, x: 18, y: 68, label: "Casque audio" },            // homme premier plan gauche
-      { id: 11, x: 18, y: 79, label: "Peluche Spider-Man" },      // petite fille gauche
-      { id: 12, x: 24, y: 71, label: "Figurine super-héros" },    // homme face à la fille
-      { id: 13, x: 57, y: 54, label: "Smartphone chevalier" },    // chevalier cheval brun
-      { id: 14, x: 60, y: 66, label: "Sacs de livraison" },       // charrette centre-droit
-      { id: 15, x: 79, y: 46, label: "Frisbee jaune" },           // en l'air, champ droit
-      { id: 16, x: 54, y: 81, label: "Gobelet de café" },         // sol, centre avant
-      { id: 17, x: 84, y: 76, label: "Vélo moderne" },            // homme chapeau marron
-      { id: 18, x: 87, y: 68, label: "Canettes de soda" },        // marcheur à côté vélo
-      { id: 19, x: 91, y: 61, label: "Journaux imprimés" },       // étal droit
-      { id: 20, x: 90, y: 53, label: "Guirlandes lumineuses" },   // toit étal droit
-      { id: 21, x: 66, y: 74, label: "Vêtements denim" },         // homme marchant avant centre
+      { id: 2,  x: 38, y: 12, label: "Parabole satellite" },      // clocher de l'église
+      { id: 3,  x: 67, y: 10, label: "Éoliennes" },               // collines fond droite
+      { id: 4,  x: 96, y: 43, label: "Poteau électrique" },       // extrême droite
+      { id: 5,  x: 67, y: 32, label: "Panneaux solaires" },       // sur l'arbre centre-droit
+      { id: 6,  x: 84, y: 51, label: "Cabine WC bleue" },         // arrière-plan droit
+      { id: 7,  x: 83, y: 63, label: "Bicyclette noire" },        // sous la cabine WC
+      { id: 8,  x: 10, y: 62, label: "Caisse enregistreuse" },    // table marchande gauche
+      { id: 9,  x: 6,  y: 75, label: "Panneaux signalisation" },  // premier plan gauche
+      { id: 10, x: 17, y: 67, label: "Casque audio" },            // homme premier plan gauche
+      { id: 11, x: 17, y: 78, label: "Peluche Spider-Man" },      // petite fille, main gauche
+      { id: 12, x: 24, y: 70, label: "Figurine super-héros" },    // homme face à la fille
+      { id: 13, x: 57, y: 53, label: "Smartphone chevalier" },    // chevalier sur cheval brun
+      { id: 14, x: 60, y: 65, label: "Sacs de livraison" },       // sur la charrette
+      { id: 15, x: 79, y: 45, label: "Frisbee jaune" },           // en vol, champ droit
+      { id: 16, x: 54, y: 80, label: "Gobelet de café" },         // sol, centre avant
+      { id: 17, x: 85, y: 75, label: "Vélo moderne" },            // homme chapeau marron droite
+      { id: 18, x: 87, y: 67, label: "Canettes de soda" },        // marcheur à côté du vélo
+      { id: 19, x: 91, y: 60, label: "Journaux imprimés" },       // étal droit
+      { id: 20, x: 90, y: 52, label: "Guirlandes lumineuses" },   // toit de l'étal droit
+      { id: 21, x: 66, y: 73, label: "Vêtements denim" },         // homme marchant avant centre
     ],
   },
 };
