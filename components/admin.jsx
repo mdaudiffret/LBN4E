@@ -721,7 +721,7 @@ const TabGazette = () => {
 const PostForm = ({ post, onSave, onCancel }) => {
   const today = new Date().toISOString().slice(0, 10);
   const [iso, setIso]                   = React.useState(post ? post.iso : today);
-  const [publishTime, setPublishTime]   = React.useState(post ? (post.publishAt ? post.publishAt.slice(11, 16) : "12:00") : "12:00");
+  const [publishTime, setPublishTime]   = React.useState(post ? (post.publishAt ? (() => { const d = new Date(post.publishAt); return `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`; })() : "12:00") : "12:00");
   const [titre, setTitre]               = React.useState(post ? post.titre : "");
   const [author, setAuthor]             = React.useState(post ? post.author : "Intendance · LBN4E");
   const [kind, setKind]                 = React.useState(post ? post.imageKind : "manuscrit");
@@ -769,7 +769,7 @@ const PostForm = ({ post, onSave, onCancel }) => {
     onSave({
       id: post ? post.id : `post-${iso}`,
       iso,
-      publishAt: `${iso}T${publishTime}`,
+      publishAt: new Date(`${iso}T${publishTime}:00`).toISOString(),
       dateShort: `${String(dd).padStart(2,"0")}·${romans[mm]}·${yRom}`,
       dateLong: `${["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"][d.getDay()]} ${toRoman(dd)} de ${months[mm]} · ${yRom}`,
       titre: titre.trim(),

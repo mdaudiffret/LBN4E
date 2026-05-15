@@ -107,12 +107,12 @@ const GAMES_LIST = [
       { lv: 3, label: "Maître",  hint: "Survive 45s · doubles herses",           maxTime: 50, target: 45, total: 50 }
     ]
   },
-  { id: "differences", num: "14", cat: "Logique",  title: "Les 7 Différences",
-    desc: "Trouve les 7 différences entre les deux images. Clique sur une différence dans l'une ou l'autre moitié pour la marquer.",
+  { id: "differences", num: "14", cat: "Logique",  title: "Les Intrus",
+    desc: "Des objets anachroniques se cachent dans ces illustrations médiévales. Clique sur chaque intrus pour le démasquer avant la fin du temps !",
     levels: [
-      { lv: 1, label: "Enfant",  hint: "7 diff. · 3:00 · chevalier",         maxTime: 180, target: 7, total: 7 },
-      { lv: 2, label: "Adulte",  hint: "7 diff. · 2:30 · tapisserie",        maxTime: 150, target: 7, total: 7 },
-      { lv: 3, label: "Maître",  hint: "7 diff. · 2:00 · très difficiles",   maxTime: 120, target: 7, total: 7 }
+      { lv: 1, label: "Enfant",  hint: "7 intrus · 3:00 · chevalier",        maxTime: 180, target: 7,  total: 7  },
+      { lv: 2, label: "Adulte",  hint: "14 intrus · 2:30 · tapisserie",      maxTime: 150, target: 14, total: 14 },
+      { lv: 3, label: "Maître",  hint: "21 intrus · 2:00 · village médiéval",maxTime: 120, target: 21, total: 21 }
     ]
   },
   { id: "archives",    num: "15", cat: "Logique",  title: "Les Archives",
