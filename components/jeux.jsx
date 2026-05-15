@@ -359,7 +359,7 @@ function JeuxCard({ game, indices, onOpen }) {
 }
 
 // ── Play overlay ──────────────────────────────────────────────────
-function JeuxPlayView({ game, onClose, indices, unlockIndice, jeuxIndices }) {
+function JeuxPlayView({ game, onClose, indices, unlockIndice, jeuxIndices, isAdmin, onUpdateData, data }) {
   const [level, setLevel] = React.useState(1);
   const [hud, setHud] = React.useState({ time: null, score: null, total: null });
   const [runKey, setRunKey] = React.useState(0);
@@ -494,7 +494,12 @@ function JeuxPlayView({ game, onClose, indices, unlockIndice, jeuxIndices }) {
               </div>
             </div>
           ) : Game ? (
-            <Game key={runKey} level={level} onHud={setHud} onFinish={finish} onRestart={restart} />
+            <Game key={runKey} level={level} onHud={setHud} onFinish={finish} onRestart={restart}
+              isAdmin={isAdmin}
+              onSaveConfig={game.id === "differences" && onUpdateData ? async (cfg) => {
+                await onUpdateData({ ...data, differencesConfig: cfg });
+              } : undefined}
+            />
           ) : (
             <div className="muted center" style={{ padding: "40px 0", fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.2em" }}>
               Chargement…
@@ -606,7 +611,7 @@ function JeuxLeaderboard({ currentUserId, adminPseudos }) {
 }
 
 // ── Main page ─────────────────────────────────────────────────────
-function JeuxPage({ data, user, onLogout }) {
+function JeuxPage({ data, user, onLogout, isAdmin, onUpdateData }) {
   const [filter, setFilter] = React.useState("all");
   const [openId, setOpenId] = React.useState(null);
   const [indices, setIndices] = React.useState({});
@@ -713,6 +718,9 @@ function JeuxPage({ data, user, onLogout }) {
           indices={indices}
           unlockIndice={unlockIndice}
           jeuxIndices={jeuxIndices}
+          isAdmin={isAdmin}
+          onUpdateData={onUpdateData}
+          data={data}
         />
       )}
     </div>
