@@ -30,7 +30,9 @@ const useAppConfig = () => {
     sb.from("app_config").select("data").eq("id", 1).single()
       .then(({ data: row }) => {
         if (row?.data && Object.keys(row.data).length > 0) {
-          setData({ ...window.DEFAULT_DATA, ...row.data });
+          const merged = { ...window.DEFAULT_DATA, ...row.data };
+          setData(merged);
+          if (merged.differencesConfig) window.__differencesConfig = merged.differencesConfig;
         }
       }, () => {})
       .finally(() => setLoaded(true));
@@ -155,7 +157,7 @@ const App = () => {
       <Topbar route={route} user={user} onLogout={logoutUser} />
       {page === "maison"     && <MaisonPage  data={data} isAdmin={isAdmin} onUpdateData={saveConfig} user={user} />}
       {page === "gazette"    && <GazettePage isAdmin={isAdmin} isAdminUser={(() => { const ap = data.adminPseudos || (data.adminPseudo ? [data.adminPseudo] : []); return !!user && ap.map(p => p.toLowerCase()).includes((user.pseudo || "").toLowerCase()); })()} />}
-      {page === "jeux"       && <JeuxPage    data={data} user={user} onLogout={logoutUser} />}
+      {page === "jeux"       && <JeuxPage    data={data} user={user} onLogout={logoutUser} isAdmin={isAdmin} onUpdateData={saveConfig} />}
       {page === "intendance" && <IntendancePage data={data} onUpdateData={saveConfig} isAdmin={isAdmin} onLogin={onLogin} onLogout={onLogout} configLoaded={configLoaded} />}
       {page !== "intendance" && <Footer />}
       {!user && page !== "intendance" && (
