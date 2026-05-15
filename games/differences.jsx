@@ -45,27 +45,27 @@ const CONFIGS = {
     tolerance: 4,
     maxTime: 120,
     intrus: [
-      { id: 1,  x: 10, y: 5,  label: "Drones" },                  // ciel haut-gauche
-      { id: 2,  x: 38, y: 12, label: "Parabole satellite" },      // clocher de l'église
-      { id: 3,  x: 67, y: 10, label: "Éoliennes" },               // collines fond droite
-      { id: 4,  x: 96, y: 43, label: "Poteau électrique" },       // extrême droite
-      { id: 5,  x: 67, y: 32, label: "Panneaux solaires" },       // sur l'arbre centre-droit
-      { id: 6,  x: 84, y: 51, label: "Cabine WC bleue" },         // arrière-plan droit
-      { id: 7,  x: 83, y: 63, label: "Bicyclette noire" },        // sous la cabine WC
-      { id: 8,  x: 10, y: 62, label: "Caisse enregistreuse" },    // table marchande gauche
+      { id: 1,  x: 19, y: 8,  label: "Drones" },                  // ciel haut-gauche
+      { id: 2,  x: 35, y: 8,  label: "Parabole satellite" },      // clocher de l'église
+      { id: 3,  x: 47, y: 13, label: "Éoliennes" },               // grande éolienne centre
+      { id: 4,  x: 93, y: 9,  label: "Poteau électrique" },       // extrême droite haut
+      { id: 5,  x: 67, y: 28, label: "Panneaux solaires" },       // sur l'arbre centre-droit
+      { id: 6,  x: 86, y: 33, label: "Cabine WC bleue" },         // arrière-plan droit
+      { id: 7,  x: 82, y: 78, label: "Bicyclette noire" },        // premier plan droit
+      { id: 8,  x: 10, y: 72, label: "Caisse enregistreuse" },    // table marchande gauche
       { id: 9,  x: 6,  y: 75, label: "Panneaux signalisation" },  // premier plan gauche
-      { id: 10, x: 17, y: 67, label: "Casque audio" },            // homme premier plan gauche
-      { id: 11, x: 17, y: 78, label: "Peluche Spider-Man" },      // petite fille, main gauche
-      { id: 12, x: 24, y: 70, label: "Figurine super-héros" },    // homme face à la fille
-      { id: 13, x: 57, y: 53, label: "Smartphone chevalier" },    // chevalier sur cheval brun
-      { id: 14, x: 60, y: 65, label: "Sacs de livraison" },       // sur la charrette
-      { id: 15, x: 79, y: 45, label: "Frisbee jaune" },           // en vol, champ droit
+      { id: 10, x: 18, y: 63, label: "Casque audio" },            // homme premier plan gauche
+      { id: 11, x: 33, y: 80, label: "Peluche Spider-Man" },      // petite fille, main gauche
+      { id: 12, x: 30, y: 63, label: "Figurine super-héros" },    // homme face à la fille
+      { id: 13, x: 57, y: 52, label: "Smartphone chevalier" },    // chevalier sur cheval brun
+      { id: 14, x: 67, y: 52, label: "Sacs de livraison" },       // cavalier centre-droit
+      { id: 15, x: 79, y: 47, label: "Frisbee jaune" },           // en vol, champ droit
       { id: 16, x: 54, y: 80, label: "Gobelet de café" },         // sol, centre avant
-      { id: 17, x: 85, y: 75, label: "Vélo moderne" },            // homme chapeau marron droite
+      { id: 17, x: 75, y: 67, label: "Vélo moderne" },            // homme droite
       { id: 18, x: 87, y: 67, label: "Canettes de soda" },        // marcheur à côté du vélo
-      { id: 19, x: 91, y: 60, label: "Journaux imprimés" },       // étal droit
-      { id: 20, x: 90, y: 52, label: "Guirlandes lumineuses" },   // toit de l'étal droit
-      { id: 21, x: 66, y: 73, label: "Vêtements denim" },         // homme marchant avant centre
+      { id: 19, x: 91, y: 77, label: "Journaux imprimés" },       // étal droit
+      { id: 20, x: 93, y: 47, label: "Guirlandes lumineuses" },   // toit de l'étal droit
+      { id: 21, x: 72, y: 53, label: "Vêtements denim" },         // cavalier / moto centre
     ],
   },
 };
