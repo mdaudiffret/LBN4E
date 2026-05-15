@@ -195,7 +195,7 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
     setResults(r);
     setSubmitted(true);
 
-    // Sauvegarder les nouveaux codes corrects dans Supabase
+    // Sauvegarder les nouveaux codes corrects + enregistrer la tentative dans Supabase
     if (user) {
       const sb = window.__supabase;
       if (sb) {
@@ -209,6 +209,7 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
           if (error) { console.error("[user_codes upsert]", error); }
           else { setFoundIdx(prev => new Set([...prev, ...newlyFound])); }
         }
+        await sb.from("user_attempts").insert({ user_id: user.id });
       }
     }
 
@@ -602,13 +603,16 @@ const Leaderboard = ({ adminPseudos }) => {
       Promise.all([
         sb.from("users").select("id, pseudo"),
         sb.from("user_codes").select("user_id"),
-      ]).then(([u, c]) => {
+        sb.from("user_attempts").select("user_id"),
+      ]).then(([u, c, a]) => {
         const admins = (adminPseudos || []).map(p => p.toLowerCase());
         const users = (u.data || []).filter(p => !admins.includes(p.pseudo.toLowerCase()));
         const counts = {};
         (c.data || []).forEach(r => { counts[r.user_id] = (counts[r.user_id] || 0) + 1; });
+        const attempts = {};
+        (a.data || []).forEach(r => { attempts[r.user_id] = (attempts[r.user_id] || 0) + 1; });
         const list = users
-          .map(p => ({ ...p, count: counts[p.id] || 0 }))
+          .map(p => ({ ...p, count: counts[p.id] || 0, attempts: attempts[p.id] || 0 }))
           .sort((a, b) => b.count - a.count || a.pseudo.localeCompare(b.pseudo));
         setRows(list);
       }, () => setRows([]));
@@ -617,6 +621,7 @@ const Leaderboard = ({ adminPseudos }) => {
 
     const ch = sb.channel("lb-rt")
       .on("postgres_changes", { event: "*", schema: "public", table: "user_codes" }, load)
+      .on("postgres_changes", { event: "*", schema: "public", table: "user_attempts" }, load)
       .subscribe();
     return () => sb.removeChannel(ch);
   }, [adminPseudos]);
@@ -645,7 +650,11 @@ const Leaderboard = ({ adminPseudos }) => {
             style: { width: `${Math.round((row.count / 20) * 100)}%` },
           })
         ),
-        React.createElement("span", { className: "lb-count" }, `${row.count}/20`)
+        React.createElement("span", { className: "lb-count" }, `${row.count}/20`),
+        row.attempts > 0 && React.createElement("span", {
+          className: "lb-attempts",
+          title: "Nombre de tentatives",
+        }, `${row.attempts} tentative${row.attempts > 1 ? "s" : ""}`)
       )
     )
   );

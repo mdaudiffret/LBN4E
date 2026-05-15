@@ -1307,7 +1307,7 @@ img { max-width: 100%; display: block; }
 /* ── Leaderboard ─────────────────────────────────────────────── */
 .lb-row {
   display: grid;
-  grid-template-columns: 32px 1fr 140px 40px;
+  grid-template-columns: 32px 1fr 140px 40px auto;
   align-items: center;
   gap: 16px;
   padding: 10px 0;
@@ -1346,6 +1346,15 @@ img { max-width: 100%; display: block; }
   opacity: 0.5;
   text-align: right;
 }
+.lb-attempts {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.10em;
+  color: var(--neon-magenta);
+  opacity: 0.6;
+  text-align: right;
+  white-space: nowrap;
+}
 
 /* Responsive */
 @media (max-width: 720px) {
@@ -1362,5 +1371,6 @@ img { max-width: 100%; display: block; }
   .countdown-box { gap: 10px; padding: 16px 16px; }
   .countdown-cell { min-width: 48px; }
   .countdown-sep { font-size: 20px; padding-top: 6px; }
-  .lb-row { grid-template-columns: 24px 1fr 80px 28px; gap: 10px; }
+  .lb-row { grid-template-columns: 24px 1fr 80px 28px auto; gap: 10px; }
+  .lb-attempts { font-size: 9px; }
 }
