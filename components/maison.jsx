@@ -266,33 +266,23 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
           marginBottom: 28,
         }
       },
-        React.createElement("div", {
-          style: {
-            fontFamily: "var(--font-mono)",
-            fontSize: 9,
-            letterSpacing: "0.3em",
-            color: "var(--gold)",
-            textTransform: "uppercase",
-            marginBottom: 14,
-          }
-        }, "⚜ Ordonnance de l'Intendance ⚜"),
         [
-          "Vingt codes scellent ces pages — chacun estant un mot. Pour chacun d'iceux, un indice est caché en les Gazettes publiées chaque vendredi à XII heures sonnantes.",
-          "Chaque indice vous révèle la position du code parmy les vingt, & quelque indice sur le mot qu'il vous faut trouver.",
-          "Point n'est besoin d'attendre que tous les indices soient connus : soumettez vos codes au fil de chaque dépêche, & les bonnes réponses seront aussitôt enregistrées & conservées pour vous.",
-          "Si un code est juste, son encadré s'allume en bleu & il est sauvegardé — vous ne pouvez plus le modifier. En orange s'il n'est qu'à deux lettres près — vous n'estes point loin. En rouge, point du tout.",
-          "Encore faut-il les ranger dans le bon ordre. Le sceau ne se rompt que si les vingt sont exacts & bien ordonnez. Bonne chasse, mes très-honorez compaignons.",
+          "Pour dévoiler les informations ci-dessous, vous devez trouver 20 codes. Chaque code est un mot (sans majuscule).",
+          "Pour trouver ces codes, chaque vendredi à 12h pile, une nouvelle dépêche sera publiée dans la gazette de ce site. Chaque dépêche contient une énigme que vous devez résoudre pour trouver le mot, mais aussi sa position parmi les codes numérotés ci-dessous. Et oui, ils ne sont pas dans l'ordre — ça serait trop facile.",
+          "Pas besoin d'attendre tous les indices : soumettez vos codes au fur et à mesure, et vos bonnes réponses seront enregistrées automatiquement.",
+          "Si un code est correct, son encadré devient bleu et il est sauvegardé — vous ne pouvez plus le modifier. Orange signifie que vous êtes à deux lettres près. Rouge, vous êtes loin du compte.",
+          "Une fois les 20 codes trouvés, les informations sur le lieu et le programme seront dévoilées.",
+          "Utilisez les jeux pour débloquer des indices complémentaires pour résoudre les énigmes.",
+          "Bonne chasse !",
         ].map((line, i) =>
           React.createElement("p", {
             key: i,
             style: {
               fontFamily: "var(--font-serif)",
-              fontStyle: "italic",
-              fontSize: 16,
-              lineHeight: 1.55,
+              fontSize: 18,
+              lineHeight: 1.65,
               color: "var(--bone)",
-              margin: i === 0 ? "0 0 10px" : "10px 0 0",
-              opacity: 0.9,
+              margin: i === 0 ? "0 0 12px" : "12px 0 0",
             }
           }, line)
         )
