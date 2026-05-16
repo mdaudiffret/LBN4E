@@ -913,13 +913,13 @@ img { max-width: 100%; display: block; }
   background: rgba(7,7,12,0.75);
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
   z-index: 200;
-  display: flex; align-items: center; justify-content: center; padding: 24px;
+  display: flex; align-items: stretch; justify-content: center; padding: 24px;
   animation: jeux-fadeIn .2s ease-out;
 }
 @keyframes jeux-fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .play {
-  width: min(960px, 100%); max-height: calc(100vh - 48px);
+  width: min(960px, 100%); max-height: calc(100vh - 48px); height: 100%;
   background: var(--char); color: var(--pearl);
   border-radius: 18px; border: 1px solid rgba(212,162,76,0.35);
   box-shadow: 0 30px 60px -10px rgba(0,0,0,0.8), 0 0 0 1px rgba(212,162,76,0.15);
@@ -1064,17 +1064,29 @@ img { max-width: 100%; display: block; }
   margin-top: 8px; line-height: 1.1;
 }
 
-/* Compact version used in the persistent strip */
+/* Compact version used in the persistent strip — thin single line */
 .jeux-indice-card--compact {
-  margin: 0 auto; padding: 14px 20px;
-  border-radius: 10px;
+  margin: 0; padding: 6px 14px;
+  border-radius: 8px;
+  display: flex; align-items: center; gap: 10px;
+  text-align: left;
 }
-.jeux-indice-card--compact .jeux-indice-card__code { font-size: 40px; }
-.jeux-indice-card--compact .jeux-indice-card__text { font-size: 13px; }
+.jeux-indice-card--compact::before,
+.jeux-indice-card--compact::after { display: none; }
+.jeux-indice-card--compact .jeux-indice-card__label {
+  margin-bottom: 0; font-size: 9px; flex-shrink: 0; white-space: nowrap;
+}
+.jeux-indice-card--compact .jeux-indice-card__code {
+  font-size: 13px; flex-shrink: 0;
+}
+.jeux-indice-card--compact .jeux-indice-card__text {
+  margin-top: 0; font-size: 16px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 
 /* Persistent indice strip between game body and footer */
 .play__indice-strip {
-  padding: 12px 22px 14px;
+  padding: 6px 22px;
   border-top: 1px solid rgba(212,162,76,0.28);
   background: rgba(212,162,76,0.04);
   flex-shrink: 0;
@@ -1399,6 +1411,21 @@ img { max-width: 100%; display: block; }
 }
 
 /* Responsive */
+@media (max-width: 600px) {
+  .play-overlay { padding: 0; }
+  .play { border-radius: 0; max-height: 100dvh; width: 100%; }
+  .play__top { padding: 10px 12px; }
+  .play__num-tiny { width: 32px; height: 32px; font-size: 13px; border-radius: 8px; }
+  .play__title { font-size: 16px; }
+  .play__top-left { gap: 10px; }
+  .play__diff-bar { padding: 8px 12px; gap: 6px; }
+  .diff-tab { height: 30px; padding: 0 10px; font-size: 12px; }
+  .play__targets { padding: 6px 12px; gap: 8px; font-size: 11px; }
+  .play__body { padding: 16px 12px; }
+  .play__footer { padding: 8px 12px; }
+  .play__indice-strip { padding: 5px 12px; }
+}
+
 @media (max-width: 720px) {
   .shell { padding: 0 20px; }
   .topbar-inner { height: 56px; gap: 12px; }
