@@ -901,7 +901,7 @@ const JEUX_ADMIN_GAMES = [
   { id: "intrus",      num: "11", title: "L'Imposteur" },
   { id: "flamme",      num: "12", title: "La Flamme Vacillante" },
   { id: "chevauchee",  num: "13", title: "La Chevauchée" },
-  { id: "catapulte",   num: "14", title: "Le Siège" },
+  { id: "differences", num: "14", title: "Les Intrus" },
   { id: "archives",    num: "15", title: "Les Archives" },
   { id: "copiste",     num: "16", title: "Le Copiste" },
   { id: "blason",      num: "17", title: "L'Héraldiste" },
