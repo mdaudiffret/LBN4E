@@ -78,9 +78,9 @@ const GAMES_LIST = [
   { id: "mastermind",  num: "10", cat: "Logique",  title: "Code du Coffre",
     desc: "Déchiffre la combinaison secrète du coffre en plaçant des gemmes. Chaque essai révèle les bien placées et les mal placées.",
     levels: [
-      { lv: 1, label: "Enfant",  hint: "4 positions · 5 couleurs · 8 essais",  maxTime: 300, target: 1, total: 1 },
-      { lv: 2, label: "Adulte",  hint: "4 positions · 6 couleurs · 7 essais",  maxTime: 240, target: 1, total: 1 },
-      { lv: 3, label: "Maître",  hint: "5 positions · 6 couleurs · 6 essais",  maxTime: 240, target: 1, total: 1 }
+      { lv: 1, label: "Enfant",  hint: "3 positions · 4 couleurs · 10 essais", maxTime: 300, target: 1, total: 1 },
+      { lv: 2, label: "Adulte",  hint: "4 positions · 5 couleurs · 9 essais",  maxTime: 240, target: 1, total: 1 },
+      { lv: 3, label: "Maître",  hint: "4 positions · 6 couleurs · 8 essais",  maxTime: 240, target: 1, total: 1 }
     ]
   },
   { id: "intrus",      num: "11", cat: "Logique",  title: "L'Imposteur",
