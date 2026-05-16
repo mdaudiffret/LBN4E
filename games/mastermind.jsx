@@ -1,6 +1,6 @@
 ;(function() {
 // games/mastermind.jsx — Code du Coffre
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect } = React;
 
 const COLORS = [
   { id: "gold",    hex: "#D4A24C" },
@@ -12,9 +12,9 @@ const COLORS = [
 ];
 
 const CONFIG = {
-  1: { positions: 4, colors: 5, maxTries: 8 },
-  2: { positions: 4, colors: 6, maxTries: 7 },
-  3: { positions: 5, colors: 6, maxTries: 6 },
+  1: { positions: 3, colors: 4, maxTries: 10 },
+  2: { positions: 4, colors: 5, maxTries: 9 },
+  3: { positions: 4, colors: 6, maxTries: 8 },
 };
 
 function makeSecret(positions, numColors) {
@@ -26,49 +26,20 @@ function makeSecret(positions, numColors) {
 }
 
 function score(secret, guess) {
-  let black = 0; // right color, right position
-  let white = 0; // right color, wrong position
+  let black = 0;
+  let white = 0;
   const sUsed = secret.map(() => false);
   const gUsed = guess.map(() => false);
-
-  // First pass: exact matches
   for (let i = 0; i < secret.length; i++) {
-    if (guess[i] === secret[i]) {
-      black++;
-      sUsed[i] = true;
-      gUsed[i] = true;
-    }
+    if (guess[i] === secret[i]) { black++; sUsed[i] = true; gUsed[i] = true; }
   }
-  // Second pass: color present but wrong position
   for (let i = 0; i < guess.length; i++) {
     if (gUsed[i]) continue;
     for (let j = 0; j < secret.length; j++) {
-      if (!sUsed[j] && guess[i] === secret[j]) {
-        white++;
-        sUsed[j] = true;
-        break;
-      }
+      if (!sUsed[j] && guess[i] === secret[j]) { white++; sUsed[j] = true; break; }
     }
   }
   return { black, white };
-}
-
-function ColorDot({ colorIdx, size, onClick, dimmed }) {
-  const hex = colorIdx === null ? null : COLORS[colorIdx].hex;
-  return React.createElement("button", {
-    onClick,
-    style: {
-      width: size, height: size,
-      borderRadius: "50%",
-      background: hex || "var(--char-2)",
-      border: `2px solid ${hex ? hex : "var(--line)"}`,
-      cursor: onClick ? "pointer" : "default",
-      opacity: dimmed ? 0.4 : 1,
-      transition: "background 0.15s, border-color 0.15s, opacity 0.15s",
-      flexShrink: 0,
-      boxShadow: hex ? `0 0 8px ${hex}55` : "none"
-    }
-  });
 }
 
 function PegDots({ black, white, total }) {
@@ -76,25 +47,15 @@ function PegDots({ black, white, total }) {
   for (let i = 0; i < black; i++) pegs.push("black");
   for (let i = 0; i < white; i++) pegs.push("white");
   for (let i = pegs.length; i < total; i++) pegs.push("empty");
-
   return React.createElement("div", {
-    style: {
-      display: "flex", flexWrap: "wrap",
-      gap: 4,
-      width: total <= 4 ? 36 : 46,
-      alignContent: "flex-start"
-    }
+    style: { display: "flex", flexWrap: "wrap", gap: 4, width: 36, alignContent: "flex-start" }
   },
     pegs.map((p, i) =>
       React.createElement("div", {
         key: i,
         style: {
-          width: total <= 4 ? 12 : 10,
-          height: total <= 4 ? 12 : 10,
-          borderRadius: "50%",
-          background: p === "black" ? "var(--pearl)"
-                    : p === "white" ? "transparent"
-                    : "var(--line-dim)",
+          width: 12, height: 12, borderRadius: "50%",
+          background: p === "black" ? "var(--pearl)" : p === "white" ? "transparent" : "var(--line-dim)",
           border: p === "white" ? "2px solid var(--pearl)" : "none",
           boxSizing: "border-box"
         }
@@ -105,31 +66,25 @@ function PegDots({ black, white, total }) {
 
 function MastermindGame({ level, onHud, onFinish }) {
   const cfg = CONFIG[level];
-  const numColors = cfg.colors;
-  const positions = cfg.positions;
-  const maxTries = cfg.maxTries;
+  const { positions, colors: numColors, maxTries } = cfg;
   const palette = COLORS.slice(0, numColors);
 
   const [secret] = useState(() => makeSecret(positions, numColors));
-  const [history, setHistory] = useState([]); // [{guess:[...], black, white}]
+  const [history, setHistory] = useState([]);
   const [current, setCurrent] = useState(() => Array(positions).fill(null));
-  const [phase, setPhase] = useState("playing"); // playing | won | lost
-  const attemptNum = history.length + 1;
+  const [selected, setSelected] = useState(0); // currently selected palette color
+  const [phase, setPhase] = useState("playing");
 
-  useEffect(() => {
-    onHud({ score: history.length, total: maxTries });
-  }, [history.length]);
+  useEffect(() => { onHud({ score: history.length, total: maxTries }); }, [history.length]);
 
-  function cycleColor(pos) {
+  function placeColor(pos) {
     if (phase !== "playing") return;
-    setCurrent(prev => {
-      const next = prev.slice();
-      const cur = prev[pos];
-      if (cur === null) next[pos] = 0;
-      else if (cur + 1 >= numColors) next[pos] = null;
-      else next[pos] = cur + 1;
-      return next;
-    });
+    setCurrent(prev => { const n = prev.slice(); n[pos] = selected; return n; });
+  }
+
+  function clearPos(pos) {
+    if (phase !== "playing") return;
+    setCurrent(prev => { const n = prev.slice(); n[pos] = null; return n; });
   }
 
   function submit() {
@@ -154,15 +109,15 @@ function MastermindGame({ level, onHud, onFinish }) {
   }
 
   const canSubmit = phase === "playing" && current.every(c => c !== null);
-  const dotSize = positions <= 4 ? 44 : 36;
+  const dotSize = 44;
 
   return (
-    React.createElement("div", { className: "col", style: { flex: 1, gap: 12, alignItems: "center" } },
+    React.createElement("div", { className: "col", style: { flex: 1, gap: 14, alignItems: "center" } },
 
       // Header
       React.createElement("div", { className: "row", style: { justifyContent: "space-between", width: "100%" } },
         React.createElement("span", { className: "prompt__instruction" },
-          `Essai ${Math.min(attemptNum, maxTries)} / ${maxTries}`
+          `Essai ${Math.min(history.length + 1, maxTries)} / ${maxTries}`
         ),
         React.createElement("span", { className: "prompt__instruction" },
           `${positions} positions · ${numColors} couleurs`
@@ -170,128 +125,119 @@ function MastermindGame({ level, onHud, onFinish }) {
       ),
 
       // History
-      React.createElement("div", {
-        style: {
-          width: "100%",
-          display: "flex", flexDirection: "column", gap: 6,
-          minHeight: 60
-        }
+      history.length > 0 && React.createElement("div", {
+        style: { width: "100%", display: "flex", flexDirection: "column", gap: 6 }
       },
         history.map((entry, hi) =>
           React.createElement("div", {
             key: hi,
             style: {
-              display: "flex", alignItems: "center", gap: 12,
-              padding: "8px 12px",
+              display: "flex", alignItems: "center", gap: 10,
+              padding: "7px 12px",
               background: "var(--char-2)",
               borderRadius: 10,
               border: "1px solid var(--line-dim)"
             }
           },
             React.createElement("span", {
-              style: {
-                fontFamily: "var(--font-mono)", fontSize: 11,
-                color: "var(--bone)", minWidth: 20
-              }
+              style: { fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--bone)", minWidth: 18 }
             }, `${hi + 1}.`),
             React.createElement("div", { style: { display: "flex", gap: 6 } },
               entry.guess.map((ci, pi) =>
-                React.createElement(ColorDot, { key: pi, colorIdx: ci, size: 28 })
+                React.createElement("div", {
+                  key: pi,
+                  style: {
+                    width: 26, height: 26, borderRadius: "50%",
+                    background: COLORS[ci].hex,
+                    boxShadow: `0 0 6px ${COLORS[ci].hex}55`
+                  }
+                })
               )
             ),
             React.createElement("div", { style: { marginLeft: "auto" } },
               React.createElement(PegDots, { black: entry.black, white: entry.white, total: positions })
             ),
             React.createElement("span", {
-              style: {
-                fontFamily: "var(--font-mono)", fontSize: 11,
-                color: "var(--pearl)", minWidth: 50
-              }
+              style: { fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--pearl)", minWidth: 48 }
             },
-              entry.black > 0 || entry.white > 0
-                ? `${entry.black}⬛ ${entry.white}⬜`
-                : "—"
+              entry.black > 0 || entry.white > 0 ? `${entry.black}⬛ ${entry.white}⬜` : "—"
             )
           )
         )
       ),
 
-      // Divider
-      history.length > 0 && React.createElement("div", {
-        style: { width: "100%", height: 1, background: "var(--line-dim)" }
-      }),
-
-      // Current guess row
-      phase === "playing" && React.createElement("div", {
-        style: {
-          display: "flex", alignItems: "center", gap: 10,
-          padding: "12px 16px",
-          background: "var(--char-2)",
-          borderRadius: 12,
-          border: "1px solid var(--gold-soft)"
-        }
-      },
-        React.createElement("div", { style: { display: "flex", gap: 8 } },
-          current.map((ci, pi) =>
-            React.createElement(ColorDot, {
-              key: pi,
-              colorIdx: ci,
-              size: dotSize,
-              onClick: () => cycleColor(pi)
-            })
-          )
-        ),
-        React.createElement("button", {
-          className: "k-btn k-btn--brand k-btn--sm",
-          onClick: submit,
-          disabled: !canSubmit,
-          style: {
-            marginLeft: 12,
-            opacity: canSubmit ? 1 : 0.4,
-            cursor: canSubmit ? "pointer" : "default"
-          }
-        }, "Valider")
-      ),
-
-      // Color legend
-      React.createElement("div", {
-        style: {
-          display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center",
-          marginTop: 4
-        }
-      },
-        palette.map((c, i) =>
-          React.createElement("div", { key: i, style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 3 } },
-            React.createElement("div", {
+      // Palette selector
+      React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 8 } },
+        React.createElement("span", {
+          style: { fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--bone)" }
+        }, "1. Choisis une couleur"),
+        React.createElement("div", { style: { display: "flex", gap: 10 } },
+          palette.map((c, i) =>
+            React.createElement("button", {
+              key: i,
+              onClick: () => setSelected(i),
               style: {
-                width: 16, height: 16, borderRadius: "50%",
+                width: 40, height: 40, borderRadius: "50%",
                 background: c.hex,
-                boxShadow: `0 0 6px ${c.hex}66`
+                border: selected === i ? "3px solid var(--pearl)" : "3px solid transparent",
+                boxShadow: selected === i ? `0 0 14px ${c.hex}` : `0 0 6px ${c.hex}55`,
+                cursor: "pointer",
+                transform: selected === i ? "scale(1.18)" : "scale(1)",
+                transition: "all 0.15s"
               }
-            }),
-            React.createElement("span", {
-              style: { fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--bone)" }
-            }, i + 1)
+            })
           )
         )
       ),
 
-      // Hint
-      React.createElement("div", {
-        style: {
-          fontFamily: "var(--font-mono)", fontSize: 11,
-          color: "var(--bone)", textAlign: "center", lineHeight: 1.6
-        }
-      }, "Cliquez sur un cercle pour changer la couleur · ⬛ bonne position · ⬜ bonne couleur"),
+      // Current guess row
+      phase === "playing" && React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: 8 } },
+        React.createElement("span", {
+          style: { fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--bone)" }
+        }, "2. Place tes gemmes · clic droit pour effacer"),
+        React.createElement("div", {
+          style: {
+            display: "flex", alignItems: "center", gap: 10,
+            padding: "12px 16px",
+            background: "var(--char-2)",
+            borderRadius: 12,
+            border: "1px solid var(--gold-soft)"
+          }
+        },
+          React.createElement("div", { style: { display: "flex", gap: 10 } },
+            current.map((ci, pi) =>
+              React.createElement("button", {
+                key: pi,
+                onClick: () => placeColor(pi),
+                onContextMenu: (e) => { e.preventDefault(); clearPos(pi); },
+                style: {
+                  width: dotSize, height: dotSize, borderRadius: "50%",
+                  background: ci !== null ? COLORS[ci].hex : "var(--char-2)",
+                  border: ci !== null ? `2px solid ${COLORS[ci].hex}` : "2px dashed var(--line)",
+                  cursor: "pointer",
+                  boxShadow: ci !== null ? `0 0 10px ${COLORS[ci].hex}66` : "none",
+                  transition: "all 0.15s"
+                }
+              })
+            )
+          ),
+          React.createElement("button", {
+            className: "k-btn k-btn--brand k-btn--sm",
+            onClick: submit,
+            disabled: !canSubmit,
+            style: { marginLeft: 8, opacity: canSubmit ? 1 : 0.4, cursor: canSubmit ? "pointer" : "default" }
+          }, "Valider")
+        )
+      ),
 
-      // Outcome overlay
+      // Légende
+      React.createElement("div", {
+        style: { fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--bone)", textAlign: "center", lineHeight: 1.6 }
+      }, "⬛ bonne position · ⬜ bonne couleur, mauvaise position"),
+
+      // Outcome
       (phase === "won" || phase === "lost") && React.createElement("div", {
-        style: {
-          marginTop: 8,
-          padding: "12px 24px",
-          borderRadius: 12,
-          textAlign: "center"
-        }
+        style: { marginTop: 8, padding: "12px 24px", borderRadius: 12, textAlign: "center" }
       },
         React.createElement("div", { className: `feedback ${phase === "won" ? "ok" : "ko"}` },
           phase === "won"
