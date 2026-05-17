@@ -2,10 +2,23 @@
 
 const MaisonPage = ({ data, isAdmin, onUpdateData, user }) => {
   const [adminLocalReveal, setAdminLocalReveal] = React.useState(false);
-  const revealed = data.infosRevealed || (isAdmin && adminLocalReveal);
+  const [userRevealed, setUserRevealed] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!user) return;
+    const sb = window.__supabase;
+    if (!sb) return;
+    sb.from("user_codes").select("code_index").eq("user_id", user.id)
+      .then(({ data: rows }) => {
+        if (rows && rows.length >= 20) setUserRevealed(true);
+      })
+      .catch(() => {});
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const revealed = data.infosRevealed || userRevealed || (isAdmin && adminLocalReveal);
 
   const handleSeal = () => {
-    if (adminLocalReveal && !data.infosRevealed) {
+    if (adminLocalReveal && !data.infosRevealed && !userRevealed) {
       setAdminLocalReveal(false);
     } else {
       onUpdateData({ ...data, infosRevealed: false });
@@ -22,7 +35,7 @@ const MaisonPage = ({ data, isAdmin, onUpdateData, user }) => {
             isAdmin,
             revealCodes: data.revealCodes,
             onAdminReveal: () => setAdminLocalReveal(true),
-            onGlobalReveal: () => onUpdateData({ ...data, infosRevealed: true }),
+            onReveal: () => setUserRevealed(true),
             user,
           }),
       React.createElement(Divider, null),
@@ -141,7 +154,7 @@ const levenshtein = (a, b) => {
 const romans = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX"];
 
 /* ---------- SEALED ---------- */
-const InfosSealed = ({ isAdmin, onAdminReveal, onGlobalReveal, revealCodes, user }) => {
+const InfosSealed = ({ isAdmin, onAdminReveal, onReveal, revealCodes, user }) => {
   const codes = revealCodes || Array(20).fill("");
   const [tick, setTick]           = React.useState(0);
   const [inputs, setInputs]       = React.useState(Array(20).fill(""));
@@ -225,7 +238,7 @@ const InfosSealed = ({ isAdmin, onAdminReveal, onGlobalReveal, revealCodes, user
       }
     }
 
-    if (r.every(s => s === "correct")) onGlobalReveal();
+    if (r.every(s => s === "correct")) onReveal();
   };
 
   const allCorrect = submitted && results.every(s => s === "correct");
