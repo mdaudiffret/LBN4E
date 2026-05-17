@@ -1,23 +1,35 @@
 /* global React */
 
-const MaisonPage = ({ data, isAdmin, onUpdateData, user }) => (
-  React.createElement("div", { className: "page" },
+const MaisonPage = ({ data, isAdmin, onUpdateData, user }) => {
+  const [adminLocalReveal, setAdminLocalReveal] = React.useState(false);
+  const revealed = data.infosRevealed || (isAdmin && adminLocalReveal);
+
+  const handleSeal = () => {
+    if (adminLocalReveal && !data.infosRevealed) {
+      setAdminLocalReveal(false);
+    } else {
+      onUpdateData({ ...data, infosRevealed: false });
+    }
+  };
+
+  return React.createElement("div", { className: "page" },
     React.createElement("div", { className: "shell" },
       React.createElement(Hero, { data }),
       React.createElement(Divider, null),
-      data.infosRevealed
-        ? React.createElement(InfosRevealed, { data, isAdmin, onUpdateData })
+      revealed
+        ? React.createElement(InfosRevealed, { data, isAdmin, onSeal: handleSeal })
         : React.createElement(InfosSealed, {
             isAdmin,
             revealCodes: data.revealCodes,
-            onReveal: () => onUpdateData({ ...data, infosRevealed: true }),
+            onAdminReveal: () => setAdminLocalReveal(true),
+            onGlobalReveal: () => onUpdateData({ ...data, infosRevealed: true }),
             user,
           }),
       React.createElement(Divider, null),
       React.createElement(Leaderboard, { adminPseudos: data.adminPseudos || (data.adminPseudo ? [data.adminPseudo] : []) })
     )
-  )
-);
+  );
+};
 
 const Hero = ({ data }) => (
   React.createElement("section", { style: { paddingTop: 24, position: "relative", overflow: "hidden" } },
@@ -129,7 +141,7 @@ const levenshtein = (a, b) => {
 const romans = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX"];
 
 /* ---------- SEALED ---------- */
-const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
+const InfosSealed = ({ isAdmin, onAdminReveal, onGlobalReveal, revealCodes, user }) => {
   const codes = revealCodes || Array(20).fill("");
   const [tick, setTick]           = React.useState(0);
   const [inputs, setInputs]       = React.useState(Array(20).fill(""));
@@ -213,7 +225,7 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
       }
     }
 
-    if (r.every(s => s === "correct")) onReveal();
+    if (r.every(s => s === "correct")) onGlobalReveal();
   };
 
   const allCorrect = submitted && results.every(s => s === "correct");
@@ -379,7 +391,7 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
         isAdmin && React.createElement("button", {
           className: "btn btn--ghost",
           style: { marginTop: 12, fontSize: 10 },
-          onClick: onReveal,
+          onClick: onAdminReveal,
         }, "↺ Rompre sans codes (admin)")
       )
     )
@@ -387,8 +399,7 @@ const InfosSealed = ({ isAdmin, onReveal, revealCodes, user }) => {
 };
 
 /* ---------- REVEALED ---------- */
-const InfosRevealed = ({ data, isAdmin, onUpdateData }) => {
-  const seal = () => onUpdateData({ ...data, infosRevealed: false });
+const InfosRevealed = ({ data, isAdmin, onSeal }) => {
 
   return (
     React.createElement("section", null,
@@ -574,7 +585,7 @@ const InfosRevealed = ({ data, isAdmin, onUpdateData }) => {
       ),
 
       isAdmin && React.createElement("div", { style: { marginTop: 32 } },
-        React.createElement("button", { className: "btn btn--ghost", onClick: seal },
+        React.createElement("button", { className: "btn btn--ghost", onClick: onSeal },
           "↺ Re-sceller (admin)"
         )
       )
