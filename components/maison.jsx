@@ -1,23 +1,40 @@
 /* global React */
 
-const MaisonPage = ({ data, isAdmin, onUpdateData, user }) => (
-  React.createElement("div", { className: "page" },
+const MaisonPage = ({ data, isAdmin, onUpdateData, user }) => {
+  const [userRevealed, setUserRevealed] = React.useState(false);
+
+  // Check if current user has already found all 20 codes (per-user reveal state)
+  React.useEffect(() => {
+    if (!user) return;
+    const sb = window.__supabase;
+    if (!sb) return;
+    sb.from("user_codes").select("code_index").eq("user_id", user.id)
+      .then(({ data: rows }) => {
+        if (rows && rows.length >= 20) setUserRevealed(true);
+      })
+      .catch(() => {});
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Admin global override OR this specific user has unlocked
+  const isRevealed = data.infosRevealed || userRevealed;
+
+  return React.createElement("div", { className: "page" },
     React.createElement("div", { className: "shell" },
       React.createElement(Hero, { data }),
       React.createElement(Divider, null),
-      data.infosRevealed
+      isRevealed
         ? React.createElement(InfosRevealed, { data, isAdmin, onUpdateData })
         : React.createElement(InfosSealed, {
             isAdmin,
             revealCodes: data.revealCodes,
-            onReveal: () => onUpdateData({ ...data, infosRevealed: true }),
+            onReveal: () => setUserRevealed(true),
             user,
           }),
       React.createElement(Divider, null),
       React.createElement(Leaderboard, { adminPseudos: data.adminPseudos || (data.adminPseudo ? [data.adminPseudo] : []) })
     )
-  )
-);
+  );
+};
 
 const Hero = ({ data }) => (
   React.createElement("section", { style: { paddingTop: 24, position: "relative", overflow: "hidden" } },
