@@ -39,7 +39,7 @@ const MaisonPage = ({ data, isAdmin, onUpdateData, user }) => {
             user,
           }),
       React.createElement(Divider, null),
-      React.createElement(Leaderboard, { adminPseudos: data.adminPseudos || (data.adminPseudo ? [data.adminPseudo] : []) })
+      React.createElement(Leaderboard, { adminPseudos: data.adminPseudos || (data.adminPseudo ? [data.adminPseudo] : []), isAdmin })
     )
   );
 };
@@ -607,7 +607,7 @@ const InfosRevealed = ({ data, isAdmin, onSeal }) => {
 };
 
 /* ── Leaderboard ─────────────────────────────────────────────── */
-const Leaderboard = ({ adminPseudos }) => {
+const Leaderboard = ({ adminPseudos, isAdmin }) => {
   const [rows, setRows] = React.useState(null);
 
   React.useEffect(() => {
@@ -628,7 +628,7 @@ const Leaderboard = ({ adminPseudos }) => {
         (a.data || []).forEach(r => { attempts[r.user_id] = (attempts[r.user_id] || 0) + 1; });
         const list = users
           .map(p => ({ ...p, count: counts[p.id] || 0, attempts: attempts[p.id] || 0 }))
-          .sort((a, b) => b.count - a.count || a.pseudo.localeCompare(b.pseudo));
+          .sort((a, b) => b.count - a.count || a.attempts - b.attempts || a.pseudo.localeCompare(b.pseudo));
         setRows(list);
       }, () => setRows([]));
 
@@ -666,7 +666,7 @@ const Leaderboard = ({ adminPseudos }) => {
           })
         ),
         React.createElement("span", { className: "lb-count" }, `${row.count}/20`),
-        row.attempts > 0 && React.createElement("span", {
+        isAdmin && row.attempts > 0 && React.createElement("span", {
           className: "lb-attempts",
           title: "Nombre de tentatives",
         }, `${row.attempts} tentative${row.attempts > 1 ? "s" : ""}`)
