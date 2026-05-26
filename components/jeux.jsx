@@ -532,7 +532,7 @@ function JeuxPlayView({ game, onClose, indices, unlockIndice, jeuxIndices, isAdm
 // ── Leaderboard ───────────────────────────────────────────────────
 const MEDALS = ["⚜", "✦", "◆"];
 
-function JeuxLeaderboard({ currentUserId, adminPseudos }) {
+function JeuxLeaderboard({ currentUserId, adminPseudos, isAdmin }) {
   const [board, setBoard]       = React.useState([]);
   const [expanded, setExpanded] = React.useState(true);
 
@@ -547,7 +547,7 @@ function JeuxLeaderboard({ currentUserId, adminPseudos }) {
     const counts = {};
     allIdx.forEach(r => { counts[r.user_id] = (counts[r.user_id] || 0) + 1; });
     const ranked = allUsers
-      .filter(u => !(adminPseudos || []).map(p => p.toLowerCase()).includes(u.pseudo.toLowerCase()))
+      .filter(u => isAdmin || !(adminPseudos || []).map(p => p.toLowerCase()).includes(u.pseudo.toLowerCase()))
       .map(u => ({ id: u.id, pseudo: u.pseudo, count: counts[u.id] || 0 }))
       .sort((a, b) => b.count - a.count || a.pseudo.localeCompare(b.pseudo));
     setBoard(ranked);
@@ -685,7 +685,7 @@ function JeuxPage({ data, user, onLogout, isAdmin, onUpdateData }) {
         </div>
 
         {/* Leaderboard temps réel */}
-        <JeuxLeaderboard currentUserId={user?.id} adminPseudos={data.adminPseudos || (data.adminPseudo ? [data.adminPseudo] : [])} />
+        <JeuxLeaderboard currentUserId={user?.id} adminPseudos={data.adminPseudos || (data.adminPseudo ? [data.adminPseudo] : [])} isAdmin={isAdmin} />
 
         {/* Category filter */}
         <div className="jeux-filter-row">
